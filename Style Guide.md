@@ -38,5 +38,8 @@ end_draw_back_ground:
 	ret
 ```
 
-# Ecalls
-- 
+# Nome de branch
+Criar branch separada para cada tópico, manter a branch main sempre rodando no RARS  
+Ex:  
+feat/<nome-da-feature>
+fix/<nome-do-fix>

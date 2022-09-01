@@ -3,7 +3,7 @@
 #################################################
 INIT_VIDEO:
   # Setting current view frame
-  li t0, 0xFF200604 # current frame address
+  li t0, CURRENT_DISPLAY_FRAME_ADRESS
   # Force start on frame 0
   sw zero,0(t0)
 
@@ -19,7 +19,7 @@ INIT_VIDEO:
 #########################################################
 SWAP_FRAMES:
 	# Swap current view frame
-  li t0, 0xFF200604 # current frame number (0 or 1)
+  li t0, CURRENT_DISPLAY_FRAME_ADRESS 
   lw t1, 0(t0)
 	xori t2,t1,1
 	sw t2,0(t0)
@@ -83,7 +83,7 @@ RENDER_TILE:
   li t5, NUMBER_OF_TILES_IN_IMAGE
   slli t5, t5, 4
   
-draw_line:
+draw_line_render_tile:
 	lw t6,0(a0)			        # carrega em t6 uma word (4 pixeis) da imagem
 	sw t6,0(t0)		        	# imprime no bitmap a word (4 pixeis) da imagem
 		
@@ -91,7 +91,7 @@ draw_line:
 	addi a0,a0,4			      # incrementa endereco da imagem
 		
 	addi t2,t2,4			      # incrementa contador de coluna
-	blt t2,t4, draw_line		# se contador da coluna < largura, continue imprimindo
+	blt t2,t4, draw_line_render_tile	# se contador da coluna < largura, continue imprimindo
 
   # isso serve pra "pular" de linha no bitmap display e na imagem
 	addi t0,t0, SCREEN_SIZE # t0 += 320
@@ -101,6 +101,6 @@ draw_line:
 		
 	li t2, 0			          # zera (contador de coluna)
 	addi t3,t3,1			      # incrementa contador de linha
-	bgt t4, t3, draw_line		# se altura > contador de linha, continue imprimindo
+	bgt t4, t3, draw_line_render_tile		# se altura > contador de linha, continue imprimindo
 		
-	ret				        # retorna
+	ret				              # retorna
