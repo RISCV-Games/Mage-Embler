@@ -1,6 +1,6 @@
-.include "data.s"
-.include "consts.s"
-.include "macros.s"
+.include "../src/data.s"
+.include "../src/consts.s"
+.include "../src/macros.s"
 
 .text
   jal INIT_VIDEO
@@ -25,4 +25,4 @@ GAME:
   j GAME
 
 
-.include "video.s"
+.include "../src/video.s"
