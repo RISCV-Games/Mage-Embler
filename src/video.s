@@ -104,3 +104,74 @@ draw_line_render_tile:
 	bgt t4, t3, draw_line_render_tile		# se altura > contador de linha, continue imprimindo
 		
 	ret				              # retorna
+
+#########################################################
+#	Desenha uma imagem na tela desenha                    #
+# sempre uma imagem toda                                #
+#########################################################
+# a0 = endereço para a imagem                           #
+# a1 = X  real of screen                                #
+# a2 = Y  real of screen                                #
+# a3 = width of image                                   #
+# a4 = height of image                                  #
+# a5 = reverse (if 1 reverse image)                     # 
+#########################################################
+RENDER:
+# Render baseado em tiles 16x16
+  # Calculando posicao na tela para print
+  GET_BUFFER_TO_DRAW(t0)
+  add t0, t0, a1 # Adciona X
+
+  li t1, SCREEN_SIZE
+  mul t1, t1, a2 # y x 320
+  add t0, t0, t1 # Adiciona y
+
+  # Setting counter to zero
+  li t2, 0 # Contador de coluna
+  li t3, 0 # Contador de linha
+
+  bne a5, zero, rev_render
+
+draw_line_render:
+	lb t6,0(a0)			                    # carrega em t6 um byte da imagem
+	sb t6,0(t0)		        	            # imprime no bitmap byte da imagem
+		
+	addi t0,t0,1			                  # incrementa endereco do bitmap
+	addi a0,a0,1			                  # incrementa endereco da imagem
+		
+	addi t2,t2,1			                  # incrementa contador de coluna
+	blt t2,a3,draw_line_render          # se contador da coluna < largura, continue imprimindo
+
+  # isso serve pra "pular" de linha no bitmap display e na imagem
+	addi t0,t0, SCREEN_SIZE # t0 += 320
+	sub t0,t0,a3			                  # t0 -= largura da tile
+		
+	li t2, 0			                      # zera (contador de coluna)
+	addi t3,t3,1			                  # incrementa contador de linha
+	bgt a4, t3, draw_line_render        # se altura > contador de linha, continue imprimindo
+		
+	ret				              # retorna
+
+rev_render:
+  addi t4, a3, -1                  # Width - 1
+  add t0, t0, t4                   # Image inicio +  width - 1
+
+rev_draw_line_render:
+	lb t6,0(a0)			                 # carrega em t6 um byte da imagem
+	sb t6,0(t0)			                 # imprime no bitmap o byte da imagem
+		
+	addi t0,t0, -1			             # incrementa endereco do bitmap
+	addi a0,a0, 1			               # incrementa endereco da imagem
+		
+	addi t2,t2,1			               # incrementa contador de coluna
+	blt t2,a3, rev_draw_line_render	 # se contador da coluna < largura, continue imprimindo
+
+	addi t0,t0,320			             # t0 += 320
+	add t0,t0,a3			               # t0 -= largura da imagem
+	# ^ isso serve pra "pular" de linha no bitmap display
+		
+  li t2, 0
+	addi t3,t3,1			                # incrementa contador de linha
+	bgt a4,t3, rev_draw_line_render		# se altura > contador de linha, continue imprimindo
+		
+	ret				# retorna
