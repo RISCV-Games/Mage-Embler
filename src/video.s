@@ -180,11 +180,12 @@ rev_draw_line_render:
 ######################################################################
 #	Anima uma imagem com informações estão guardadas                   
 # na memória começando no endereço em a1.                            
-# Formato do a1 (WORD): tamanho, 0, 0, anim1..., animN                  
+# Formato do a1 (WORD): tamanho, i, MIN_WORD, anim1..., animN                  
 # cada animN representa um numero da tile a ser desenhada.
-# O primeiro zero representa o indice da tile atual sendo desenhada.
-# O segundo zero representa o tempo em que a ultima tile foi
-# desenhada, em millisegundos.
+# "tamanho" indica quantos frames a animaçao possui.
+# "i" eh um numero que satisfas 0 <= i < tamanho e indica a partir
+# de qual frame a animacao comecara (geralmente i eh 0).
+# Exemplos de como usar a funcao: anim_test.s, cursor_test.s
 ######################################################################
 # a0 = endereço da imagem com tiles
 # a1 = informações da animação
