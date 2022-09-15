@@ -10,6 +10,7 @@ DRAW_CURSOR:
 	la t0, CURSOR_POS
 	lbu a2, 0(t0)
 	lbu a3, 1(t0)
+	li a4, CURSOR_ANIM_DELAY
 	jal DRAW_ANIMATION_TILE
 
 	lw ra, 0(sp)

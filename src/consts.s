@@ -11,3 +11,6 @@
 .eqv CURSOR_NUM1 1 # tile number of second frame of cursor animation
 .eqv SCREEN_CENTER_X 9
 .eqv SCREEN_CENTER_Y 7
+.eqv MAX_WORD 0xFFFFFFFF
+.eqv MIN_WORD 0x10000000
+.eqv CURSOR_ANIM_DELAY 100 # time between each frame of cursor animation

@@ -178,21 +178,47 @@ rev_draw_line_render:
 
 
 ######################################################################
-#	Anima uma imagem com informações estão guardadas                   #
-# na memória começando no endereço em a1.                            #
-# Formato do a1 (WORD): tamanho, 0, anim1..., animN                  #
-# cada animN representa um numero da tile a ser desenhada            #
+#	Anima uma imagem com informações estão guardadas                   
+# na memória começando no endereço em a1.                            
+# Formato do a1 (WORD): tamanho, 0, 0, anim1..., animN                  
+# cada animN representa um numero da tile a ser desenhada.
+# O primeiro zero representa o indice da tile atual sendo desenhada.
+# O segundo zero representa o tempo em que a ultima tile foi
+# desenhada, em millisegundos.
 ######################################################################
 # a0 = endereço da imagem com tiles
 # a1 = informações da animação
 # a2 = X
 # a3 = Y
+# a4 = tempo entre frames (ms)
 ######################################################################
 DRAW_ANIMATION_TILE:
 	# save ra
 	addi sp, sp, -4
 	sw ra, 0(sp)
 
+	# if time passed is less than a4, dont animate
+	csrr t0, time
+	lw t1, 8(a1)
+	#andi t1, t1, 0x111111
+	#andi t0, t0, 0x111111
+	sub t0, t0, t1
+	bgeu t0, a4, continue_draw_animation
+
+	# t1 = (t1 + tamanho - 1) % tamanho
+	lw t0, 0(a1)
+	lw t1, 4(a1)
+	add t1, t0, t1
+	addi t1, t1, -1
+	rem t1, t1, t0 
+	sw t1, 4(a1)
+	j skip_draw_animation
+
+continue_draw_animation:	
+	csrr t0, time
+	sw t0, 8(a1)
+
+skip_draw_animation:
 	# t0 = tamanho, t1 = i
 	lw t0, 0(a1)
 	lw t1, 4(a1)
@@ -205,7 +231,7 @@ DRAW_ANIMATION_TILE:
 	# t1 = number of current tile
 	slli t1, t1, 2
 	add t1, a1, t1
-	lw t1, 8(t1)
+	lw t1, 12(t1)
 
 	# draw the tile
 	mv a1, a2
@@ -213,6 +239,7 @@ DRAW_ANIMATION_TILE:
 	mv a3, t1
 	jal RENDER_TILE
 
+ret_draw_animation:
 	# restore stack and return
 	lw ra, 0(sp)
 	addi sp, sp, 4
