@@ -201,8 +201,6 @@ DRAW_ANIMATION_TILE:
 	# if time passed is less than a4, dont animate
 	csrr t0, time
 	lw t1, 8(a1)
-	andi t1, t1, 0x111111
-	andi t0, t0, 0x111111
 	sub t0, t0, t1
 	bgeu t0, a4, continue_draw_animation
 
