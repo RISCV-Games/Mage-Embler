@@ -175,3 +175,45 @@ rev_draw_line_render:
 	bgt a4,t3, rev_draw_line_render		# se altura > contador de linha, continue imprimindo
 		
 	ret				# retorna
+
+
+######################################################################
+#	Anima uma imagem com informações estão guardadas                   #
+# na memória começando no endereço em a1.                            #
+# Formato do a1 (WORD): tamanho, 0, anim1..., animN                  #
+# cada animN representa um numero da tile a ser desenhada            #
+######################################################################
+# a0 = endereço da imagem com tiles
+# a1 = informações da animação
+# a2 = X
+# a3 = Y
+######################################################################
+DRAW_ANIMATION_TILE:
+  # save ra
+  addi sp, sp, -4
+  sw ra, 0(sp)
+
+  # t0 = tamanho, t1 = i
+  lw t0, 0(a1)
+  lw t1, 4(a1)
+
+  # t2 = (i + 1) % tamanho
+  addi t2, t1, 1
+  rem t2, t2, t0
+  sw t2, 4(a1)
+
+  # t1 = number of current tile
+  slli t1, t1, 2
+  add t1, a1, t1
+  lw t1, 8(t1)
+
+  # draw the tile
+  mv a1, a2
+  mv a2, a3
+  mv a3, t1
+  jal RENDER_TILE
+
+  # restore stack and return
+  lw ra, 0(sp)
+  addi sp, sp, 4
+  ret
