@@ -15,7 +15,7 @@ V  - Victor
 - [E] Animacao cursor
 - [E] Movimentacao do jogador 
 - [R] Animacao do jogador (Mundo)
-- [E] Audio
+- [X] Audio
 - [ ] Menus
 - [ ] Modo de batalha
 - [ ] Sistema de dialogos
