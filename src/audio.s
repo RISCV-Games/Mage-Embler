@@ -5,7 +5,7 @@
 # tamanho, i, MIN_WORD, notas/duracoes
 ##################################################
 # a0 = endereco da lista com informacoes do audio
-# no formato explicado acima
+# no formato explicado acima (ver audio_test.s para um exemplo)
 # a1 = instrumento
 # a2 = volume
 ##################################################
