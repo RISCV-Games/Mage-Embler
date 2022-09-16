@@ -40,17 +40,17 @@ playAudio:
 	csrr t0, time
 	sw t0, 8(a0)
 
-	# t0 = nota, t1 = duracao, t2 = i + 1
-	lw t0, 4(a0)
+	# t0 = nota, t1 = duracao, t2 = (i + 1) % tamanho
+	lw t2, 4(a0)
+	slli t1, t2, 3
+	add t1, t1, a0
+	lw t0, 12(t1)
+	lw t1, 16(t1)
 	addi t2, t2, 1
-	slli t0, t0, 3
-	add t0, t0, a0
-	addi t0, t0, 12
-	addi t1, t0, 4
-
-	# increment i
 	lw t3, 0(a0)
 	rem t2, t2, t3
+
+	# save incremented value of i
 	sw t2, 4(a0)
 
 	# play sound
@@ -60,7 +60,7 @@ playAudio:
 	mv a2, a1
 	mv a1, t1
 	li a7, 33
-	jal AUDIO_TEST
+	ecall
 
 	lw ra, 0(sp)
 	addi sp, sp, 4
