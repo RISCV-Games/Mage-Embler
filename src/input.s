@@ -9,7 +9,6 @@
 # Caso keyCode nao seja uma das letras acima retorna
 # GET_DIR_EXCEPTION no a0.
 #####################################################
-#####################################################
 # a0 = keyCode
 #####################################################
 GET_DIR_FROM_KEY:
@@ -38,4 +37,35 @@ notS_get_dir_from_key:
 	ret
 notD_get_dir_from_key:
 	li a0, GET_DIR_EXCEPTION
+	ret
+
+#######################################################
+# Movimenta o cursor de acordo com a tecla pressionada.
+#######################################################
+# a0 = keyCode
+#####################################################
+MOVE_CURSOR:
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	# (a0, a1) = (deltaX, deltaY)
+	jal GET_DIR_FROM_KEY
+
+	# (t1, t2) = (x, y)
+	la t0, CURSOR_POS
+	lb t1, 0(t0)
+	lb t2, 1(t0)
+
+	# (t1, t2) = (x + deltaX, y + deltaY)
+	add t1, t1, a0
+	add t2, t2, a1
+
+	# (cursorX, cursorY) = (t1, t2)
+	sb t1, 0(t0)
+	sb t2, 0(t0)
+
+
+	# return
+	lw ra, 0(sp)
+	addi sp, sp, 4
 	ret
