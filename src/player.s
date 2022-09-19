@@ -41,3 +41,12 @@ ret_draw_cursor_trail:
 	lw ra, 0(sp)
 	lw s0, 4(sp)
 	addi sp, sp, 8
+
+
+#####################################################
+# Monta e desenha o caminho feito pelo cursor na tela
+#####################################################
+# a0 = keyCode
+#####################################################
+MAKE_PATH:
+	
