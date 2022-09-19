@@ -16,6 +16,7 @@ V  - Victor
 - [E] Movimentacao do jogador 
 - [R] Animacao do jogador (Mundo)
 - [X] Audio
+- [ ] Adicionar .datas com músicas
 - [ ] Menus
 - [ ] Modo de batalha
 - [ ] Sistema de dialogos
