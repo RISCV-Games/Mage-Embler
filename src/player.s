@@ -31,7 +31,7 @@ is_body_draw_cursor_trail:
 	la a0, tiles
 	lb a1, 0(s0)
 	lb a2, 1(s0)
-	lb a3, t1
+	mv a3, t1
 	jal RENDER_TILE
 
 	addi s0, s0, 2
