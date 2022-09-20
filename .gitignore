@@ -2,3 +2,5 @@ bin/
 .vscode/
 *.png
 fpgrars.exe
+*.exe
+*.jar

@@ -50,6 +50,42 @@ end_draw_back_ground:
 	ret
 
 #########################################################
+#	Desenha um retangulo com a cor desejada             #
+#########################################################
+# a0 = cor                                              #
+# a1 = x                                                #
+# a2 = y                                                #
+# a3 = size_x                                           #
+# a4 = size_y                                           #
+#########################################################
+DRAW_RETANGULE:
+	GET_BUFFER_TO_DRAW(t0)
+
+	# calculating starting position
+	li t1, 320
+	mul t1, a2, t1
+	add t0, t0, t1
+	add t0, t0, a1
+
+	li t1, 0
+	li t2, 0
+
+draw_line_draw_rentangule:
+	sb a0, 0(t0)
+	addi t0, t0, 1
+	addi t1, t1, 1
+	blt t1, a3, draw_line_draw_rentangule 
+
+	li t1, 0
+	addi t2, t2, 1
+
+	addi t0, t0, 320
+	sub t0, t0, a3
+
+	bgt a4, t2, draw_line_draw_rentangule
+	ret
+
+#########################################################
 #	Desenha um tile na tela                               #
 #########################################################
 # a0 = endereço para a imagem                           #
@@ -276,7 +312,7 @@ naopulalinha_PRINT_STRING:
 
 fimloop_PRINT_STRING:	
   lw      ra, 0(sp)  	                    # recupera ra
-	lw 	    s0, 0(sp)		                    # recupera s0 original
+	lw 	    s0, 4(sp)		                    # recupera s0 original
   addi    sp, sp, 8		                    # libera espaco
 fimprintString:	
 

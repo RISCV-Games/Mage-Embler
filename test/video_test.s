@@ -6,8 +6,8 @@
 	jal INIT_VIDEO
 
 GAME:
-	li a0, 0x09090909
-	jal DRAW_BACKGROUND
+	#li a0, 0x09090909
+	#jal DRAW_BACKGROUND
 
 	la a0, tiles
 	li a1, 0
@@ -36,6 +36,14 @@ GAME:
 	li a4, 16
 	li a5, 1
 	jal RENDER
+
+
+	li a0, 0x09090909
+	li a1, 100
+	li a2, 100
+	li a3, 120
+	li a4, 120
+	jal DRAW_RETANGULE
 
 	jal SWAP_FRAMES
 	j GAME

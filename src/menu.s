@@ -1,16 +1,16 @@
-; #########################################################
-; #	Cria um menu a partir de opcoes dadas por strings     #
-; retornando a posicao selecionada 0 index                # 
-; #########################################################
-; # a0 = quantidade de opcoes                             #
-; # a1 = endereco das strings                             #
-; # a2 = cor das strings                                  #
-; # a3 = tamanho x do menu                                #
-; # a4 = tamanho y do menu                                #
-; # a5 = cor do menu                                      #
-; #########################################################
+#########################################################
+#	Cria um menu a partir de opcoes dadas por strings     #
+# retornando a posicao selecionada 0 index                # 
+#########################################################
+# a0 = quantidade de opcoes                             #
+# a1 = endereco das strings                             #
+# a2 = cor das strings                                  #
+# a3 = tamanho x do menu                                #
+# a4 = tamanho y do menu                                #
+# a5 = cor do menu                                      #
+#########################################################
 DRAW_MENU:
-  addi sp, sp, -28
+  addi sp, sp, -32
   sw ra, 0(sp)
   sw s0, 4(sp) # a0
   sw s1, 8(sp) # a1
@@ -18,6 +18,7 @@ DRAW_MENU:
   sw s3, 16(sp) # a3
   sw s4, 20(sp) # starting y 
   sw s5, 24(sp) # counter
+  sw s6, 28(sp) # starting x
 
   mv s0, a0
   mv s1, a1
@@ -29,11 +30,27 @@ DRAW_MENU:
   sub s4, a4, s4
   srai s4, s4, 1
 
+  # Drawing retangule
+  li a1, 320
+  li a2, 240
+
+  sub a1, a1, a3
+  sub a2, a2, a4
+
+  srai a1, a1, 1
+  srai a2, a2, 1
+
+  mv s6, a1
+  add s4, s4, a2
+
+  mv a0, a5
+
+  jal DRAW_RETANGULE
+
   li s5, 0 # counter
 
-
 drawstring_DRAW_MENU:
-  bge t5, s0, end_DRAW_MENU
+  bge s5, s0, end_DRAW_MENU
   
   # Getting string
   slli t1, s5, 2
@@ -43,8 +60,10 @@ drawstring_DRAW_MENU:
   # Caluculating string position on menu
   jal GET_STRING_SIZE # a1 = string size
 
+  slli a1, a1, 3
   sub a1, s3, a1
-  srai a1, a1, 2 # a1 = (x - string_size) / 2
+  srai a1, a1, 1 # a1 = (size_x - string_size) / 2
+  add a1, a1, s6
 
   mv a2, s4
   mv a3, s2
@@ -63,18 +82,19 @@ end_DRAW_MENU:
   lw s3, 16(sp) # a3
   lw s4, 20(sp) # starting y 
   lw s5, 24(sp) # counter
+  lw s6, 28(sp) # starting x
 
-  addi sp, sp, 28
+  addi sp, sp, 32
 
   ret
 
 
-; ###########################################################
-; #	Retorna o tamanho da string em a1, quebrando a convensao#
-; retornando a posicao selecionada 0 index                  # 
-; ########################################################  #
-; # a0 = endereco da string                               #
-; #########################################################
+###########################################################
+#	Retorna o tamanho da string em a1, quebrando a convensao#
+# retornando a posicao selecionada 0 index                  # 
+########################################################  #
+# a0 = endereco da string                               #
+#########################################################
 GET_STRING_SIZE:
   li t0, 0     # counter
   mv t1, a0
