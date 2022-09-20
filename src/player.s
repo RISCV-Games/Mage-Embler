@@ -41,6 +41,7 @@ ret_draw_cursor_trail:
 	lw ra, 0(sp)
 	lw s0, 4(sp)
 	addi sp, sp, 8
+	ret
 
 
 #####################################################
@@ -49,4 +50,75 @@ ret_draw_cursor_trail:
 # a0 = keyCode
 #####################################################
 MAKE_PATH:
-	
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	# movimenta cursor
+	# a funcao retorna 0 se e somente se cursor nao mexeu
+	jal MOVE_CURSOR
+
+	la t0, CURSOR_TRAIL
+	beq a0, zero, draw_trail_make_path
+	# if cursor moved then add position to trail
+
+loop_make_path:
+	lb t1, 0(t0)
+	li t2, -1
+	beq t1, t2, exit_loop_make_path
+
+	addi t0, t0, 2
+	j loop_make_path
+
+exit_loop_make_path:
+	# add new mouse pos to path
+	la t1, CURSOR_POS
+	lb t2, 0(t1)
+	lb t3, 1(t1)
+	li t4, -1
+	sb t2, 0(t0)
+	sb t3, 1(t0)
+	sb t4, 2(t0)
+
+draw_trail_make_path:
+	jal DRAW_CURSOR_TRAIL
+
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+
+#####################################################
+# Imprime o trail atual do cursor para debug.
+#####################################################
+PRINT_CURSOR_TRAIL:
+	la t0, CURSOR_TRAIL
+
+loop_print_cursor_trail:
+	li t1, -1
+	lb t2, 0(t0)
+
+	beq t2, t1, exit_print_cursor_trail
+
+	li a7, 1
+	mv a0, t2
+	ecall
+	li a7, 11
+	li a0, ' '
+	ecall
+	lb a0, 1(t0)
+	li a7, 1
+	ecall
+	li a0, '\n'
+	li a7, 11
+	ecall
+
+	addi t0, t0, 2
+	j loop_print_cursor_trail
+
+exit_print_cursor_trail:
+	li a0, -1
+	li a7, 1
+	ecall
+	li a0, '\n'
+	li a7, 11
+	ecall
+	ret
