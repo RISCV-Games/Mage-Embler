@@ -49,7 +49,7 @@ ret_draw_cursor_trail:
 #####################################################
 # a0 = keyCode
 #####################################################
-MAKE_PATH:
+MAKE_TRAIL:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 
@@ -58,19 +58,19 @@ MAKE_PATH:
 	jal MOVE_CURSOR
 
 	la t0, CURSOR_TRAIL
-	beq a0, zero, draw_trail_make_path
+	beq a0, zero, draw_trail_make_trail
 	# if cursor moved then add position to trail
 
-loop_make_path:
+loop_make_trail:
 	lb t1, 0(t0)
 	li t2, -1
-	beq t1, t2, exit_loop_make_path
+	beq t1, t2, exit_loop_make_trail
 
 	addi t0, t0, 2
-	j loop_make_path
+	j loop_make_trail
 
-exit_loop_make_path:
-	# add new mouse pos to path
+exit_loop_make_trail:
+	# add new mouse pos to trail
 	la t1, CURSOR_POS
 	lb t2, 0(t1)
 	lb t3, 1(t1)
@@ -79,7 +79,7 @@ exit_loop_make_path:
 	sb t3, 1(t0)
 	sb t4, 2(t0)
 
-draw_trail_make_path:
+draw_trail_make_trail:
 	jal DRAW_CURSOR_TRAIL
 
 	lw ra, 0(sp)

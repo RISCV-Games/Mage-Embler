@@ -18,12 +18,17 @@ DRAW_CURSOR:
 	ret
 
 #########################################################
-# Inicializa o path do cursor com um -1 no CURSOR_TRAIL
+# Inicializa o trail do cursor com sua posição inicial.
 #########################################################
-INIT_CURSOR_PATH:
-	li t0, -1
-	la t1, CURSOR_TRAIL
-	sb t0, 0(t1)
+INIT_CURSOR_TRAIL:
+	la t0, CURSOR_POS
+	lb t1, 0(t0)
+	lb t2, 1(t0)
+	li t3, -1
+	la t4, CURSOR_TRAIL
+	sb t1, 0(t4)
+	sb t2, 1(t4)
+	sb t3, 2(t4)
 	ret
 
 #######################################################
