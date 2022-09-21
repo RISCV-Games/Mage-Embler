@@ -50,7 +50,7 @@ end_draw_back_ground:
 	ret
 
 #########################################################
-#	Desenha um retangulo com a cor desejada             #
+#	Desenha um retangulo e preenche com a cor desejada  #
 #########################################################
 # a0 = cor                                              #
 # a1 = x                                                #
@@ -58,7 +58,7 @@ end_draw_back_ground:
 # a3 = size_x                                           #
 # a4 = size_y                                           #
 #########################################################
-DRAW_RETANGULE:
+DRAW_FILL_RETANGULE:
 	GET_BUFFER_TO_DRAW(t0)
 
 	# calculating starting position
@@ -70,11 +70,11 @@ DRAW_RETANGULE:
 	li t1, 0
 	li t2, 0
 
-draw_line_draw_rentangule:
+draw_line_draw_fill_retangule:
 	sb a0, 0(t0)
 	addi t0, t0, 1
 	addi t1, t1, 1
-	blt t1, a3, draw_line_draw_rentangule 
+	blt t1, a3, draw_line_draw_fill_retangule
 
 	li t1, 0
 	addi t2, t2, 1
@@ -82,7 +82,74 @@ draw_line_draw_rentangule:
 	addi t0, t0, 320
 	sub t0, t0, a3
 
-	bgt a4, t2, draw_line_draw_rentangule
+	bgt a4, t2, draw_line_draw_fill_retangule
+	ret
+
+#########################################################
+#	Desenha um retangulo e preenche com a cor desejada  #
+#########################################################
+# a0 = cor                                              #
+# a1 = x                                                #
+# a2 = y                                                #
+# a3 = size_x                                           #
+# a4 = size_y                                           #
+#########################################################
+DRAW_RETANGULE:
+	addi sp, sp -20
+	sw ra, 0(sp)
+	sw s0, 4(sp)
+	sw s1, 8(sp)
+	sw s2, 12(sp)
+	sw s4, 16(sp)
+
+	mv s0, a0
+	mv s1, a1
+	mv s2, a2
+	mv s3, a3
+	mv s4, a4
+
+	# Linha horizontal um
+	mv a0, s1
+	mv a1, s2
+	add a2, s1, s3
+	mv a3, s2
+	mv a4, s0
+	jal DRAW_LINE
+
+	# Linha horizontal 2
+	mv a0, s1
+	add a1, s2, s4
+	add a1, s2, s4
+	add a2, s1, s3
+	add a3, s2, s4
+	mv a4, s0
+	jal DRAW_LINE
+
+	# Linha vertical 1
+	mv a0, s1
+	mv a1, s2
+	mv a2, s1
+	add a3, s2, s4
+	mv a4, s0
+	jal DRAW_LINE
+
+	# Linha vertical 2
+	add a0, s1, s3
+	mv a1, s2
+	add a2, s1, s3
+	add a3, s2, s4
+	addi a3, a3, 1
+	mv a4, s0
+	jal DRAW_LINE
+
+	lw ra, 0(sp)
+	lw s0, 4(sp)
+	lw s1, 8(sp)
+	lw s2, 12(sp)
+	lw s4, 16(sp)
+	addi sp, sp 20
+
+
 	ret
 
 #########################################################
@@ -291,29 +358,29 @@ ret_draw_animation:
 #########################################################
 
 PRINT_STRING:	
-  addi	sp, sp, -8                        # aloca espaco
-  sw	ra, 0(sp)                           # salva ra
-  sw	s0, 4(sp)                           # salva s0
-  mv	s0, a0                              # s0 = endereco do caractere na string
+	addi	sp, sp, -8                        # aloca espaco
+	sw	ra, 0(sp)                           # salva ra
+  	sw	s0, 4(sp)                           # salva s0
+	mv	s0, a0                              # s0 = endereco do caractere na string
 
 loop_PRINT_STRING:
-  lb	a0, 0(s0)                           # le em a0 o caracter a ser impresso
-  beq     a0, zero, fimloop_PRINT_STRING  # string ASCIIZ termina com NULL
-  jal     PRINT_CHAR                      # imprime char
+	lb	a0, 0(s0)                           # le em a0 o caracter a ser impresso
+	beq     a0, zero, fimloop_PRINT_STRING  # string ASCIIZ termina com NULL
+	jal     PRINT_CHAR                      # imprime char
 	addi    a1, a1, 8                       # incrementa a coluna
 	li 	t6, 313		
 	blt	a1, t6, naopulalinha_PRINT_STRING   # se ainda tiver lugar na linha
-  addi    a2, a2, 8                       # incrementa a linha
-  mv    	a1, zero                        # volta a coluna zero
+	addi    a2, a2, 8                       # incrementa a linha
+	mv    	a1, zero                        # volta a coluna zero
 
 naopulalinha_PRINT_STRING:	
-  addi    s0, s0, 1                       # proximo caractere
-  j       loop_PRINT_STRING               # volta ao loop
+	addi    s0, s0, 1                       # proximo caractere
+	j       loop_PRINT_STRING               # volta ao loop
 
 fimloop_PRINT_STRING:	
-  lw      ra, 0(sp)  	                    # recupera ra
+	lw      ra, 0(sp)  	                    # recupera ra
 	lw 	    s0, 4(sp)		                    # recupera s0 original
-  addi    sp, sp, 8		                    # libera espaco
+	addi    sp, sp, 8		                    # libera espaco
 fimprintString:	
 
   ret      	    			                    # retorna
@@ -329,35 +396,35 @@ fimprintString:
 
 
 PRINT_CHAR:	
-  addi sp, sp, -8
-  sw s9, 0(sp)
-  sw s8, 4(sp)
+	addi sp, sp, -8
+	sw s9, 0(sp)
+	sw s8, 4(sp)
 
-  li t4, 0xFF                                      # t4 temporario
+	li t4, 0xFF                                      # t4 temporario
 	slli t4, t4, 8                                   # t4 = 0x0000FF00 (no RARS, nao podemos fazer diretamente "andi rd, rs1, 0xFF00")
 	and	t5, a3, t4                                   # t5 obtem cor de fundo
-  srli t5, t5, 8                                   # numero da cor de fundo
+	srli t5, t5, 8                                   # numero da cor de fundo
 	andi t6, a3, 0xFF                                # t6 obtem cor de frente
-
+	
 	li 	s8, ' '
 	blt a0, s8, naoimprimivel_PRINT_CHAR	           # ascii menor que 32 nao eh imprimivel
 	li 	s8, '~'
 	bgt	a0, s8, naoimprimivel_PRINT_CHAR	           # ascii Maior que 126  nao eh imprimivel
-  j imprimivel_PRINT_CHAR
+	j imprimivel_PRINT_CHAR
     
 naoimprimivel_PRINT_CHAR: 
-  li      a0, 32		                               # Imprime espaco
+  	li      a0, 32		                               # Imprime espaco
 
 imprimivel_PRINT_CHAR:	
-  li	s8, SCREEN_SIZE		                            # Num colunas 320
-  mul     t4, s8, a2			                          # multiplica a2x320  t4 = coordenada y
+	li	s8, SCREEN_SIZE		                            # Num colunas 320
+	mul     t4, s8, a2			                          # multiplica a2x320  t4 = coordenada y
 
-  add     t4, t4, a1                                # t4 = 320*y + x
-  addi    t4, t4, 7                                 # t4 = 320*y + (x+7)
-
-  GET_BUFFER_TO_DRAW(s8)
-
-  add     t4, t4, s8                                # t4 = endereco de impressao do ultimo pixel da primeira linha do char
+	add     t4, t4, a1                                # t4 = 320*y + x
+	addi    t4, t4, 7                                 # t4 = 320*y + (x+7)
+	
+	GET_BUFFER_TO_DRAW(s8)
+	
+	add     t4, t4, s8                                # t4 = endereco de impressao do ultimo pixel da primeira linha do char
 	addi    t2, a0, -32                               # indice do char na memoria
 	slli    t2, t2, 3                                 # offset em bytes em relacao ao endereco inicial
 	la      t3, LabelTabChar                          # endereco dos caracteres na memoria
@@ -366,61 +433,167 @@ imprimivel_PRINT_CHAR:
 	li 	    t0, 4				                              # i=4
 
 forchar1I_PRINT_CHAR:	
-  beq     t0, zero, endforchar1I_PRINT_CHAR         # if(i == 0) end for i
-  addi    t1, zero, 8               	              # j = 8
+  	beq     t0, zero, endforchar1I_PRINT_CHAR         # if(i == 0) end for i
+  	addi    t1, zero, 8               	              # j = 8
 
 forchar1J_PRINT_CHAR:	
-  beq     t1, zero, endforchar1J_PRINT_CHAR         # if(j == 0) end for j
-  andi    s9, t3, 0x001			                        # primeiro bit do caracter
-  srli    t3, t3, 1             		                # retira o primeiro bit
-  beq     s9, zero, printcharpixelbg1_PRINT_CHAR	  # pixel eh fundo?
-  sb      t6, 0(t4)             		                # imprime pixel com cor de frente
-  j       endcharpixel1_PRINT_CHAR
+	beq     t1, zero, endforchar1J_PRINT_CHAR         # if(j == 0) end for j
+	andi    s9, t3, 0x001			                        # primeiro bit do caracter
+	srli    t3, t3, 1             		                # retira o primeiro bit
+	beq     s9, zero, printcharpixelbg1_PRINT_CHAR	  # pixel eh fundo?
+	sb      t6, 0(t4)             		                # imprime pixel com cor de frente
+	j       endcharpixel1_PRINT_CHAR
 
 printcharpixelbg1_PRINT_CHAR:	
-  sb      t5, 0(t4)                                 # imprime pixel com cor de fundo
+  	sb      t5, 0(t4)                                 # imprime pixel com cor de fundo
 
 endcharpixel1_PRINT_CHAR: 
-  addi    t1, t1, -1                	              # j--
-  addi    t4, t4, -1                	              # t4 aponta um pixel para a esquerda
-  j       forchar1J_PRINT_CHAR		                  # vollta novo pixel
+  	addi    t1, t1, -1                	              # j--
+  	addi    t4, t4, -1                	              # t4 aponta um pixel para a esquerda
+  	j       forchar1J_PRINT_CHAR		                  # vollta novo pixel
 
 endforchar1J_PRINT_CHAR: 
-  addi    t0, t0, -1 		                            # i--
-  addi    t4, t4, 328           	                  # 2**12 + 8
-  j       forchar1I_PRINT_CHAR	                    # volta ao loop
+  	addi    t0, t0, -1 		                            # i--
+  	addi    t4, t4, 328           	                  # 2**12 + 8
+  	j       forchar1I_PRINT_CHAR	                    # volta ao loop
 
 endforchar1I_PRINT_CHAR:	
-  lw      t3, 4(t2)           	                    # carrega a segunda word do char
+  	lw      t3, 4(t2)           	                    # carrega a segunda word do char
 	li 	t0, 4			# i = 4
 
 forchar2I_PRINT_CHAR:    
-  beq     t0, zero, endforchar2I_PRINT_CHAR         # if(i == 0) end for i
-  addi    t1, zero, 8                               # j = 8
+  	beq     t0, zero, endforchar2I_PRINT_CHAR         # if(i == 0) end for i
+  	addi    t1, zero, 8                               # j = 8
 
 forchar2J_PRINT_CHAR:	
-  beq	t1, zero, endforchar2J_PRINT_CHAR             # if(j == 0) end for j
-  andi    s9, t3, 0x001	    		                    # pixel a ser impresso
-  srli    t3, t3, 1                 	              # desloca para o proximo
-  beq     s9, zero, printcharpixelbg2_PRINT_CHAR    # pixel eh fundo?
-  sb      t6, 0(t4)			                            # imprime cor frente
-  j       endcharpixel2_PRINT_CHAR		              # volta ao loop
+  	beq	t1, zero, endforchar2J_PRINT_CHAR             # if(j == 0) end for j
+  	andi    s9, t3, 0x001	    		                    # pixel a ser impresso
+  	srli    t3, t3, 1                 	              # desloca para o proximo
+  	beq     s9, zero, printcharpixelbg2_PRINT_CHAR    # pixel eh fundo?
+  	sb      t6, 0(t4)			                            # imprime cor frente
+  	j       endcharpixel2_PRINT_CHAR		              # volta ao loop
 
 printcharpixelbg2_PRINT_CHAR:
-  sb      t5, 0(t4)		                              # imprime cor de fundo
+  	sb      t5, 0(t4)		                              # imprime cor de fundo
 
 endcharpixel2_PRINT_CHAR:
-  addi    t1, t1, -1		                            # j--
-  addi    t4, t4, -1                                # t4 aponta um pixel para a esquerda
-  j       forchar2J_PRINT_CHAR
+  	addi    t1, t1, -1		                            # j--
+  	addi    t4, t4, -1                                # t4 aponta um pixel para a esquerda
+  	j       forchar2J_PRINT_CHAR
 
 endforchar2J_PRINT_CHAR:	
-  addi	t0, t0, -1 		                              # i--
-  addi    t4, t4, 328		                            #
-  j       forchar2I_PRINT_CHAR	                    # volta ao loop
+  	addi	t0, t0, -1 		                              # i--
+  	addi    t4, t4, 328		                            #
+  	j       forchar2I_PRINT_CHAR	                    # volta ao loop
 
 endforchar2I_PRINT_CHAR:
-  lw s9, 0(sp)
-  lw s8, 4(sp)
-  addi sp, sp, 8                                  # reduzindo pilha
-  ret				                                        # retorna
+  	lw s9, 0(sp)
+  	lw s8, 4(sp)
+  	addi sp, sp, 8                                  # reduzindo pilha
+  	ret				                                        # retorna
+
+
+#########################################################
+#  Draw Line                  													#
+#  Desenha uma linha do ponto (a0,a1) ao ponto (a2,a3)  #
+# com a cor a4                                          #
+#########################################################
+# a0 = x inicial                                        #
+# a1 = y inicial                                        #
+# a2 = x final                                          #
+# a3 = y final                                          #
+# a4 = cor                                              #
+#########################################################
+
+DRAW_LINE: 	
+	GET_BUFFER_TO_DRAW(a6)
+	   	
+	li 	  a7, 320
+	sub 	t0, a3, a1
+	bge 	t0, zero, pula_signedY_draw_line
+	sub 	t0, zero, t0
+pula_signedY_draw_line:	
+	sub 	t1, a2, a0
+	bge  	t1, zero, pula_signedX_draw_line
+	sub  	t1, zero, t1	
+pula_signedX_draw_line: 	
+	bge t0, t1, pulacbres_draw_line
+	ble a0, a2, pulac1bres_draw_line
+ 	mv 	a5, a0
+ 	mv 	a0, a2
+ 	mv 	a2, a5
+ 	mv	a5, a1
+ 	mv 	a1, a3
+ 	mv 	a3, a5
+pulac1bres_draw_line:	
+	j plotlowbres_draw_line
+
+pulacbres_draw_line: 	
+	ble  	a1, a3, pulac2bres_draw_line
+	mv 	a5, a0
+	mv 	a0, a2
+	mv 	a2, a5
+	mv 	a5, a1
+	mv 	a1, a3
+	mv 	a3, a5
+pulac2bres_draw_line:	
+	j plothighbres_draw_line
+
+plotlowbres_draw_line:	
+	sub 	t0, a2, a0		# dx=x1-x0
+	sub 	t1, a3, a1		# dy y1-y0
+	li  	t2, 1			# yi=1
+	bge 	t1, zero, pula1bres_draw_line	# dy>=0 PULA
+	li  	t2, -1			# yi=-1
+	sub 	t1, zero, t1		# dy=-dy
+pula1bres_draw_line:	
+	slli 	t3, t1, 1		# 2*dy
+	sub 	t3, t3, t0		# D=2*dy-dx
+	mv 	t4, a1			# y=y0
+	mv 	t5, a0			# x=x0
+	
+loopx1bres_draw_line:	
+	mul 	t6, t4, a7		# y*320
+	add 	t6, t6, t5		# y*320+x
+	add 	t6, t6, a6		# 0xFF000000+y*320+x
+	sb 	a4, 0(t6)		# plot com cor a4
+	
+	ble 	t3, zero, pula2bres_draw_line	# D<=0
+	add 	t4, t4, t2		# y=y+yi
+	slli 	t6, t0, 1		# 2*dx
+	sub 	t3, t3, t6		# D=D-2dx
+pula2bres_draw_line:
+	slli 	t6, t1, 1		# 2*dy
+	add 	t3, t3, t6		# D=D+2dx
+	addi	t5, t5, 1
+	bne 	t5, a2, loopx1bres_draw_line
+	ret
+		
+plothighbres_draw_line: 	
+	sub 	t0, a2, a0		# dx=x1-x0
+	sub 	t1, a3, a1		# dy y1-y0
+	li 	t2, 1			# xi=1
+	bge 	t0, zero, pula3bres_draw_line	# dy>=0 PULA
+	li 	t2, -1			# xi=-1
+	sub 	t0, zero, t0		# dx=-dx
+pula3bres_draw_line:	
+	slli 	t3, t0, 1		# 2*dx
+	sub 	t3, t3, t1		# D=2*dx-d1
+	mv 	t4, a0			# x=x0
+	mv 	t5, a1			# y=y0
+	
+loopx2bres_draw_line:	
+	mul 	t6, t5, a7		# y*320
+	add 	t6, t6, t4		# y*320+x
+	add 	t6, t6, a6		# 0xFF000000+y*320+x
+	sb 	a4, 0(t6)		# plot com cor a4
+	
+	ble 	t3, zero, pula4bres_draw_line	# D<=0
+	add 	t4, t4, t2		# x=x+xi
+	slli 	t6, t1, 1		# 2*dy
+	sub 	t3, t3, t6		# D=D-2dy
+pula4bres_draw_line: 	slli 	t6, t0, 1		# 2*dy
+	add 	t3, t3, t6		# D=D+2dx
+	addi 	t5, t5, 1
+	bne 	t5, a3, loopx2bres_draw_line
+	ret		

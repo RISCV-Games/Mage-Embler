@@ -22,7 +22,7 @@ GAME:
 	jal RENDER_TILE
 
 	la a0, tiles
-	li a1, 0
+	li a1, 50
 	li a2, 70
 	li a3, 64
 	li a4, 16
@@ -43,7 +43,21 @@ GAME:
 	li a2, 100
 	li a3, 120
 	li a4, 120
+	jal DRAW_FILL_RETANGULE
+
+	li a0, 0x0FF
+	li a1, 100
+	li a2, 100
+	li a3, 120
+	li a4, 120
 	jal DRAW_RETANGULE
+
+	li a0, 50
+	li a1, 50
+	li a2, 100
+	li a3, 100
+	li a4, 0x000000FF
+	jal DRAW_LINE
 
 	jal SWAP_FRAMES
 	j GAME
