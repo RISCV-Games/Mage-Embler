@@ -75,8 +75,11 @@ drawstring_DRAW_MENU:
 	bne s5, s8, not_selected_DRAW_MENU
 
 	# Code to do with a selected option inverting colors right now
-	andi t0, a3, 0x000000FF # last byte
-	andi t2, a3, 0x0000FF00 # second last  byte
+	
+	li t0, 0x000000FF
+	li t2, 0x0000FF00
+	and t0, a3, t0 # last byte
+	and t2, a3, t2 # second last  byte
 	
 	slli t0, t0, 8  # um byte para a esquerda
 	srli t2, t2, 8  # um byte para a direita

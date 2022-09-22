@@ -49,7 +49,7 @@ GAME:
   la t0, selected_option
   lb t1, 0(t0)
   la t0, tile_to_draw
-  sw t1, 0(t0)
+  sb t1, 0(t0)
 
 
 DO_NOTHING:
