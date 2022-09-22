@@ -3,7 +3,7 @@
 .include "../src/macros.s"
 
 .data
-string_test: .string "ruan petrus\n"
+string_test: .string "ruan\npetrus"
 
 .text
 	jal INIT_VIDEO
