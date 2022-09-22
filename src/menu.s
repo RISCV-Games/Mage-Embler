@@ -136,7 +136,9 @@ end_GET_STRING_SIZE:
 # Possui um estado de menu ou nao coloca o estado em 0  #
 # Apos o player selecionar uma opcao                    #
 #########################################################
-# ao = quantidade de opcoes                             #  
+# a0 = quantidade de opcoes                             #  
+# a1 = label de que segura opcao do menu                #
+# a2 = label de que segura quando o player fez uma acao #
 #########################################################
 INPUT_MENU:
 	li t1,0xFF200000        	            # carrega o endereco de controle do KDMMIO
@@ -147,10 +149,41 @@ INPUT_MENU:
 
 	lw t2, 4(t1)                            # t2 = valor da tecla teclada
 
-	li a0, 'w'          
-	beq t2, t0, input_menu_op
-	li a0, 's'          
-	beq t2, t0, input_menu_op
+	li t0, 's'          
+	beq t2, t0, inc_input_menu
+	li t0, 'w'          
+	beq t2, t0, dec_input_menu
+	li t0, '\n'          
+	beq t2, t0, selected_input_menu
+	j fim_input_menu
+
+
+inc_input_menu:
+	lb t0, 0(a1)
+	addi t0, t0, 1
+
+	blt t0, a0, safe_inc_input_menu
+	li t0, 0
+
+safe_inc_input_menu:
+	sb t0, 0(a1)
+	j fim_input_menu
+
+dec_input_menu:
+	lb t0, 0(a1)
+	addi t0, t0, -1
+
+	bge t0, zero, safe_dec_input_menu
+	addi t0, a0, -1
+
+safe_dec_input_menu:
+	sb t0, 0(a1)
+	j fim_input_menu
+
+selected_input_menu:
+	li t0, 1
+	sb t0, 0(a2)
+	j fim_input_menu
 
 fim_input_menu:
 	ret

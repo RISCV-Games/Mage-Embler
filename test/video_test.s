@@ -24,7 +24,7 @@ GAME:
 	la a0, tiles
 	li a1, 50
 	li a2, 70
-	li a3, 64
+	li a3, 96
 	li a4, 16
 	li a5, 0
 	jal RENDER
@@ -32,7 +32,7 @@ GAME:
 	la a0, tiles
 	li a1, 0
 	li a2, 86
-	li a3, 64
+	li a3, 96
 	li a4, 16
 	li a5, 1
 	jal RENDER
