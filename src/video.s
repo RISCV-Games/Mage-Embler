@@ -86,7 +86,7 @@ draw_line_draw_fill_retangule:
 	ret
 
 #########################################################
-#	Desenha um retangulo e preenche com a cor desejada  #
+#	Desenha um retangulo                                #
 #########################################################
 # a0 = cor                                              #
 # a1 = x                                                #
@@ -358,20 +358,28 @@ ret_draw_animation:
 #########################################################
 
 PRINT_STRING:	
-	addi	sp, sp, -8                        # aloca espaco
+	addi	sp, sp, -12                        # aloca espaco
 	sw	ra, 0(sp)                           # salva ra
   	sw	s0, 4(sp)                           # salva s0
+	sw  s1, 8(sp)
 	mv	s0, a0                              # s0 = endereco do caractere na string
+	mv s1, a1                               # s1 = x para voltar caso \n
 
 loop_PRINT_STRING:
 	lb	a0, 0(s0)                           # le em a0 o caracter a ser impresso
 	beq     a0, zero, fimloop_PRINT_STRING  # string ASCIIZ termina com NULL
+
+	li t6, '\n'
+	beq a0, t6, pula_linha_PRINT_STRING     # Checking if char is \n
+
 	jal     PRINT_CHAR                      # imprime char
-	addi    a1, a1, 8                       # incrementa a coluna
+	addi    a1, a1, 8                       # incrementa a linha
 	li 	t6, 313		
 	blt	a1, t6, naopulalinha_PRINT_STRING   # se ainda tiver lugar na linha
-	addi    a2, a2, 8                       # incrementa a linha
-	mv    	a1, zero                        # volta a coluna zero
+
+pula_linha_PRINT_STRING:
+	addi    a2, a2, 9                       # incrementa a coluna
+	mv    	a1, s1                        # volta a linha para inicial
 
 naopulalinha_PRINT_STRING:	
 	addi    s0, s0, 1                       # proximo caractere
@@ -380,7 +388,8 @@ naopulalinha_PRINT_STRING:
 fimloop_PRINT_STRING:	
 	lw      ra, 0(sp)  	                    # recupera ra
 	lw 	    s0, 4(sp)		                    # recupera s0 original
-	addi    sp, sp, 8		                    # libera espaco
+	lw 	    s1, 8(sp)		                    # recupera s0 original
+	addi    sp, sp, 12		                    # libera espaco
 fimprintString:	
 
   ret      	    			                    # retorna
