@@ -3,7 +3,7 @@
 	sw s11, 0(sp)
 
 	la %reg, FRAME_TO_DRAW
-	lb %reg, 0(t0)
+	lb %reg, 0(%reg)
 	slli %reg, %reg, 20
 	li s11, BUFFER_ADRESS
 	add %reg, s11, %reg
