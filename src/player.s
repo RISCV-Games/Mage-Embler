@@ -17,15 +17,10 @@ loop_draw_cursor_trail:
 	li t2, -1
 	beq t1, t2, ret_draw_cursor_trail
 
-	# if trail[i+1] == -1 then t1 = tile = TRAIL_HEAD_TILE
+	# if trail[i+1] == -1 then dont draw trail
 	lb t1, 2(s0)
-	beq t1, t2, is_head_draw_cursor_trail
-
+	beq t1, t2, is_first_draw_cursor_trail
 	li t1, TRAIL_BODY_TILE
-	j is_body_draw_cursor_trail
-is_head_draw_cursor_trail:
-	li t1, TRAIL_HEAD_TILE
-is_body_draw_cursor_trail:
 
 	# Draw the tile
 	la a0, tiles
@@ -34,6 +29,7 @@ is_body_draw_cursor_trail:
 	mv a3, t1
 	jal RENDER_TILE
 
+	is_first_draw_cursor_trail:
 	addi s0, s0, 2
 	j loop_draw_cursor_trail
 
