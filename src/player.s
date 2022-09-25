@@ -10,11 +10,15 @@ DRAW_CURSOR_TRAIL:
 
 	# s0 = trail
 	la s0, CURSOR_TRAIL
+
+	# checks if first two trail positions are filled, if not return
 	lb t0, 0(s0)
 	li t2, -1
 	beq t0, t2, ret_draw_cursor_trail
 	lb t0, 2(s0)
 	beq t0, t2, ret_draw_cursor_trail
+
+	# if first two are filled draw the first trail tile
 	jal GET_FIRST_TRAIL_TILE
 	j draw_tile_draw_cursor_trail
 	
@@ -24,9 +28,9 @@ loop_draw_cursor_trail:
 	li t2, -1
 	beq t1, t2, ret_draw_cursor_trail
 
-	# if trail[i+1] == -1 then dont draw trail
+	# if trail[i+1] == -1 then draw arrow
 	lb t1, 2(s0)
-	beq t1, t2, is_last_draw_cursor_trail
+	beq t1, t2, arrow_draw_cursor_trail
 
 	# get correct tile to draw
 	mv a0, s0
@@ -40,9 +44,40 @@ draw_tile_draw_cursor_trail:
 	lb a2, 1(s0)
 	jal RENDER_TILE
 
-	is_last_draw_cursor_trail:
 	addi s0, s0, 2
 	j loop_draw_cursor_trail
+
+arrow_draw_cursor_trail:
+	# t0 = deltaX
+	lb t0, 0(s0)
+	lb t1, -2(s0)
+	sub t0, t0, t1
+	li t1, 1
+	beq t0, t1, arrow_right_draw_cursor_trail
+	li t1, -1
+	beq t0, t1, arrow_left_draw_cursor_trail
+	
+	# t0 = deltaY
+	lb t0, 1(s0)
+	lb t1, -1(s0)
+	sub t0, t0, t1
+	li t1, 1
+	beq t0, t1, arrow_down_draw_cursor_trail
+
+	li a0, ARROW_UP_TILE
+	j draw_tile_draw_cursor_trail
+
+arrow_down_draw_cursor_trail:
+	li a0, ARROW_DOWN_TILE
+	j draw_tile_draw_cursor_trail
+
+arrow_left_draw_cursor_trail:
+	li a0, ARROW_LEFT_TILE
+	j draw_tile_draw_cursor_trail
+
+arrow_right_draw_cursor_trail:
+	li a0, ARROW_RIGHT_TILE
+	j draw_tile_draw_cursor_trail
 
 ret_draw_cursor_trail:
 	lw ra, 0(sp)
