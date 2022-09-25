@@ -53,14 +53,46 @@ MOVE_CURSOR:
 	add t1, t1, a0
 	add t2, t2, a1
 
+	# se cursor nao mexeu seta a0 = 0
+	add a0, a0, a1
+
+	# t1 = min(CURSOR_MAX_X, t1), t1 = max(0, t1)
+	blt t1, zero, x_min_move_cursor
+	li t6, CURSOR_MAX_X
+	bgt t1, t6, x_max_move_cursor
+x_max_back_move_cursor:
+
+	# t2 = min(CURSOR_MAX_Y, t2), t2 = max(0, t2)
+	blt t2, zero, y_min_move_cursor
+	li t6, CURSOR_MAX_Y
+	bgt t2, t6, y_max_move_cursor
+y_max_back_move_cursor:
+
 	# (cursorX, cursorY) = (t1, t2)
 	sb t1, 0(t0)
 	sb t2, 1(t0)
-
-	# se cursor nao mexeu seta a0 = 0
-	add a0, a0, a1
 
 	# return
 	lw ra, 0(sp)
 	addi sp, sp, 4
 	ret
+
+x_max_move_cursor:
+	mv t1, t6 
+	mv a0, zero
+	j x_max_back_move_cursor
+
+x_min_move_cursor:
+	mv t1, zero
+	mv a0, zero
+	j x_max_back_move_cursor
+
+y_min_move_cursor:
+	mv t2, zero
+	mv a0, zero
+	j y_max_back_move_cursor
+
+y_max_move_cursor:
+	mv t2, t6
+	mv a0, zero
+	j y_max_back_move_cursor

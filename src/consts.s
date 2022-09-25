@@ -41,3 +41,5 @@
 
 # Constantes para mecanica do jogo
 .eqv MOVE_RADIUS 5
+.eqv CURSOR_MAX_X 19
+.eqv CURSOR_MAX_Y 14
