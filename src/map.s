@@ -22,7 +22,7 @@ loop_draw_map_debug:
 	lb a0, 0(a0)
 	
 	# a1 = x, a2 = y
-	li t0, 20
+	li t0, MAP_WIDTH
 	rem a1, s1, t0
 	div a2, s1, t0
 
@@ -82,4 +82,155 @@ not_enemy_draw_block_debug:
 ret_draw_block_debug:
 	lw ra, 0(sp)
 	addi sp, sp, 4
+	ret
+
+######################################################################
+# Desenha os blocos atingíveis de acordo com WALKABLE_BLOCKS.
+######################################################################
+DRAW_WALKABLE_BLOCKS:
+	addi sp, sp, -8
+	sw ra, 0(sp)
+	sw s0, 4(sp)
+
+	# s0 = i = 0
+	li s0, 0
+
+loop_draw_walkable_blocks:
+	li t0, TILES_PER_MAP
+	beq s0, t0, ret_draw_walkable_blocks
+
+	la t0, WALKABLE_BLOCKS
+	add t0, t0, s0
+	lb t0, 0(t0)
+	beq t0, zero, continue_loop_draw_walkable_blocks
+
+	# a0 = tiles, a1 = x, a2 = y
+	la a0, tiles
+	li t0, MAP_WIDTH
+	rem a1, s0, t0
+	div a2, s0, t0
+	li a3, BLOCK_WALKABLE
+	jal RENDER_TILE
+
+continue_loop_draw_walkable_blocks:
+	addi s0, s0, 1
+	j loop_draw_walkable_blocks
+
+ret_draw_walkable_blocks:
+	lw ra, 0(sp)
+	lw s0, 4(sp)
+	addi sp, sp, 8
+	ret
+
+
+######################################################################
+# Atualiza a lista que contêm os blocos alcançáveis.
+######################################################################
+# a0 = startTile.x
+# a1 = startTile.y
+# a2 = map
+######################################################################
+UPDATE_WALKABLE_BLOCKS:
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	# clear walkable blocks array
+	la t0, WALKABLE_BLOCKS
+	li t1, 0
+
+loop_update_walkable_blocks:
+	li t2, TILES_PER_MAP
+	beq t1, t2, break_loop_update_walkable_blocks
+
+	add t2, t0, t1
+	sw zero, 0(t2)
+
+	addi t1, t1, 4
+	j loop_update_walkable_blocks
+
+break_loop_update_walkable_blocks:
+
+	mv a3, a2
+	li a2, MOVE_RADIUS
+	jal FIND_WALKABLE_BLOCKS
+
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+
+######################################################################
+# Preenche a lista de blocos andáveis com 1s de forma recursiva.
+######################################################################
+# a0 = startTile.x
+# a1 = startTile.y
+# a2 = totalDist
+# a3 = map
+######################################################################
+FIND_WALKABLE_BLOCKS:
+	# t0 = map[pos]
+	li t0, MAP_WIDTH
+	mul t0, a1, t0
+	add t0, t0, a0
+	add t0, a3, t0
+	lb t2, 0(t0)
+	li t1, BLOCK_OBSTACLE
+	beq t2, t1, ret_find_walkable_blocks
+	beq a2, zero, base_case_0_find_walkable_blocks
+
+	# constrain a0 and a1
+	blt a0, zero, ret_find_walkable_blocks
+	blt a1, zero, ret_find_walkable_blocks
+	li t1, MAP_WIDTH
+	bge a0, t1, ret_find_walkable_blocks
+	li t1, MAP_HEIGHT
+	bge a1, t1, ret_find_walkable_blocks
+
+	sub t0, t0, a3
+	la t1, WALKABLE_BLOCKS
+	add t0, t0, t1
+	li t1, 1
+	sb t1, 0(t0)
+
+	addi a2, a2, -1
+
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	addi a0, a0, 1
+	jal FIND_WALKABLE_BLOCKS
+
+	addi a0, a0, -2
+	jal FIND_WALKABLE_BLOCKS
+	addi a0, a0, 1
+	
+	addi a1, a1, 1
+	jal FIND_WALKABLE_BLOCKS
+
+	addi a1, a1, -2
+	jal FIND_WALKABLE_BLOCKS
+	addi a1, a1, 1
+
+	addi a2, a2, 1
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+
+ret_find_walkable_blocks:
+	ret
+
+base_case_0_find_walkable_blocks:
+	blt a0, zero, ret_find_walkable_blocks
+	blt a1, zero, ret_find_walkable_blocks
+	li t0, MAP_WIDTH
+	bge a0, t0, ret_find_walkable_blocks
+	li t0, MAP_HEIGHT
+	bge a1, t0, ret_find_walkable_blocks
+
+	li t0, MAP_WIDTH
+	mul t0, a1, t0
+	add t0, t0, a0
+	la t1, WALKABLE_BLOCKS
+	add t0, t0, t1
+	li t1, 1
+	sb t1, 0(t0)
 	ret

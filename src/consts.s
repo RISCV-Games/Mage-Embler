@@ -32,14 +32,16 @@
 .eqv BLOCK_OBSTACLE 1
 .eqv BLOCK_ALLY 2
 .eqv BLOCK_ENEMY 3
+.eqv BLOCK_WALKABLE 0
 # Tiles usadas para desenhar o mapa no modo debug
 .eqv DEBUG_TILE_EMPTY 3
 .eqv DEBUG_TILE_OBSTACLE 1
 .eqv DEBUG_TILE_ALLY 2
 .eqv DEBUG_TILE_ENEMY 0
-.eqv DEBUG_TILE_MOVABLE 6
 
 # Constantes para mecanica do jogo
-.eqv MOVE_RADIUS 5
+.eqv MOVE_RADIUS 7
 .eqv CURSOR_MAX_X 19
 .eqv CURSOR_MAX_Y 14
+.eqv MAP_WIDTH 20
+.eqv MAP_HEIGHT 15
