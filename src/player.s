@@ -103,15 +103,37 @@ MAKE_TRAIL:
 	beq a0, zero, draw_trail_make_trail
 	# if cursor moved then add position to trail
 
+	# t6 = trail.length
+	li t6, 0
+
 loop_make_trail:
 	lb t1, 0(t0)
 	li t2, -1
 	beq t1, t2, exit_loop_make_trail
 
+	addi t6, t6, 1
 	addi t0, t0, 2
 	j loop_make_trail
 
 exit_loop_make_trail:
+	li t1, 2
+	blt t6, t1, add_pos_make_trail
+
+	# (t2, t3) = (mouseX, mouseY), (t4, t5) = trail[trail.length-2]
+	la t1, CURSOR_POS
+	lb t2, 0(t1)
+	lb t3, 1(t1)
+	lb t4, -4(t0)
+	lb t5, -3(t0)
+	xor t2, t2, t4
+	xor t3, t3, t5
+	add t2, t2, t3
+	bne t2, zero, add_pos_make_trail
+	li t1, -1
+	sb t1, -2(t0)
+	j draw_trail_make_trail
+
+add_pos_make_trail:
 	# add new mouse pos to trail
 	la t1, CURSOR_POS
 	lb t2, 0(t1)
