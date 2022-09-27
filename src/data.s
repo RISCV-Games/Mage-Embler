@@ -36,5 +36,9 @@ LabelTabChar:
 	0x99FF5A81, 0x99663CFF, 0x10280000, 0x00000028, 0x10081020, 0x00081020
 
 
+# Temp buffer so we can perform operations on strings
+TEMP_BUFFER:
+.space 512
+
 # Images
 .include "../sprites/tiles.data"

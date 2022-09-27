@@ -18,6 +18,12 @@ GAME:
   li a3, 0x000009ff
   jal PRINT_STRING
 
+  li a0, 10
+  li a1, 100
+  li a2, 100
+  li a3, 0x000009ff
+  jal PRINT_INT
+
 	jal SWAP_FRAMES
 	j GAME
 

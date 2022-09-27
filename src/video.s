@@ -348,6 +348,60 @@ ret_draw_animation:
 	ret
 
 
+
+#########################################################
+#	Desenha um inteiro na tela                            #
+#############################################
+#  PrintInt                                 #
+#  a0    =    valor inteiro                 #
+#  a1    =    x                             #
+#  a2    =    y  			                #
+#  a3    =    cor                           #
+#############################################
+
+PRINT_INT:	
+	addi 	sp, sp, -4			# Aloca espaco
+	sw 	ra, 0(sp)			    # salva ra
+	la 	t0, TEMP_BUFFER			# carrega o Endereco do Buffer da String
+		
+	bge 	a0, zero, ehpos_print_int		# Se eh positvo
+	li 	t1, '-'				# carrega o sinal -
+	sb 	t1, 0(t0)			# coloca no buffer
+	addi 	t0, t0, 1		# incrementa endereco do buffer
+	sub 	a0, zero, a0	# torna o numero positivo
+		
+ehpos_print_int:  
+	li 	t2, 10				# carrega numero 10
+	li 	t1, 0				# carrega numero de digitos com 0
+		
+loop1_print_int:	
+	div 	t4, a0, t2			# divide por 10 (quociente)
+	rem 	t3, a0, t2			# resto
+	addi  sp, sp, -4			        # aloca espaco na pilha
+	sw 	t3, 0(sp)			# coloca resto na pilha
+	mv 	a0, t4				# atualiza o numero com o quociente
+	addi 	t1, t1, 1			# incrementa o contador de digitos
+	bne 	a0, zero, loop1_print_int		# verifica se o numero eh zero
+				
+loop2_print_int:	
+	lw 	t2, 0(sp)			    # le digito da pilha
+	addi 	sp, sp, 4			# libera espaco
+	addi 	t2, t2, 48			# converte o digito para ascii
+	sb 	t2, 0(t0)			    # coloca caractere no buffer
+	addi 	t0, t0, 1			# incrementa endereco do buffer
+	addi 	t1, t1, -1			# decrementa contador de digitos
+	bne 	t1, zero, loop2_print_int		# eh o ultimo?
+	sb 	zero, 0(t0)			    # insere \NULL na string
+	
+	la 	a0, TEMP_BUFFER			# Endereco do buffer da srting
+	jal 	PRINT_STRING		# chama o print string
+			
+	lw 	ra, 0(sp)			# recupera a
+	addi 	sp, sp, 4			# libera espaco
+fim_print_int:	
+	ret					# retorna
+
+
 #########################################################
 #	Desenha uma string na tela                            #
 #########################################################
