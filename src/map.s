@@ -264,3 +264,50 @@ DRAW_BLOCK:
 	lw ra, 0(sp)
 	addi sp, sp, 4
 	ret
+
+######################################################################
+# Desenha o mapa.
+######################################################################
+# a0 = endereco do mapa
+# a1 = lista de correspondencia de tiles.
+######################################################################
+DRAW_MAP:
+	addi sp, sp, -16
+	sw ra, 0(sp)
+	sw s0, 4(sp)
+	sw s1, 8(sp)
+	sw s2, 12(sp)
+
+	# s0 = map, s1 = i = 0, s2 = correspondence list
+	mv s0, a0
+	li s1, 0
+	mv s2, a1
+
+loop_draw_map:
+	li t0, TILES_PER_MAP
+	bge s1, t0, ret_draw_map
+
+	# a1 = map[s1]
+	add a1, s0, s1
+	lb a1, 0(a1)
+	
+	# a2 = x, a3 = y
+	li t0, MAP_WIDTH
+	rem a2, s1, t0
+	div a3, s1, t0
+	
+	# a0 = map
+	mv a0, s2
+	jal DRAW_BLOCK
+
+	addi s1, s1, 1
+	j loop_draw_map
+
+
+ret_draw_map:
+	lw ra, 0(sp)
+	lw s0, 4(sp)
+	lw s1, 8(sp)
+	lw s2, 12(sp)
+	addi sp, sp, 12
+	ret

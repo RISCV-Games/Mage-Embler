@@ -32,7 +32,7 @@ MAPS:
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 CORRESPONDENCE_ARR_MAP0:
-.byte 3, 2, 0
+.byte 3, 2, 1
 
 # Images
 .include "../sprites/tiles.data"
