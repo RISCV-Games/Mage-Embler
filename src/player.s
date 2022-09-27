@@ -280,3 +280,42 @@ hor_get_trail_tile:
 ver_get_trail_tile:
 	li a0, TRAIL_VERTICAL_TILE
 	ret
+
+#######################################################
+# Para o processo de criaçao do trail e deleta o trail.
+# Retorna a ultima posicao salva pelo trail
+#######################################################
+STOP_TRAIL:
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	jal GET_LAST_TRAIL_POS
+
+	la t0, MAKING_TRAIL
+	sb zero, 0(t0)
+
+	la t0, CURSOR_TRAIL
+	li t1, -1
+	sb t1, 0(t0)
+
+	lw ra, 0(sp)
+	addi sp, sp, 4
+
+#####################################################
+# Retorna a ultima posicao salva no trail
+#####################################################
+GET_LAST_TRAIL_POS:
+	la t0, CURSOR_TRAIL
+	li t1, -1
+
+loop_get_last_trail_pos:
+	lb t2, 0(t0)
+	beq t1, t2, ret_last_trail_pos
+
+	addi t0, t0, 2
+	j loop_get_last_trail_pos
+
+ret_last_trail_pos:
+	lb a0, -2(t0)
+	lb a1, -1(t0)
+	ret

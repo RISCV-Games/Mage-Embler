@@ -2,9 +2,6 @@
 .include "../src/consts.s"
 .include "../src/macros.s"
 
-.data
-MAKING_TRAIL: .byte 0
-
 .text
 jal INIT_VIDEO
 GAME:
@@ -18,12 +15,20 @@ GAME:
 
 	jal DRAW_WALKABLE_BLOCKS
 	jal GET_KBD_INPUT
+	mv s0, a0
 	jal MAKE_TRAIL
 	jal DRAW_CURSOR
+
+	li t0, 'x'
+	beq s0, t0, stop_trail_game
 
 continue_loop_game:
 	jal SWAP_FRAMES
 	j GAME
+
+stop_trail_game:
+	jal STOP_TRAIL
+	j continue_loop_game
 
 not_making_trail_game:
 	jal GET_KBD_INPUT
@@ -31,10 +36,10 @@ not_making_trail_game:
 	jal MOVE_CURSOR
 	jal DRAW_CURSOR
 	li t0, 'x'
-	beq s0, t0, get_walkable
+	beq s0, t0, get_walkable_game
 	j continue_loop_game
 
-get_walkable:
+get_walkable_game:
 	la t0, CURSOR_POS
 	lb a0, 0(t0)
 	lb a1, 1(t0)
