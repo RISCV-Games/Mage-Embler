@@ -1,3 +1,4 @@
+########## Put the buffer to draw on register #########
 .macro GET_BUFFER_TO_DRAW(%reg)
 	addi sp, sp, -4
 	sw s11, 0(sp)
@@ -10,4 +11,10 @@
 
 	lw s11, 0(sp)
 	addi sp, sp, 4
+.end_macro
+
+######### Verifica se eh a DE1-SoC ###############
+.macro DE1(%reg,%salto)
+	li %reg, 0x10008000	# carrega tp
+	bne gp, %reg, %salto	# Na DE1 gp = 0 ! Não tem segmento .extern
 .end_macro
