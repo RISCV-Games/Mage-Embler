@@ -173,7 +173,10 @@ FIND_WALKABLE_BLOCKS:
 	add t0, t0, a0
 	add t0, a3, t0
 	lb t2, 0(t0)
+	andi t2, t2, 0x7
 	li t1, BLOCK_OBSTACLE
+	beq t2, t1, ret_find_walkable_blocks
+	li t1, BLOCK_ALLY
 	beq t2, t1, ret_find_walkable_blocks
 	beq a2, zero, base_case_0_find_walkable_blocks
 
