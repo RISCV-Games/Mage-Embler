@@ -97,7 +97,8 @@ MAKE_TRAIL:
 
 	# movimenta cursor
 	# a funcao retorna 0 se e somente se cursor nao mexeu
-	jal MOVE_CURSOR
+	la a1, WALKABLE_BLOCKS
+	jal MOVE_CURSOR_LIMITED
 
 	la t0, CURSOR_TRAIL
 	beq a0, zero, draw_trail_make_trail

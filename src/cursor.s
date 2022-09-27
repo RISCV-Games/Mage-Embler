@@ -96,3 +96,53 @@ y_max_move_cursor:
 	mv t2, t6
 	mv a0, zero
 	j y_max_back_move_cursor
+
+#######################################################
+# Movimenta o cursor de acordo com a tecla pressionada
+# levando em consideracao uma lista de blocos atingiveis.
+# A lista deve conter 0 se o cursor nao eh permitido
+# naquele bloco e 1 caso contrario.
+# Retorna 0 quando o cursor nao foi movimentado.
+#######################################################
+# a0 = keyCode
+# a1 = limitation array address
+#####################################################
+MOVE_CURSOR_LIMITED:
+	addi sp, sp, -12
+	sw ra, 0(sp)
+	sw s0, 4(sp)
+	sw s1, 8(sp)
+
+	mv s0, a0
+	mv s1, a1
+
+	# (a0, a1) = (deltaX, deltaY)
+	jal GET_DIR_FROM_KEY
+
+	#(t0, t1) = (mouseX+deltaX, mouseY+deltaY)
+	la t1, CURSOR_POS
+	lb t0, 0(t1)
+	lb t1, 1(t1)
+	add t0, t0, a0
+	add t1, t1, a1
+	
+	li t2, 20
+	mul t1, t1, t2
+	add t0, t0, t1
+	add t0, t0, s1
+	lb t0, 0(t0)
+
+	beq t0, zero, not_move_cursor_limited
+	mv a0, s0
+	jal MOVE_CURSOR
+	j ret_move_cursor_limited
+
+not_move_cursor_limited:
+	mv a0, zero
+
+ret_move_cursor_limited:
+	lw ra, 0(sp)
+	lw s0, 4(sp)
+	lw s1, 8(sp)
+	addi sp, sp, 12
+	ret
