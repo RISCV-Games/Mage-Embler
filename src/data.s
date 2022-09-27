@@ -32,6 +32,11 @@ MAPS:
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
+# Allocating PLAYER_BYTE_SIZE * (total number of players we might want) bytes
+.align 0
+PLAYERS:
+.space 40
+
 CORRESPONDENCE_ARR_MAP0:
 .byte 3, 2, 1
 
