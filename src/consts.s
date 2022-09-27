@@ -40,7 +40,7 @@
 .eqv DEBUG_TILE_ENEMY 0
 
 # Constantes para mecanica do jogo
-.eqv MOVE_RADIUS 7
+.eqv MOVE_RADIUS 5
 .eqv CURSOR_MAX_X 19
 .eqv CURSOR_MAX_Y 14
 .eqv MAP_WIDTH 20

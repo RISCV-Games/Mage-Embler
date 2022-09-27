@@ -234,3 +234,33 @@ base_case_0_find_walkable_blocks:
 	li t1, 1
 	sb t1, 0(t0)
 	ret
+
+######################################################################
+# Desenha uma bloco no mapa.
+######################################################################
+# a0 = lista com correspondencia entre os tipo do bloco e a tile
+# a1 = tipo do bloco. Os 5 bits mais significativos escolhem a tile a
+# ser renderizada e os outros 3 bits selecionam o comportamento logico
+# dela, entao sao irrelevantes para essa funcao.
+# a2 = x
+# a3 = y
+######################################################################
+DRAW_BLOCK:
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	# t0 = tile number
+	srli a1, a1, 3
+	add t0, a0, a1
+	lb t0, 0(t0)
+
+	la a0, tiles
+	mv a1, a2
+	mv a2, a3
+	mv a3, t0
+	jal RENDER_TILE
+
+
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
