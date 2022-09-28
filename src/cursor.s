@@ -29,6 +29,11 @@ INIT_CURSOR_TRAIL:
 	sb t1, 0(t4)
 	sb t2, 1(t4)
 	sb t3, 2(t4)
+
+	# MAKING_TRAIL = true
+	la t0, MAKING_TRAIL
+	li t1, 1
+	sb t1, 0(t0)
 	ret
 
 #######################################################
