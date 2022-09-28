@@ -95,7 +95,7 @@ draw_line_draw_fill_retangule:
 # a4 = size_y                                           #
 #########################################################
 DRAW_RETANGULE:
-	addi sp, sp -20
+	addi sp, sp, -20
 	sw ra, 0(sp)
 	sw s0, 4(sp)
 	sw s1, 8(sp)
@@ -147,7 +147,7 @@ DRAW_RETANGULE:
 	lw s1, 8(sp)
 	lw s2, 12(sp)
 	lw s4, 16(sp)
-	addi sp, sp 20
+	addi sp, sp, 20
 
 
 	ret

@@ -42,3 +42,5 @@ TEMP_BUFFER:
 
 # Images
 .include "../sprites/tiles.data"
+.include "../sprites/vida_cheia.data"
+.include "../sprites/vida_vazia.data"
