@@ -178,6 +178,8 @@ FIND_WALKABLE_BLOCKS:
 	beq t2, t1, ret_find_walkable_blocks
 	li t1, BLOCK_ALLY
 	beq t2, t1, ret_find_walkable_blocks
+	li t1, BLOCK_ENEMY
+	beq t2, t1, ret_find_walkable_blocks
 	beq a2, zero, base_case_0_find_walkable_blocks
 
 	# constrain a0 and a1
