@@ -177,25 +177,26 @@ rev_draw_line_render:
 	ret				# retorna
 
 
-######################################################################
-#	Anima uma imagem com informações estão guardadas                   
-# na memória começando no endereço em a1.                            
-# Formato do a1 (WORD): tamanho, i, MIN_WORD, anim1..., animN                  
+##############################################################################################
+#	Anima uma imagem com informações estão guardadas
+# na memória começando no endereço em a1. Retorna 1 se a animação já foi desenhada por inteiro
+# uma vez e 0 caso contrário
+# Formato do a1 (WORD): tamanho, i, MIN_WORD, anim1..., animN
 # cada animN representa um numero da tile a ser desenhada.
 # "tamanho" indica quantos frames a animaçao possui.
 # "i" eh um numero que satisfas 0 <= i < tamanho e indica a partir
 # de qual frame a animacao comecara (geralmente i eh 0).
 # Exemplos de como usar a funcao: anim_test.s, cursor_test.s
-######################################################################
+##############################################################################################
 # a0 = endereço da imagem com tiles
 # a1 = informações da animação
 # a2 = X
 # a3 = Y
 # a4 = tempo entre frames (ms)
-######################################################################
+##############################################################################################
 DRAW_ANIMATION_TILE:
 	# save ra
-	addi sp, sp, -4
+	addi sp, sp, -8
 	sw ra, 0(sp)
 
 	# if time passed is less than a4, dont animate
@@ -226,6 +227,8 @@ skip_draw_animation:
 	addi t2, t1, 1
 	rem t2, t2, t0
 	sw t2, 4(a1)
+	# save t2 on stack to calculate the return value later
+	sw t2, 4(sp)
 
 	# t1 = number of current tile
 	slli t1, t1, 2
@@ -238,8 +241,17 @@ skip_draw_animation:
 	mv a3, t1
 	jal RENDER_TILE
 
+	# if the animation endend return 1 else return 0
+	lw t2, 4(sp)
+	beq t2, zero, end_draw_animation
+	mv a0, zero
+
 ret_draw_animation:
 	# restore stack and return
 	lw ra, 0(sp)
-	addi sp, sp, 4
+	addi sp, sp, 8
 	ret
+
+end_draw_animation:
+	li a0, 1
+	j ret_draw_animation
