@@ -72,10 +72,10 @@ init_init_players:
 	lb t4, 0(t4)
 
 	# initialize values
-	sb t1, 0(t3)
-	sb t2, 1(t3)
-	sb t4, 2(t3)
-	sb a2, 3(t3)
+	sb t1, PLAYER_BPOS_X(t3)
+	sb t2, PLAYER_BPOS_Y(t3)
+	sb t4, PLAYER_BTILE_NUM(t3)
+	sb a2, PLAYER_BIS_ALLY(t3)
 	
 	j continue_loop_init_players
 
@@ -101,8 +101,8 @@ loop_get_player_by_pos:
 	bge t1, t2, ret_get_player_by_pos
 
 	add t3, t0, t1
-	lb t4, 0(t3)
-	lb t5, 1(t3)
+	lb t4, PLAYER_BPOS_X(t3)
+	lb t5, PLAYER_BPOS_X(t3)
 	bne t4, a0, continue_loop_get_player_by_pos
 	bne t5, a1, continue_loop_get_player_by_pos
 	j ret_get_player_by_pos
@@ -193,4 +193,4 @@ init_move_player:
 ###################################################################################
 ACTUALLY_MOVE_PLAYER:
 	# por equanto apenas move o jogador, adicionar a animação depois.
-	la t0
+	#la t0

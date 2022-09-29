@@ -203,6 +203,86 @@ DRAW_ANIMATION_TILE:
 	csrr t0, time
 	lw t1, 8(a1)
 	sub t0, t0, t1
+	bgeu t0, a4, continue_draw_animation_tile
+
+	# t1 = (t1 + tamanho - 1) % tamanho
+	lw t0, 0(a1)
+	lw t1, 4(a1)
+	add t1, t0, t1
+	addi t1, t1, -1
+	rem t1, t1, t0 
+	sw t1, 4(a1)
+	j skip_draw_animation_tile
+
+continue_draw_animation_tile:	
+	csrr t0, time
+	sw t0, 8(a1)
+
+skip_draw_animation_tile:
+	# t0 = tamanho, t1 = i
+	lw t0, 0(a1)
+	lw t1, 4(a1)
+
+	# t2 = (i + 1) % tamanho
+	addi t2, t1, 1
+	rem t2, t2, t0
+	sw t2, 4(a1)
+	# save t2 on stack to calculate the return value later
+	sw t2, 4(sp)
+
+	# t1 = number of current tile
+	slli t1, t1, 2
+	add t1, a1, t1
+	lw t1, 12(t1)
+
+	# draw the tile
+	mv a1, a2
+	mv a2, a3
+	mv a3, t1
+	jal RENDER_TILE
+
+	# if the animation endend return 1 else return 0
+	lw t2, 4(sp)
+	beq t2, zero, end_draw_animation_tile
+	mv a0, zero
+
+ret_draw_animation_tile:
+	# restore stack and return
+	lw ra, 0(sp)
+	addi sp, sp, 8
+	ret
+
+end_draw_animation_tile:
+	li a0, 1
+	j ret_draw_animation_tile
+
+##############################################################################################
+#	Anima uma imagem com informações estão guardadas
+# na memória começando no endereço em a1. Retorna 1 se a animação já foi desenhada por inteiro
+# uma vez e 0 caso contrário
+# Formato do a1 (WORD): tamanho, i, MIN_WORD, anim1..., animN
+# cada animN representa um numero da tile a ser desenhada.
+# "tamanho" indica quantos frames a animaçao possui.
+# "i" eh um numero que satisfas 0 <= i < tamanho e indica a partir
+# de qual frame a animacao comecara (geralmente i eh 0).
+# Exemplos de como usar a funcao: anim_test.s, cursor_test.s
+##############################################################################################
+# a0 = tamanho da imagem x
+# a1 = informações da animação
+# a2 = X
+# a3 = Y
+# a4 = tempo entre frames (ms)
+# a5 = tamanho da imagem y
+##############################################################################################
+DRAW_ANIMATION:
+	# save ra
+	addi sp, sp, -8
+	sw ra, 0(sp)
+
+	# if time passed is less than a4, dont animate
+	csrr t0, time
+	lw t1, 8(a1)
+	sub t0, t0, t1
 	bgeu t0, a4, continue_draw_animation
 
 	# t1 = (t1 + tamanho - 1) % tamanho
@@ -230,16 +310,19 @@ skip_draw_animation:
 	# save t2 on stack to calculate the return value later
 	sw t2, 4(sp)
 
-	# t1 = number of current tile
+	# t1 = address of current image
 	slli t1, t1, 2
 	add t1, a1, t1
 	lw t1, 12(t1)
 
 	# draw the tile
+	mv a3, a0
+	mv a0, t1
 	mv a1, a2
 	mv a2, a3
-	mv a3, t1
-	jal RENDER_TILE
+	mv a4, a5
+	li a5, 0
+	jal RENDER
 
 	# if the animation endend return 1 else return 0
 	lw t2, 4(sp)
