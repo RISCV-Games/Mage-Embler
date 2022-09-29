@@ -6,27 +6,51 @@
 .eqv magia_y 110
 .data:
 .align 2
-PLAYER1: .word combat_mago_pose, magia_idle
+PLAYER1: .word 0 ,0
 .byte 20, 5
-.half magia_x, magia_y 
-.byte IDLE_POWER_WIDTH, IDLE_POWER_HEIGHT
-PLAYER2: .word combat_mago_idle, magia_idle
+.half 0, 0 
+.byte 0, 0
+.byte AL_AZUL
+PLAYER2: .word 0, 0
 .byte 20, 15 
-.half magia_x, magia_y 
-.byte IDLE_POWER_WIDTH, IDLE_POWER_HEIGHT
+.half 0, 0 
+.byte 0, 0
+.byte AL_AZUL
 
 .text
 jal INIT_VIDEO
+
+la t0, PLAYER1
+la t1, PLAYER2
+la t2, PLAYERS_IN_COMBAT
+
+sw t0, 0(t2)
+sw t1, 4(t2)
+
+la t0, IN_COMBAT
+li t1, 1
+sb t1, 0(t0)
 
 GAME:
     
 	li a0, 0x09090909
 	jal DRAW_BACKGROUND
 
-    la a0, PLAYER1
-    la a1, PLAYER2
-    li a2, 1
+    la t0, IN_COMBAT
+    lb t0, 0(t0)
+    beq t0, zero, no_combat
+
+    la t0, PLAYERS_IN_COMBAT
+    lw a0, 0(t0)
+    lw a1, 4(t0)
+
+    la t0, PLAYER_ATACKING
+    lb a2, 0(t0)
     jal DRAW_COMBAT
+
+    jal LOGIC_COMBAT
+
+no_combat:
     jal SWAP_FRAMES
 	
   j GAME

@@ -4,8 +4,20 @@
 FRAME_TO_DRAW: .byte 0
 CURSOR_POS: .byte SCREEN_CENTER_X SCREEN_CENTER_Y
 
+# Estados
+IN_COMBAT: .byte 0      # 0 - fora de comabate    1 - aliado ataca primeiro    2 - inimigo ataca primeiro
+COMBAT_STEP: .byte 0    # idle - primeiro atack - tira vida - segundo atack - tira vida
+COMBAT_LAST_TIME: .word 0
+
+.align 2
+PLAYERS_IN_COMBAT: .word 0, 0
+PLAYER_ATACKING: .byte 2
+
 .align 2
 CURSOR_ANIM: .word 2, 0, MIN_WORD, CURSOR_NUM0, CURSOR_NUM1
+
+# TIPE_TO_COMBAT_IDLE_IMAGES: .word combat_idle_aliado_azul, combat_idle_aliado_vermelho, combat_idle_aliado_marron, 
+# combat_idle_inimigo_azul, combat_idle_inimigo_vermelho, combat_idle_inimigo_marron
 
 # Caracteres para print(string, char)
 LabelTabChar:
@@ -47,3 +59,4 @@ TEMP_BUFFER:
 .include "../sprites/combat_mago_idle.data"
 .include "../sprites/combat_mago_pose.data"
 .include "../sprites/magia_idle.data"
+.include "../sprites/projetil.data"
