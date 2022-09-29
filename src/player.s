@@ -1,23 +1,22 @@
-#########################################################
+############################################################
 # Player (8 bytes)
 # Alterar PLAYERS e PLAYER_BYTE_SIZE ao mudar o tamanho.
-#########################################################
+############################################################
 # Classe representando os jogadores, tanto aliados
 # quanto inimigos.
-#########################################################
+############################################################
 # 0: byte posX
 # 1: byte posY
-# 2: byte tileNum
-# 3: byte isAlly
-# 4: word moveAnimationData
-#########################################################
+# 2: byte isAlly
+# 3: byte element (PLAYER_WATER, PLAYER_FIRE, PLAYER_EARTH)
+#############################################################
 
-#########################################################
+############################################################
 # Inicializa os players a partir do mapa.
-#########################################################
+############################################################
 # a0 = map
 # a1 = correspondence array
-#########################################################
+############################################################
 INIT_PLAYERS:
 	# t0 = i = 0
 	li t0, 0
@@ -74,7 +73,6 @@ init_init_players:
 	# initialize values
 	sb t1, PLAYER_BPOS_X(t3)
 	sb t2, PLAYER_BPOS_Y(t3)
-	sb t4, PLAYER_BTILE_NUM(t3)
 	sb a2, PLAYER_BIS_ALLY(t3)
 	
 	j continue_loop_init_players
@@ -126,6 +124,11 @@ MOVE_PLAYER:
 	sw ra, 0(sp)
 	sw a0, 4(sp)
 	sw a1, 8(sp)
+
+	# if blink animation is in progress go to actually move_player
+	la t0, BLINK_ANIMATION
+	lb t0, 0(t0)
+	beq t0, zero, goto_actually_move_player
 
 	# initialize trail if function is being called for the first time
 	la t0, MAKING_TRAIL
@@ -180,6 +183,69 @@ init_move_player:
 
 	j finish_init_move_player
 
+########################################
+# Desenha o jogador na tela.
+########################################
+# a0 = player
+########################################
+DRAW_PLAYER:
+	# if blink animation is not ongoing, run the "standing still" animation
+	la t0, BLINK_ANIMATION
+	lb t0, 0(t0)
+	bne t0, zero, EXECUTE_BLINK_ANIMATION
+
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	la a1, PLAYER_EARTH_STILL_ANIM
+	lb a2, PLAYER_BPOS_X(a0)
+	lb a3, PLAYER_BPOS_Y(a0)
+	li a4, PLAYER_STILL_ANIMATION_DELAY
+	la a0, tiles
+	jal DRAW_ANIMATION_TILE
+
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+
+EXECUTE_BLINK_ANIMATION:
+	ret
+
+###################################################################################
+# Inicializa os argumentos estáticos necessários para ACTUALLY_MOVE_PLAYER e
+# movimenta o jogador logicamente.
+###################################################################################
+# a0 = player
+###################################################################################
+INIT_ACTUALLY_MOVE_PLAYER:
+	# indicate that blink animation started
+	la t0, BLINK_ANIMATION
+	li t1, 1
+	#sb t1, 0(t0)
+
+	# save player pos
+	lb t0, PLAYER_BPOS_X(a0)
+	lb t1, PLAYER_BPOS_X(a0)
+	la t3, ACTUALLY_MOVE_PLAYER_DATA
+	sb t0, ACTUALLY_MOVE_PLAYER_DATA_BPOSX(t3)
+	sb t1, ACTUALLY_MOVE_PLAYER_DATA_BPOSY(t3)
+
+	# set status to ACTUALLY_MOVE_PLAYER_DISAPPEAR
+	li t0, ACTUALLY_MOVE_PLAYER_DISAPPEAR
+	sb t0, ACTUALLY_MOVE_PLAYER_DATA_BSTATUS(t3)
+
+	# save player
+	sw a0, ACTUALLY_MOVE_PLAYER_DATA_WPLAYER(t3)
+
+	# move player to cursor position
+	la t1, CURSOR_POS
+	lb t0, 0(t1)
+	lb t1, 1(t1)
+	sb t0, PLAYER_BPOS_X(a0)
+	sb t1, PLAYER_BPOS_Y(a0)
+	ret
+	
+
 ###################################################################################
 # Executa a animação de movimentação do jogador e movimenta ele.
 # Utiliza informações guardadas em ACTUALLY_MOVE_PLAYER_DATA da seguinte forma:
@@ -194,3 +260,4 @@ init_move_player:
 ACTUALLY_MOVE_PLAYER:
 	# por equanto apenas move o jogador, adicionar a animação depois.
 	#la t0
+goto_actually_move_player:
