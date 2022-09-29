@@ -44,3 +44,6 @@ TEMP_BUFFER:
 .include "../sprites/tiles.data"
 .include "../sprites/vida_cheia.data"
 .include "../sprites/vida_vazia.data"
+.include "../sprites/combat_mago_idle.data"
+.include "../sprites/combat_mago_pose.data"
+.include "../sprites/magia_idle.data"
