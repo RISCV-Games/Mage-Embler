@@ -7,6 +7,8 @@ CURSOR_POS: .byte SCREEN_CENTER_X, SCREEN_CENTER_Y
 CURSOR_ANIM: .word 2, 0, MIN_WORD, CURSOR_NUM0, CURSOR_NUM1
 PLAYER_BLINK_ANIM0: .word 2, 0, MIN_WORD, 1, 2
 PLAYER_BLINK_ANIM1: .word 2, 0, MIN_WORD, 2, 1
+SMOKE_ANIM_DISAPPEAR: .word 2, 0, -1, MIN_WORD, SMOKE0, SMOKE1
+SMOKE_ANIM_APPEAR: .word 2, 0, -1, MIN_WORD, SMOKE1, SMOKE0
 .align 0
 CURSOR_TRAIL: .space N_CURSOR_TRAIL
 MAKING_TRAIL: .byte 0
@@ -61,3 +63,5 @@ CORRESPONDENCE_ARR_MAP0:
 .align 2
 # Images
 .include "../sprites/tiles.data"
+.include "../images/SMOKE0.data"
+.include "../images/SMOKE1.data"

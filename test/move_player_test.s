@@ -8,9 +8,11 @@ la a0, MAPS
 la a1, CORRESPONDENCE_ARR_MAP0
 
 la t0, PLAYERS
+li t1, SCREEN_CENTER_X
+sb t1, PLAYER_BPOS_X(t0)
+li t1, SCREEN_CENTER_Y
+sb t1, PLAYER_BPOS_Y(t0)
 li t1, 1
-sb zero, PLAYER_BPOS_X(t0)
-sb zero, PLAYER_BPOS_Y(t0)
 sb t1, PLAYER_BIS_ALLY(t0)
 sb zero, PLAYER_BELEMENT(t0)
 
@@ -21,6 +23,7 @@ GAME:
 	jal DRAW_CURSOR
 
 	la a0, PLAYERS
+	mv a1, zero # dont force player draw
 	jal DRAW_PLAYER
 
 	jal GET_KBD_INPUT

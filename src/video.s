@@ -260,11 +260,13 @@ end_draw_animation_tile:
 #	Anima uma imagem com informações estão guardadas
 # na memória começando no endereço em a1. Retorna 1 se a animação já foi desenhada por inteiro
 # uma vez e 0 caso contrário
-# Formato do a1 (WORD): tamanho, i, MIN_WORD, anim1..., animN
+# Formato do a1 (WORD): tamanho, i, j, MIN_WORD, anim1..., animN
 # cada animN representa um numero da tile a ser desenhada.
 # "tamanho" indica quantos frames a animaçao possui.
 # "i" eh um numero que satisfas 0 <= i < tamanho e indica a partir
 # de qual frame a animacao comecara (geralmente i eh 0).
+# j é um número que deve ser inicializado como -1 e conta quantas vezes a animação já
+# rodou por completo.
 # Exemplos de como usar a funcao: anim_test.s, cursor_test.s
 ##############################################################################################
 # a0 = tamanho da imagem x
@@ -277,11 +279,12 @@ end_draw_animation_tile:
 DRAW_ANIMATION:
 	# save ra
 	addi sp, sp, -8
-	sw ra, 0(sp)
+	sw ra, 0(sp) 
+	sw a1, 4(sp)
 
 	# if time passed is less than a4, dont animate
 	csrr t0, time
-	lw t1, 8(a1)
+	lw t1, 12(a1)
 	sub t0, t0, t1
 	bgeu t0, a4, continue_draw_animation
 
@@ -296,7 +299,9 @@ DRAW_ANIMATION:
 
 continue_draw_animation:	
 	csrr t0, time
-	sw t0, 8(a1)
+	sw t0, 12(a1)
+	lw t0, 4(a1)
+	beq t0, zero, increment_anim_counter_draw_animation
 
 skip_draw_animation:
 	# t0 = tamanho, t1 = i
@@ -307,27 +312,26 @@ skip_draw_animation:
 	addi t2, t1, 1
 	rem t2, t2, t0
 	sw t2, 4(a1)
-	# save t2 on stack to calculate the return value later
-	sw t2, 4(sp)
 
 	# t1 = address of current image
 	slli t1, t1, 2
 	add t1, a1, t1
-	lw t1, 12(t1)
+	lw t1, 16(t1)
 
 	# draw the tile
-	mv a3, a0
-	mv a0, t1
 	mv a1, a2
 	mv a2, a3
 	mv a4, a5
 	li a5, 0
+	mv a3, a0
+	mv a0, t1
 	jal RENDER
 
-	# if the animation endend return 1 else return 0
-	lw t2, 4(sp)
-	beq t2, zero, end_draw_animation
-	mv a0, zero
+	# if animation was rendered at least one time then return 0
+	lw a1, 4(sp)
+	lw t0, 8(a1)
+	bgt t0, zero, ret1_draw_animation
+	li a0, 0
 
 ret_draw_animation:
 	# restore stack and return
@@ -335,6 +339,14 @@ ret_draw_animation:
 	addi sp, sp, 8
 	ret
 
-end_draw_animation:
+ret1_draw_animation:
 	li a0, 1
+	li t0, -1
+	sw t0, 8(a1)
 	j ret_draw_animation
+
+increment_anim_counter_draw_animation:
+	lw t0, 8(a1)
+	addi t0, t0, 1
+	sw t0, 8(a1)
+	j skip_draw_animation

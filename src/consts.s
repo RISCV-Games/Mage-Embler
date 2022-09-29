@@ -70,5 +70,8 @@
 .eqv ACTUALLY_MOVE_PLAYER_DISAPPEAR 0
 .eqv ACTUALLY_MOVE_PLAYER_APPEAR 1
 
-# delay in milliseconds between each frame of standing still animation
+# delay in milliseconds between each frame of animations
 .eqv PLAYER_STILL_ANIMATION_DELAY 200
+.eqv SMOKE_ANIMATION_DELAY 100
+
+.eqv SMOKE_TILE_SIZE 48

@@ -100,7 +100,7 @@ loop_get_player_by_pos:
 
 	add t3, t0, t1
 	lb t4, PLAYER_BPOS_X(t3)
-	lb t5, PLAYER_BPOS_X(t3)
+	lb t5, PLAYER_BPOS_Y(t3)
 	bne t4, a0, continue_loop_get_player_by_pos
 	bne t5, a1, continue_loop_get_player_by_pos
 	j ret_get_player_by_pos
@@ -183,17 +183,22 @@ init_move_player:
 
 	j finish_init_move_player
 
-########################################
+#########################################################
 # Desenha o jogador na tela.
-########################################
+#########################################################
 # a0 = player
-########################################
+# a1 = force draw even if BLINK_ANIMATION is in progress
+#########################################################
 DRAW_PLAYER:
+	# if a1 != 0 draw player regardess of BLINK_ANIMATION
+	bne a1, zero, start_draw_player
+
 	# if blink animation is not ongoing, run the "standing still" animation
 	la t0, BLINK_ANIMATION
 	lb t0, 0(t0)
 	bne t0, zero, EXECUTE_BLINK_ANIMATION
 
+start_draw_player:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 
@@ -209,6 +214,7 @@ DRAW_PLAYER:
 	ret
 
 EXECUTE_BLINK_ANIMATION:
+	j ACTUALLY_MOVE_PLAYER
 	ret
 
 ###################################################################################
@@ -221,11 +227,11 @@ INIT_ACTUALLY_MOVE_PLAYER:
 	# indicate that blink animation started
 	la t0, BLINK_ANIMATION
 	li t1, 1
-	#sb t1, 0(t0)
+	sb t1, 0(t0)
 
 	# save player pos
 	lb t0, PLAYER_BPOS_X(a0)
-	lb t1, PLAYER_BPOS_X(a0)
+	lb t1, PLAYER_BPOS_Y(a0)
 	la t3, ACTUALLY_MOVE_PLAYER_DATA
 	sb t0, ACTUALLY_MOVE_PLAYER_DATA_BPOSX(t3)
 	sb t1, ACTUALLY_MOVE_PLAYER_DATA_BPOSY(t3)
@@ -248,16 +254,84 @@ INIT_ACTUALLY_MOVE_PLAYER:
 
 ###################################################################################
 # Executa a animação de movimentação do jogador e movimenta ele.
-# Utiliza informações guardadas em ACTUALLY_MOVE_PLAYER_DATA da seguinte forma:
-# 0: byte oldX
-# 1: byte oldY
-# 2: byte newX
-# 3: byte newY
-# 4: word player
-###################################################################################
-# a0 = map
+# Utiliza informações guardadas em ACTUALLY_MOVE_PLAYER_DATA.
 ###################################################################################
 ACTUALLY_MOVE_PLAYER:
-	# por equanto apenas move o jogador, adicionar a animação depois.
-	#la t0
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	# goto correct part of function based on status
+	la t0, ACTUALLY_MOVE_PLAYER_DATA 
+	li t1, ACTUALLY_MOVE_PLAYER_DISAPPEAR
+	lb t2, ACTUALLY_MOVE_PLAYER_DATA_BSTATUS(t0)
+	beq t1, t2, disappear_actually_move_player
+
+	# if status is not disappear draw smoke and player at new position
+
+	# draw player
+	lw a0, ACTUALLY_MOVE_PLAYER_DATA_WPLAYER(t0)
+	li a1, 1 # force draw player
+
+	# calculate smoke position
+	la t0, ACTUALLY_MOVE_PLAYER_DATA
+	lw t2, ACTUALLY_MOVE_PLAYER_DATA_WPLAYER(t0)
+	lb t1, PLAYER_BPOS_X(t2)
+	lb t2, PLAYER_BPOS_Y(t2)
+	slli t1, t1, 4
+	slli t2, t2, 4
+	addi t1, t1, -16
+	addi t2, t2, -16
+
+	# draw smoke
+	li a0, SMOKE_TILE_SIZE
+	la a1, SMOKE_ANIM_APPEAR
+	mv a2, t1
+	mv a3, t2
+	li a4, SMOKE_ANIMATION_DELAY
+	li a5, SMOKE_TILE_SIZE
+	jal DRAW_ANIMATION
+
+	# if animation finished then conclude BLINK_ANIMATION
+	bne a0, zero, stop_blink_animation_actually_move_player
+
+ret_actually_move_player:
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+
+stop_blink_animation_actually_move_player:
+	la t0, BLINK_ANIMATION
+	sb zero, 0(t0)
+	j ret_actually_move_player
+
+disappear_actually_move_player:
+	# calculate smoke position
+	la t0, ACTUALLY_MOVE_PLAYER_DATA
+	lb t1, ACTUALLY_MOVE_PLAYER_DATA_BPOSX(t0)
+	lb t2, ACTUALLY_MOVE_PLAYER_DATA_BPOSY(t0)
+	slli t1, t1, 4
+	slli t2, t2, 4
+	addi t1, t1, -16
+	addi t2, t2, -16
+
+	# draw smoke
+	li a0, SMOKE_TILE_SIZE
+	la a1, SMOKE_ANIM_DISAPPEAR
+	mv a2, t1
+	mv a3, t2
+	li a4, SMOKE_ANIMATION_DELAY
+	li a5, SMOKE_TILE_SIZE
+	jal DRAW_ANIMATION
+
+	# if a0 != 0 then the animation ended, so set status to ACTUALLY_MOVE_PLAYER_APPEAR
+	bne a0, zero, set_appear_actually_move_player
+	j ret_actually_move_player
+
+set_appear_actually_move_player:
+	# set status to appear
+	la t0, ACTUALLY_MOVE_PLAYER_DATA
+	li t1, ACTUALLY_MOVE_PLAYER_APPEAR
+	sb t1, ACTUALLY_MOVE_PLAYER_DATA_BSTATUS(t0)
+	j ret_actually_move_player
+
 goto_actually_move_player:
