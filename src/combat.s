@@ -1,24 +1,6 @@
-####################################################
-# Player (Colocar o tamanho do objeto em bytes aqui)
-####################################################
-# 0: word sprite idle
-# 0: word sprite pose
-# 4: word sprite magia
-# 8: byte vida total
-# 9: byte vida atual
-# 10: half_word_x magia
-# 12: half_word_y magia
-# 14: byte size_x magia
-# 15: byte size_y magia
-# 16: tipo de player
-# 17: dano do player
-# 18: endereco para o nome
-# offset: (byte, half word, word) nomeDaVariavel
-
-####################################################
 
 #########################################################
-#   #
+#   Desenha o modo de combate na master
 #########################################################
 # a0 = endereco para o objeto do player1                # 
 # a1 = endereco para o objeto do player2                # 
@@ -707,10 +689,8 @@ LOGIC_COMBAT:
     blt t0, t1, second_reduce_life_logic_combat
 
     # Termina o combat
-    la t0, IN_COMBAT
-    sb zero, 0(t0)
-    j end_logic_combat
-    
+    j finish_logic_combat
+
 idle_logic_combat:
     # Vaiaveis de estado
     la t0, IS_PRINT_DMG
@@ -969,6 +949,7 @@ second_reduce_life_logic_combat:
     li t1, 1
     sb t1, 0(t2)
 
+
     # First interaction
     li t1, NUMBER_OF_STEPS_UNTIL_SECOND_LIFE
     beq t1, t0, calculate_dmg_second_logic_combat
@@ -1064,7 +1045,8 @@ sub_player_life_player_logic:
     la t1, PLAYERS_IN_COMBAT
     lw t2, 0(t1)
     lb t0, PLAYER_B_VIDA_ATUAL(t2)
-    beq t0, zero, end_logic_combat
+    beq t0, zero, finish_logic_combat
+
     la t1, COMBAT_DAMAGE
     lb t3, 0(t1)
     beq t3, zero, end_logic_combat
@@ -1079,7 +1061,7 @@ sub_enemy_life_player_logic:
     la t1, PLAYERS_IN_COMBAT
     lw t2, 4(t1)
     lb t0, PLAYER_B_VIDA_ATUAL(t2)
-    beq t0, zero, end_logic_combat
+    beq t0, zero, finish_logic_combat
     la t1, COMBAT_DAMAGE
     lb t3, 0(t1)
     beq t3, zero, end_logic_combat
@@ -1276,6 +1258,11 @@ end_logic_combat:
     addi sp, sp, 4
     ret
 
+finish_logic_combat:
+    la t0, IN_COMBAT
+    sb zero, 0(t0)
+    j end_logic_combat
+    
 
 ##################################################
 # Recebe os tipo e retorna vantagem ou desvantagem      

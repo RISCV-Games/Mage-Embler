@@ -10,19 +10,19 @@ PLAYER_2: .string "Player2"
 
 .align 2
 PLAYER1: .word,0, 0
-.byte 20, 10
+.byte 20, 5
 .half 0, 0 
 .byte 0, 0
 .word PLAYER_1
 .byte AL_AZUL
-.byte 5, 50, 1
+.byte 5, 80, 1
 PLAYER2: .word 0, 0
-.byte 25, 15 
+.byte 25, 5 
 .half 0, 0 
 .byte 0, 0
 .word PLAYER_2
 .byte IN_VER
-.byte 5, 50, 1
+.byte 5, 120, 1
 
 .text
 jal INIT_VIDEO
@@ -35,7 +35,7 @@ sw t0, 0(t2)
 sw t1, 4(t2)
 
 la t0, IN_COMBAT
-li t1, 2
+li t1, 1
 sb t1, 0(t0)
 
 GAME:
