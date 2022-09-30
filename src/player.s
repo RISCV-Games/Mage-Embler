@@ -139,8 +139,8 @@ start_draw_player:
 	lb a2, PLAYER_BPOS_X(a0)
 	lb a3, PLAYER_BPOS_Y(a0)
 	li a4, PLAYER_STILL_ANIMATION_DELAY
-	#jal GET_PLAYER_STILL_ANIMATION
-	la a1, PLAYER_EARTH_STILL_ANIM
+	jal GET_PLAYER_STILL_ANIM
+	mv a1, a0
 	la a0, tiles
 	jal DRAW_ANIMATION_TILE
 
@@ -157,10 +157,48 @@ EXECUTE_BLINK_ANIMATION:
 #########################################################
 # a0 = player
 #########################################################
-GET_PLAYER_STILL_ANIMATION:
-	#lb t0, PLAYER_BELEMENT
-	la a1, PLAYER_EARTH_STILL_ANIM
+GET_PLAYER_STILL_ANIM:
+	# t0 = player.isAlly, t1 = player.element
+	lb t0, PLAYER_BIS_ALLY(a0)	
+	lb t1, PLAYER_BELEMENT(a0)
+	bne t0, zero, ally_get_player_still_anim
+
+	li t2, PLAYER_WATER
+	beq t1, t2 water_enemy_get_player_still_anim
+	li t2, PLAYER_FIRE
+	beq t1, t2 fire_enemy_get_player_still_anim
+
+	# if player.element is neither water nor fire then it is earth
+	la a0, ENEMY_EARTH_STILL_ANIM
 	ret
+
+water_enemy_get_player_still_anim:
+	la a0, ENEMY_WATER_STILL_ANIM
+	ret
+
+fire_enemy_get_player_still_anim:
+	la a0, ENEMY_FIRE_STILL_ANIM
+	ret
+
+
+ally_get_player_still_anim:
+	li t2, PLAYER_WATER
+	beq t1, t2 water_ally_get_player_still_anim
+	li t2, PLAYER_FIRE
+	beq t1, t2 fire_ally_get_player_still_anim
+
+	# if player.element is neither water nor fire then it is earth
+	la a0, ALLY_EARTH_STILL_ANIM
+	ret
+
+water_ally_get_player_still_anim:
+	la a0, ALLY_WATER_STILL_ANIM
+	ret
+
+fire_ally_get_player_still_anim:
+	la a0, ALLY_FIRE_STILL_ANIM
+	ret
+
 
 
 #########################################################
