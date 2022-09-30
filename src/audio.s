@@ -59,8 +59,8 @@ playAudio:
 	mv a3, a2
 	mv a2, a1
 	mv a1, t1
-	li a7, 33
-	ecall
+
+    jal MIDI_OUT
 
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -90,3 +90,74 @@ AUDIO_TEST:
 	lw ra, 0(sp)
 	addi sp, sp, 4
 	ret
+
+
+
+
+
+###########################################
+#        MidiOut 31 (2015/1)              #
+#  a0 = pitch (0-127)                     #
+#  a1 = duration in milliseconds          #
+#  a2 = instrument (0-15)                 #
+#  a3 = volume (0-127)                    #
+###########################################
+
+
+#################################################################################################
+#
+# Note Data           = 32 bits     |   1'b - Melody   |   4'b - Instrument   |   7'b - Volume   |   7'b - Pitch   |   1'b - End   |   1'b - Repeat   |   11'b - Duration   |
+#
+# Note Data (ecall) = 32 bits     |   1'b - Melody   |   4'b - Instrument   |   7'b - Volume   |   7'b - Pitch   |   13'b - Duration   |
+#
+#################################################################################################
+MIDI_OUT:
+    DE1(s8,de2_midi_out)
+	
+    li a7,31		# Chama o ecall normal
+	ecall
+	j fim_midi_out
+
+de2_midi_out:	
+    li      t0, NOTE_DATA
+    add     t1, zero, zero
+
+    # Melody = 0
+
+    # Definicao do Instrumento
+	andi    t2, a2, 0x0000000F
+    slli    t2, t2, 27
+    or      t1, t1, t2
+
+    # Definicao do Volume
+    andi    t2, a3, 0x0000007F
+    slli    t2, t2, 20
+    or      t1, t1, t2
+
+    # Definicao do Pitch
+    andi    t2, a0, 0x0000007F
+    slli    t2, t2, 13
+    or      t1, t1, t2
+
+    # Definicao da Duracao
+    li 	t4, 0x1FF
+    slli 	t4, t4, 4
+    addi 	t4, t4, 0x00F			# t4 = 0x00001FFF
+    and    	t2, a1, t4
+    or      t1, t1, t2
+
+    # Guarda a definicao da duracao da nota na Word 1
+    j       sint_midi_out
+
+sint_midi_out:	
+    sw	t1, 0(t0)
+
+	# Verifica a subida do clock AUD_DACLRCK para o sintetizador receber as definicoes
+	li      t2, NOTE_CLOCK
+check_aud_daclrck_midi_out:     	
+    lw      t3, 0(t2)
+    beq     t3, zero, check_aud_daclrck_midi_out
+
+fim_midi_out:    		
+    ret
+

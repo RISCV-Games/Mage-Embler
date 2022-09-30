@@ -17,9 +17,9 @@ V  - Victor
 - [R] Animacao do jogador (Mundo)
 - [X] Audio
 - [ ] Adicionar .datas com músicas
-- [ ] Menus
+- [X] Menus
 - [ ] Modo de batalha
-- [ ] Sistema de dialogos
+- [X] Sistema de dialogos
 - [ ] UI (User interface) (sistema de combate)
 - [ ] IA dos inimigos (Movimentacao)
 - [ ] Sistema de combate (Pedra papel tesoura)
