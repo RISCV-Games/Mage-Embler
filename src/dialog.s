@@ -35,7 +35,7 @@ DRAW_DIALOG:
     mv a4, s3
     jal DRAW_FILL_RETANGULE
 
-    li a0, 0x0FF
+    li a0, branco
     jal DRAW_RETANGULE
 
     mv a0, s0
