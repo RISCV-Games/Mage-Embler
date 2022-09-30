@@ -73,3 +73,4 @@ no_combat:
 .include "../src/dialog.s"
 .include "../src/menu.s"
 .include "../src/utils.s"
+.include "../src/input.s"
