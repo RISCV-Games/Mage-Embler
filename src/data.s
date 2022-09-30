@@ -28,6 +28,9 @@ TERRA: .string "TERRA"
 HIT_STRING: .string "HIT"
 MISS_STRING: .string "MISS"
 CRIT_STRING: .string "CRIT"
+DMG_STRING: .string "DMG"
+
+INFO_STRING: .string "DMG   \nHIT   \nCRIT   "
 
 # Caracteres para print(string, char)
 LabelTabChar:

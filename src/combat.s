@@ -18,7 +18,6 @@
 ####################################################
 
 #########################################################
-#	Desenha o modo de combate                           #
 #   #
 #########################################################
 # a0 = endereco para o objeto do player1                # 
@@ -258,6 +257,246 @@ finish_life_draw_combat:
     li a6, POS_Y_ELEMENTO_PLAYER_2
     jal DRAW_DIALOG
 
+
+    # #########################
+    # COMBAT INFORMATION
+    # #########################
+    # Player 1
+    # Print retangule
+    li a0, vermelho
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    li a2, POS_Y_INFO_BOX_PLAYER
+    li a3, TAMANHO_X_INFO_BOX
+    li a4, TAMANHO_Y_INFO_BOX
+    jal DRAW_FILL_RETANGULE
+
+    li a0, branco
+    jal DRAW_RETANGULE
+
+    # Print atributes
+    # DMG
+    la a0, DMG_STRING
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    addi a1, a1, 4
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 2
+    li a3, branco
+    li t0, vermelho
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_STRING
+
+    lb a0, PLAYER_B_DAMAGE(s0)
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 2
+    li a3, branco
+    li t0, vermelho
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+
+    # HIT
+    la a0, HIT_STRING
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    addi a1, a1, 4
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 11
+    li a3, branco
+    li t0, vermelho
+    slli t0, t0, 8
+    add a3, t0, a3
+    jal PRINT_STRING
+
+    lb a0, PLAYER_B_TIPO(s0)
+    lb a1, PLAYER_B_TIPO(s1)
+    jal CONFRONT_TYPE
+    beq a0, zero, print1_normal_hit_draw_combat
+    bgt a0, zero, print1_green_hit_draw_combat
+
+    # print amarelo
+    lb t0, PLAYER_B_HIT(s0)
+    add a0, t0, a0
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 11
+    li a3, amarelo
+    li t0, vermelho
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+    j print_crit_draw_combat
+
+print1_green_hit_draw_combat:
+    lb t0, PLAYER_B_HIT(s0)
+    add a0, t0, a0
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 11
+    li a3, verde
+    li t0, vermelho
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+    j print_crit_draw_combat
+
+print1_normal_hit_draw_combat:
+    lb a0, PLAYER_B_HIT(s0)
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 11
+    li a3, branco
+    li t0, vermelho
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+
+print_crit_draw_combat:
+    # CRIT
+    la a0, CRIT_STRING
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    addi a1, a1, 4
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 20
+    li a3, branco
+    li t0, vermelho
+    slli t0, t0, 8
+    add a3, t0, a3
+    jal PRINT_STRING
+
+    lb a0, PLAYER_B_CRIT(s0)
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 20
+    li a3, branco
+    li t0, vermelho
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+
+    # Player 2
+    # Print retangule
+    li a0, azul
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    li a2, POS_Y_INFO_BOX_PLAYER
+    li a3, TAMANHO_X_INFO_BOX
+    li a4, TAMANHO_Y_INFO_BOX
+    jal DRAW_FILL_RETANGULE
+
+    li a0, branco
+    jal DRAW_RETANGULE
+
+    # Print atributes
+    # DMG
+    la a0, DMG_STRING
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    addi a1, a1, 4
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 2
+    li a3, branco
+    li t0, azul
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_STRING
+
+    lb a0, PLAYER_B_DAMAGE(s1)
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 2
+    li a3, branco
+    li t0, azul
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+
+    # HIT
+    la a0, HIT_STRING
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    addi a1, a1, 4
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 11
+    li a3, branco
+    li t0, azul
+    slli t0, t0, 8
+    add a3, t0, a3
+    jal PRINT_STRING
+
+    lb a0, PLAYER_B_TIPO(s1)
+    lb a1, PLAYER_B_TIPO(s0)
+    jal CONFRONT_TYPE
+    beq a0, zero, print2_normal_hit_draw_combat
+    bgt a0, zero, print2_green_hit_draw_combat
+
+    # print amarelo
+    lb t0, PLAYER_B_HIT(s1)
+    add a0, t0, a0
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 11
+    li a3, amarelo
+    li t0, azul
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+    j print_crit2_draw_combat
+
+print2_green_hit_draw_combat:
+    lb t0, PLAYER_B_HIT(s1)
+    add a0, t0, a0
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 11
+    li a3, verde
+    li t0, azul
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+    j print_crit2_draw_combat
+
+print2_normal_hit_draw_combat:
+    lb a0, PLAYER_B_HIT(s1)
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 11
+    li a3, branco
+    li t0, azul
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+
+print_crit2_draw_combat:
+    # CRIT
+    la a0, CRIT_STRING
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    addi a1, a1, 4
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 20
+    li a3, branco
+    li t0, azul
+    slli t0, t0, 8
+    add a3, t0, a3
+    jal PRINT_STRING
+
+    lb a0, PLAYER_B_CRIT(s1)
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 20
+    li a3, branco
+    li t0, azul
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_INT
+
     # #########################
     # DMG
     # #########################
@@ -298,6 +537,18 @@ finish_life_draw_combat:
     add a3, a3, t0
 
     jal PRINT_INT
+
+    la a0, DMG_STRING
+    li a1, DMG_STRING_POSITION_X
+    li t0, CRIT_STRING_OFFSET
+    addi t0, t0, DMG_STRING_OFFSET
+    add a1, a1, t0
+    li a2, DMG_STRING_POSITION_Y
+    li a3, branco
+    li t0, transp
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_STRING
     
     j draw_players_draw_combat
 
@@ -328,6 +579,18 @@ hit_draw_combat:
     add a3, a3, t0
 
     jal PRINT_INT
+
+    la a0, DMG_STRING
+    li a1, DMG_STRING_POSITION_X
+    li t0, DMG_STRING_OFFSET
+    addi t0, t0, HIT_STRING_OFFSET
+    add a1, a1, t0
+    li a2, DMG_STRING_POSITION_Y
+    li a3, branco
+    li t0, transp
+    slli t0, t0, 8
+    add a3, a3, t0
+    jal PRINT_STRING
     
     j draw_players_draw_combat
 
@@ -848,12 +1111,18 @@ calculate_dmg_second_logic_combat:
 
 player_calculate_dmg_logic_combat:
     # Check if players hits
-    li a0, 100
-    jal RAND_INT
-
     la t0, PLAYERS_IN_COMBAT
     lw t1, 0(t0)
     lb t2, PLAYER_B_HIT(t1)
+
+    lb a0, PLAYER_B_TIPO(t1)
+    lw t1, 4(t0)
+    lb a1, PLAYER_B_TIPO(t1)
+    jal CONFRONT_TYPE
+    add t2, t2, a0 # Hit + type
+
+    li a0, 100
+    jal RAND_INT
 
     bgt a0, t2, player_miss_calculate_dmg_logic_combat
     # acertou
@@ -898,14 +1167,21 @@ player_miss_calculate_dmg_logic_combat:
     j end_dmg_logic_combat
 
 enemy_calculate_dmg_logic_combat:
-    
     # Check if players hits
-    li a0, 100
-    jal RAND_INT
-
     la t0, PLAYERS_IN_COMBAT
     lw t1, 4(t0)
     lb t2, PLAYER_B_HIT(t1)
+    
+    lb a0, PLAYER_B_TIPO(t1)
+    lw t1, 0(t0)
+    lb a1, PLAYER_B_TIPO(t1)
+
+    jal CONFRONT_TYPE
+
+    add t2, t2, a0 # Hit + type
+
+    li a0, 100
+    jal RAND_INT
 
     bgt a0, t2, enemy_miss_calculate_dmg_logic_combat
     # acertou
@@ -977,8 +1253,6 @@ end_idle_atack_logic_combat:
     j end_logic_combat
 
 
-end_sub_player_logic:
-
 end_moving_atack_logic_combat:
     # Verifica se pode avancar a cena
 	csrr t0, time
@@ -1001,6 +1275,84 @@ end_logic_combat:
     lw ra 0(sp)
     addi sp, sp, 4
     ret
+
+
+##################################################
+# Recebe os tipo e retorna vantagem ou desvantagem      
+##################################################
+# a0 = tipo atacante
+# a1 = tipo defesa
+##################################################
+# a0 = desvantagam para acertar
+##################################################
+CONFRONT_TYPE:
+    li t0, AL_AZUL
+    beq a0, t0, blue_confront_type
+    li t0, IN_AZUL
+    beq a0, t0, blue_confront_type
+    li t0, AL_VER
+    beq a0, t0, red_confront_type
+    li t0, IN_VER
+    beq a0, t0, red_confront_type
+    li t0, AL_MAR
+    beq a0, t0, marron_confront_type
+    li t0, IN_MAR
+    beq a0, t0, marron_confront_type
+
+blue_confront_type:
+    li t0, AL_AZUL
+    beq a1, t0, eq_confront_type
+    li t0, IN_AZUL
+    beq a1, t0, eq_confront_type
+    li t0, AL_VER
+    beq a1, t0, ad_confront_type
+    li t0, IN_VER
+    beq a1, t0, ad_confront_type
+    li t0, AL_MAR
+    beq a1, t0, des_confront_type
+    li t0, IN_MAR
+    beq a1, t0, des_confront_type
+
+red_confront_type:
+    li t0, AL_AZUL
+    beq a1, t0, des_confront_type
+    li t0, IN_AZUL
+    beq a1, t0, des_confront_type
+    li t0, AL_VER
+    beq a1, t0, eq_confront_type
+    li t0, IN_VER
+    beq a1, t0, eq_confront_type
+    li t0, AL_MAR
+    beq a1, t0, ad_confront_type
+    li t0, IN_MAR
+    beq a1, t0, ad_confront_type
+
+marron_confront_type:
+    li t0, AL_AZUL
+    beq a1, t0, ad_confront_type
+    li t0, IN_AZUL
+    beq a1, t0, ad_confront_type
+    li t0, AL_VER
+    beq a1, t0, des_confront_type
+    li t0, IN_VER
+    beq a1, t0, des_confront_type
+    li t0, AL_MAR
+    beq a1, t0, eq_confront_type
+    li t0, IN_MAR
+    beq a1, t0, eq_confront_type
+
+eq_confront_type:
+    li a0, 0
+    ret
+
+ad_confront_type:
+    li a0, 20
+    ret
+
+des_confront_type:
+    li a0, -20
+    ret
+
 
 
 ##################################################

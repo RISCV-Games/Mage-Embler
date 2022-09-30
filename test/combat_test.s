@@ -14,14 +14,14 @@ PLAYER1: .word,0, 0
 .half 0, 0 
 .byte 0, 0
 .word PLAYER_1
-.byte AL_VER
+.byte AL_AZUL
 .byte 5, 50, 1
 PLAYER2: .word 0, 0
 .byte 25, 15 
 .half 0, 0 
 .byte 0, 0
 .word PLAYER_2
-.byte IN_AZUL
+.byte IN_VER
 .byte 5, 50, 1
 
 .text
