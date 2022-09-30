@@ -11,74 +11,78 @@
 # 3: byte element (PLAYER_WATER, PLAYER_FIRE, PLAYER_EARTH)
 #############################################################
 
+
+
+
+
 ############################################################
 # Inicializa os players a partir do mapa.
 ############################################################
-# a0 = map
-# a1 = correspondence array
+# a0 = map number
 ############################################################
 INIT_PLAYERS:
-	# t0 = i = 0
-	li t0, 0
+	beq a0, zero, zero_init_players
+	li t0, 1
+	beq a0, t0, one_init_players
+	li t0, 2
+	beq a0, t0, two_init_players
+	li t0, 3
+	beq a0, t0, three_init_players
+	li t0, 4
+	beq a0, t0, four_init_players
 
-loop_init_players:
-	li t1, TILES_PER_MAP
-	bge t0, t1, ret_init_players
-
-	add t1, t0, a0
-	lb t1, 0(t1)
-	andi t1, t1, 0x7
-	li t2, BLOCK_ALLY
-	beq t1, t2, ally_init_players
-	li t2, BLOCK_ENEMY
-	beq t1, t2, enemy_init_players
-
-continue_loop_init_players:
-	addi t0, t0, 1
-	j loop_init_players
-
-ally_init_players:
-	li a2, 1
-	j init_init_players
-enemy_init_players:
-	li a2, 0
-	j init_init_players
-
-init_init_players:
-	# t3 = player position in memory
-	la t1, N_PLAYERS
-	lb t1, 0(t1)
-	li t2, PLAYER_BYTE_SIZE
-	mul t2, t2, t1
-	la t4, PLAYERS
-	add t3, t4, t2
-
-	# N_PLAYERS++
-	la t4, N_PLAYERS
-	addi t1, t1, 1
-	sb t1, 0(t4)
-
-	# (t1, t2) = (posX, posY)
-	li t2, MAP_WIDTH
-	rem t1, t0, t2
-	div t2, t0, t2
-
-	# t4 = tileNum
-	add t4, a0, t0
-	lb t4, 0(t4)
-	srli t4, t4, 3
-	add t4, t4, a1
-	lb t4, 0(t4)
-
-	# initialize values
-	sb t1, PLAYER_BPOS_X(t3)
-	sb t2, PLAYER_BPOS_Y(t3)
-	sb a2, PLAYER_BIS_ALLY(t3)
-	
-	j continue_loop_init_players
-
-ret_init_players:
 	ret
+
+zero_init_players:
+	la t0, PLAYERS
+	li t1, 4
+	sb t1, PLAYER_BPOS_X(t0)
+	li t1, 10
+	sb t1, PLAYER_BPOS_Y(t0)
+	li t1, 1
+	sb t1, PLAYER_BIS_ALLY(t0)
+	li t1, PLAYER_WATER
+	sb t1, PLAYER_BELEMENT(t0)
+
+	addi t0, t0, PLAYER_BYTE_SIZE
+	li t1, 5
+	sb t1, PLAYER_BPOS_X(t0)
+	li t1, 4
+	sb t1, PLAYER_BPOS_Y(t0)
+	li t1, 1
+	sb t1, PLAYER_BIS_ALLY(t0)
+	li t1, PLAYER_FIRE
+	sb t1, PLAYER_BELEMENT(t0)
+
+	addi t0, t0, PLAYER_BYTE_SIZE
+	li t1, 16
+	sb t1, PLAYER_BPOS_X(t0)
+	li t1, 4
+	sb t1, PLAYER_BPOS_Y(t0)
+	li t1, 0
+	sb t1, PLAYER_BIS_ALLY(t0)
+	li t1, PLAYER_EARTH
+	sb t1, PLAYER_BELEMENT(t0)
+
+	# set N_PLAYERS to correct amount
+	la t0, N_PLAYERS
+	li t1, 3
+	sb t1, 0(t0)
+	ret
+
+one_init_players:
+	ret
+
+two_init_players:
+	ret
+
+three_init_players:
+	ret
+
+four_init_players:
+	ret
+
+
 ###################################################################################
 # Retorna um Player a partir de sua posição (x, y).
 ###################################################################################
@@ -113,76 +117,6 @@ ret_get_player_by_pos:
 	mv a0, t3
 	ret
 
-###################################################################################
-# Move o player localizado na posição do cursor de  acordo com o mapa.
-###################################################################################
-# a0 = map
-# a1 = keyCode
-###################################################################################
-MOVE_PLAYER:
-	addi sp, sp, -12
-	sw ra, 0(sp)
-	sw a0, 4(sp)
-	sw a1, 8(sp)
-
-	# if blink animation is in progress go to actually move_player
-	la t0, BLINK_ANIMATION
-	lb t0, 0(t0)
-	beq t0, zero, goto_actually_move_player
-
-	# initialize trail if function is being called for the first time
-	la t0, MAKING_TRAIL
-	lb t0, 0(t0)
-	beq t0, zero, init_move_player
-
-finish_init_move_player:
-
-	jal DRAW_WALKABLE_BLOCKS
-	lw a0, 8(sp)
-	jal MAKE_TRAIL
-	jal DRAW_CURSOR
-
-	# if 'x' is pressed stop trail and actually move the player
-	li t0, 'x'
-	lw t1, 8(sp)
-	beq t0, t1, finish_move_player
-
-ret_move_player:
-	lw ra, 0(sp)
-	addi sp, sp, 12
-
-finish_move_player:
-	jal GET_PLAYER_BY_POS
-	la t0, ACTUALLY_MOVE_PLAYER_DATA
-
-	# store player in sp + 8
-	# jal GET_PLAYER_BY_POS
-	# sw a0, 8(sp)
-	
-	# # stop trail and save its last pos at (a2, a3).
-	# jal STOP_TRAIL
-	# mv a2, a0
-	# mv a3, a1
-
-	# # (a0, a1) = (mouseX, mouseY)
-	# la t0, CURSOR_POS
-	# lb a0, 0(t0)
-	# lb a1, 1(t0)
-
-	# # a3 = player
-	# lw a3, 8(sp)
-
-init_move_player:
-	mv a2, a0
-	la t0, CURSOR_POS
-	lb a0, 0(t0)
-	lb a1, 1(t0)
-	jal UPDATE_WALKABLE_BLOCKS
-
-	jal INIT_CURSOR_TRAIL
-
-	j finish_init_move_player
-
 #########################################################
 # Desenha o jogador na tela.
 #########################################################
@@ -202,10 +136,11 @@ start_draw_player:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 
-	la a1, PLAYER_EARTH_STILL_ANIM
 	lb a2, PLAYER_BPOS_X(a0)
 	lb a3, PLAYER_BPOS_Y(a0)
 	li a4, PLAYER_STILL_ANIMATION_DELAY
+	#jal GET_PLAYER_STILL_ANIMATION
+	la a1, PLAYER_EARTH_STILL_ANIM
 	la a0, tiles
 	jal DRAW_ANIMATION_TILE
 
@@ -215,6 +150,53 @@ start_draw_player:
 
 EXECUTE_BLINK_ANIMATION:
 	j ACTUALLY_MOVE_PLAYER
+	ret
+
+#########################################################
+# Retorna a animação still do Player
+#########################################################
+# a0 = player
+#########################################################
+GET_PLAYER_STILL_ANIMATION:
+	#lb t0, PLAYER_BELEMENT
+	la a1, PLAYER_EARTH_STILL_ANIM
+	ret
+
+
+#########################################################
+# Desenha todos os jogadores na tela.
+#########################################################
+DRAW_PLAYERS:
+	addi sp, sp, -8
+	sw ra, 0(sp)
+	sw s0, 4(sp)
+
+	# s0 = i = 0
+	li s0, 0
+
+loop_draw_players:
+	la t0, N_PLAYERS
+	lb t0, 0(t0)
+	bge s0, t0, ret_draw_players
+
+	# a0 = players[i]
+	la a0, PLAYERS
+	li t0, PLAYER_BYTE_SIZE
+	mul t0, t0, s0
+	add a0, a0, t0
+
+	# a1 = force draw player = false
+	li a1, 0
+	jal DRAW_PLAYER
+
+	addi s0, s0, 1
+
+	j loop_draw_players
+
+ret_draw_players:
+	lw ra, 0(sp)
+	lw s0, 4(sp)
+	addi sp, sp, 8
 	ret
 
 ###################################################################################
@@ -334,4 +316,3 @@ set_appear_actually_move_player:
 	sb t1, ACTUALLY_MOVE_PLAYER_DATA_BSTATUS(t0)
 	j ret_actually_move_player
 
-goto_actually_move_player:

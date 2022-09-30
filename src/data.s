@@ -3,8 +3,6 @@
 .data
 FRAME_TO_DRAW: .byte 0
 
-CURSOR_POS: .byte SCREEN_CENTER_X SCREEN_CENTER_Y
-
 # Estados
 IN_COMBAT: .byte 0      # 0 - fora de comabate    1 - aliado ataca primeiro    2 - inimigo ataca primeiro
 COMBAT_STEP: .byte 0    # idle - primeiro atack - tira vida - segundo atack - tira vida
