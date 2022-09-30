@@ -1,0 +1,4 @@
+.data
+.align 2
+WALKABLE:
+.word 0xc0c0c0c0, 0xc0c0c0c0, 0xc0c0c0c0, 0xc0c0c0c0

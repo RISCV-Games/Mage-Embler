@@ -12,17 +12,17 @@ AE - Aelton
 V  - Victor
 
 - [X] Render de tiles
-- [E] Animacao cursor
+- [X] Animacao cursor
 - [E] Movimentacao do jogador 
-- [R] Animacao do jogador (Mundo)
+- [X] Animacao do jogador (Mundo)
 - [X] Audio
 - [ ] Adicionar .datas com músicas
 - [X] Menus
-- [ ] Modo de batalha
+- [X] Modo de batalha
 - [X] Sistema de dialogos
 - [ ] UI (User interface) (sistema de combate)
 - [ ] IA dos inimigos (Movimentacao)
-- [ ] Sistema de combate (Pedra papel tesoura)
+- [X] Sistema de combate (Pedra papel tesoura)
 - [ ] Sistema de combate (terreno especial)
 - [ ] Historia
-- [ ] Definicao de estética( Tiles, sprites de animacao )
+- [X] Definicao de estética( Tiles, sprites de animacao )

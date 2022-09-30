@@ -2,6 +2,7 @@
 
 .data
 FRAME_TO_DRAW: .byte 0
+
 CURSOR_POS: .byte SCREEN_CENTER_X SCREEN_CENTER_Y
 
 # Estados
@@ -17,8 +18,31 @@ PRINT_DMG: .byte 0
 
 IS_PRINT_DMG: .byte 0
 
+CURSOR_POS: .byte SCREEN_CENTER_X, SCREEN_CENTER_Y
+
 .align 2
 CURSOR_ANIM: .word 2, 0, MIN_WORD, CURSOR_NUM0, CURSOR_NUM1
+PLAYER_BLINK_ANIM0: .word 2, 0, MIN_WORD, 1, 2
+PLAYER_BLINK_ANIM1: .word 2, 0, MIN_WORD, 2, 1
+SMOKE_ANIM_DISAPPEAR: .word 2, 0, -1, MIN_WORD, SMOKE0, SMOKE1
+SMOKE_ANIM_APPEAR: .word 2, 0, -1, MIN_WORD, SMOKE1, SMOKE0
+.align 0
+CURSOR_TRAIL: .space N_CURSOR_TRAIL
+MAKING_TRAIL: .byte 0
+# Indicates if player blink animation is in progress
+BLINK_ANIMATION: .byte 0
+
+ACTUALLY_MOVE_PLAYER_DATA: 
+.align 2
+.word 0 # player
+.byte 0 # oldPosX
+.byte 0 # oldPosY
+.byte 0 # status
+
+.align 2
+# Player animations data:
+PLAYER_EARTH_STILL_ANIM: .word 2, 0, MIN_WORD, ALLY_EARTH_STILL_FRAME0, ALLY_EARTH_STILL_FRAME1
+
 
 # Nome dos elementos
 FOGO: .string "FOGO"
@@ -31,6 +55,29 @@ CRIT_STRING: .string "CRIT"
 DMG_STRING: .string "DMG"
 
 INFO_STRING: .string "DMG   \nHIT   \nCRIT   "
+
+
+WALKABLE_BLOCKS: .align 2
+.space TILES_PER_MAP
+
+.align 0
+MAPS:
+.byte
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0x11,0x11,0,0,0,0,0,0,
+0,0,0, 0,0,0,0,0,0,0,0,0,0x11,0x11,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0x11,0x11,0x11,0x11,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0x11,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0x11,0x11,0x11,0x11,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 # Caracteres para print(string, char)
 LabelTabChar:
@@ -65,8 +112,22 @@ LabelTabChar:
 TEMP_BUFFER:
 .space 512
 
+.align 0
+N_PLAYERS:
+.byte 0
+
+# Allocating PLAYER_BYTE_SIZE * 10 bytes
+.align 0
+PLAYERS:
+.space 40
+
+CORRESPONDENCE_ARR_MAP0:
+.byte 3, 2, 1, 0
+
+.align 2
 # Images
 .include "../sprites/tiles.data"
+
 .include "../sprites/vida_cheia.data"
 .include "../sprites/vida_vazia.data"
 .include "../sprites/combat_mago_idle.data"
@@ -87,3 +148,8 @@ TEMP_BUFFER:
 .include "../sprites/combat/combat_pose_inimigo_vermelho.data"
 .include "../sprites/combat/combat_idle_inimigo_marron.data"
 .include "../sprites/combat/combat_pose_inimigo_marron.data"
+
+.include "../images/SMOKE0.data"
+.include "../images/SMOKE1.data"
+.include "../images/walkable.data"
+

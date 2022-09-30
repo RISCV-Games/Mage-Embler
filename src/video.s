@@ -220,7 +220,22 @@ draw_line_render_tile:
 # a5 = reverse (if 1 reverse image)                     # 
 #########################################################
 RENDER:
-# Render baseado em tiles 16x16
+	# if X < 0 return
+	blt a1, zero, ret_render
+
+	# if Y < 0 return
+	blt a2, zero, ret_render
+
+	# if x + width >= 320 return
+	add t0, a1, a3
+	addi t0, t0, -320
+	bge t0, zero, ret_render
+	# if y + height >= 240 return
+	add t0, a2, a4
+	addi t0, t0, -240
+	bge t0, zero, ret_render
+
+	# Render baseado em tiles 16x16
 	# Calculando posicao na tela para print
 	GET_BUFFER_TO_DRAW(t0)
 	add t0, t0, a1 # Adciona X
@@ -276,34 +291,118 @@ rev_draw_line_render:
 	li t2, 0
 	addi t3,t3,1			                # incrementa contador de linha
 	bgt a4,t3, rev_draw_line_render		# se altura > contador de linha, continue imprimindo
-		
+ret_render:
 	ret				# retorna
 
 
-######################################################################
-#	Anima uma imagem com informações estão guardadas                   
-# na memória começando no endereço em a1.                            
-# Formato do a1 (WORD): tamanho, i, MIN_WORD, anim1..., animN                  
+##############################################################################################
+#	Anima uma imagem com informações estão guardadas
+# na memória começando no endereço em a1. Retorna 1 se a animação já foi desenhada por inteiro
+# uma vez e 0 caso contrário
+# Formato do a1 (WORD): tamanho, i, MIN_WORD, anim1..., animN
 # cada animN representa um numero da tile a ser desenhada.
 # "tamanho" indica quantos frames a animaçao possui.
 # "i" eh um numero que satisfas 0 <= i < tamanho e indica a partir
 # de qual frame a animacao comecara (geralmente i eh 0).
 # Exemplos de como usar a funcao: anim_test.s, cursor_test.s
-######################################################################
+##############################################################################################
 # a0 = endereço da imagem com tiles
 # a1 = informações da animação
 # a2 = X
 # a3 = Y
 # a4 = tempo entre frames (ms)
-######################################################################
+##############################################################################################
 DRAW_ANIMATION_TILE:
 	# save ra
-	addi sp, sp, -4
+	addi sp, sp, -8
 	sw ra, 0(sp)
 
 	# if time passed is less than a4, dont animate
 	csrr t0, time
 	lw t1, 8(a1)
+	sub t0, t0, t1
+	bgeu t0, a4, continue_draw_animation_tile
+
+	# t1 = (t1 + tamanho - 1) % tamanho
+	lw t0, 0(a1)
+	lw t1, 4(a1)
+	add t1, t0, t1
+	addi t1, t1, -1
+	rem t1, t1, t0 
+	sw t1, 4(a1)
+	j skip_draw_animation_tile
+
+continue_draw_animation_tile:	
+	csrr t0, time
+	sw t0, 8(a1)
+
+skip_draw_animation_tile:
+	# t0 = tamanho, t1 = i
+	lw t0, 0(a1)
+	lw t1, 4(a1)
+
+	# t2 = (i + 1) % tamanho
+	addi t2, t1, 1
+	rem t2, t2, t0
+	sw t2, 4(a1)
+	# save t2 on stack to calculate the return value later
+	sw t2, 4(sp)
+
+	# t1 = number of current tile
+	slli t1, t1, 2
+	add t1, a1, t1
+	lw t1, 12(t1)
+
+	# draw the tile
+	mv a1, a2
+	mv a2, a3
+	mv a3, t1
+	jal RENDER_TILE
+
+	# if the animation endend return 1 else return 0
+	lw t2, 4(sp)
+	beq t2, zero, end_draw_animation_tile
+	mv a0, zero
+
+ret_draw_animation_tile:
+	# restore stack and return
+	lw ra, 0(sp)
+	addi sp, sp, 8
+	ret
+
+end_draw_animation_tile:
+	li a0, 1
+	j ret_draw_animation_tile
+
+##############################################################################################
+#	Anima uma imagem com informações estão guardadas
+# na memória começando no endereço em a1. Retorna 1 se a animação já foi desenhada por inteiro
+# uma vez e 0 caso contrário
+# Formato do a1 (WORD): tamanho, i, j, MIN_WORD, anim1..., animN
+# cada animN representa um numero da tile a ser desenhada.
+# "tamanho" indica quantos frames a animaçao possui.
+# "i" eh um numero que satisfas 0 <= i < tamanho e indica a partir
+# de qual frame a animacao comecara (geralmente i eh 0).
+# j é um número que deve ser inicializado como -1 e conta quantas vezes a animação já
+# rodou por completo.
+# Exemplos de como usar a funcao: anim_test.s, cursor_test.s
+##############################################################################################
+# a0 = tamanho da imagem x
+# a1 = informações da animação
+# a2 = X
+# a3 = Y
+# a4 = tempo entre frames (ms)
+# a5 = tamanho da imagem y
+##############################################################################################
+DRAW_ANIMATION:
+	# save ra
+	addi sp, sp, -8
+	sw ra, 0(sp) 
+	sw a1, 4(sp)
+
+	# if time passed is less than a4, dont animate
+	csrr t0, time
+	lw t1, 12(a1)
 	sub t0, t0, t1
 	bgeu t0, a4, continue_draw_animation
 
@@ -318,7 +417,9 @@ DRAW_ANIMATION_TILE:
 
 continue_draw_animation:	
 	csrr t0, time
-	sw t0, 8(a1)
+	sw t0, 12(a1)
+	lw t0, 4(a1)
+	beq t0, zero, increment_anim_counter_draw_animation
 
 skip_draw_animation:
 	# t0 = tamanho, t1 = i
@@ -330,23 +431,44 @@ skip_draw_animation:
 	rem t2, t2, t0
 	sw t2, 4(a1)
 
-	# t1 = number of current tile
+	# t1 = address of current image
 	slli t1, t1, 2
 	add t1, a1, t1
-	lw t1, 12(t1)
+	lw t1, 16(t1)
 
 	# draw the tile
 	mv a1, a2
 	mv a2, a3
-	mv a3, t1
-	jal RENDER_TILE
+	mv a4, a5
+	li a5, 0
+	mv a3, a0
+	mv a0, t1
+	jal RENDER
+
+	# if animation was rendered at least one time then return 0
+	lw a1, 4(sp)
+	lw t0, 8(a1)
+	bgt t0, zero, ret1_draw_animation
+	li a0, 0
 
 ret_draw_animation:
 	# restore stack and return
 	lw ra, 0(sp)
-	addi sp, sp, 4
+	addi sp, sp, 8
 	ret
 
+ret1_draw_animation:
+	# return 1 and restore j to 0
+	li a0, 1
+	li t0, -1
+	sw t0, 8(a1)
+	j ret_draw_animation
+
+increment_anim_counter_draw_animation:
+	lw t0, 8(a1)
+	addi t0, t0, 1
+	sw t0, 8(a1)
+	j skip_draw_animation
 
 
 #########################################################
