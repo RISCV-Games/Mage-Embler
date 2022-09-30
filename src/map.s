@@ -104,13 +104,24 @@ loop_draw_walkable_blocks:
 	lb t0, 0(t0)
 	beq t0, zero, continue_loop_draw_walkable_blocks
 
-	# a0 = tiles, a1 = x, a2 = y
-	la a0, tiles
+	# a0 = walkable tile
+	la a0, WALKABLE
 	li t0, MAP_WIDTH
+	
+	# a1 = x * 16 + 6, a2 = y * 16 + 6
 	rem a1, s0, t0
 	div a2, s0, t0
-	li a3, BLOCK_WALKABLE
-	jal RENDER_TILE
+	slli a1, a1, 4
+	slli a2, a2, 4
+	addi a1, a1, 6
+	addi a2, a2, 6
+
+	# (a3, a4) = (width, height) = (4, 4)
+	li a3, 4
+	li a4, 4
+	# a5 = reverse = false
+	li a5, 0
+	jal RENDER
 
 continue_loop_draw_walkable_blocks:
 	addi s0, s0, 1

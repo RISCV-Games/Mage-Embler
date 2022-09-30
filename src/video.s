@@ -117,7 +117,22 @@ draw_line_render_tile:
 # a5 = reverse (if 1 reverse image)                     # 
 #########################################################
 RENDER:
-# Render baseado em tiles 16x16
+	# if X < 0 return
+	blt a1, zero, ret_render
+
+	# if Y < 0 return
+	blt a2, zero, ret_render
+
+	# if x + width >= 320 return
+	add t0, a1, a3
+	addi t0, t0, -320
+	bge t0, zero, ret_render
+	# if y + height >= 240 return
+	add t0, a2, a4
+	addi t0, t0, -240
+	bge t0, zero, ret_render
+
+	# Render baseado em tiles 16x16
 	# Calculando posicao na tela para print
 	GET_BUFFER_TO_DRAW(t0)
 	add t0, t0, a1 # Adciona X
@@ -173,7 +188,7 @@ rev_draw_line_render:
 	li t2, 0
 	addi t3,t3,1			                # incrementa contador de linha
 	bgt a4,t3, rev_draw_line_render		# se altura > contador de linha, continue imprimindo
-		
+ret_render:
 	ret				# retorna
 
 
@@ -340,6 +355,7 @@ ret_draw_animation:
 	ret
 
 ret1_draw_animation:
+	# return 1 and restore j to 0
 	li a0, 1
 	li t0, -1
 	sw t0, 8(a1)

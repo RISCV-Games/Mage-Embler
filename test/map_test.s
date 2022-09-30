@@ -8,9 +8,14 @@ la a0, MAPS
 la a1, CORRESPONDENCE_ARR_MAP0
 jal INIT_PLAYERS
 
-li a0, 3
-li a1, 3
-jal GET_PLAYER_BY_POS
+la t0, PLAYERS
+li t1, SCREEN_CENTER_X
+sb t1, PLAYER_BPOS_X(t0)
+li t1, 10
+sb t1, PLAYER_BPOS_Y(t0)
+li t1, 1
+sb t1, PLAYER_BIS_ALLY(t0)
+sb zero, PLAYER_BELEMENT(t0)
 GAME:
 	la a0, MAPS
 	la a1, CORRESPONDENCE_ARR_MAP0
@@ -26,6 +31,10 @@ GAME:
 	jal MAKE_TRAIL
 	jal DRAW_CURSOR
 
+	la a0, PLAYERS
+	mv a1, zero # dont force player draw
+	jal DRAW_PLAYER
+
 	li t0, 'x'
 	beq s0, t0, stop_trail_game
 
@@ -35,9 +44,15 @@ continue_loop_game:
 
 stop_trail_game:
 	jal STOP_TRAIL
+	la a0, PLAYERS
+	jal INIT_ACTUALLY_MOVE_PLAYER
 	j continue_loop_game
 
 not_making_trail_game:
+	la a0, PLAYERS
+	mv a1, zero # dont force player draw
+	jal DRAW_PLAYER
+
 	jal GET_KBD_INPUT
 	mv s0, a0
 	jal MOVE_CURSOR

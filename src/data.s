@@ -65,3 +65,4 @@ CORRESPONDENCE_ARR_MAP0:
 .include "../sprites/tiles.data"
 .include "../images/SMOKE0.data"
 .include "../images/SMOKE1.data"
+.include "../images/walkable.data"
