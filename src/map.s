@@ -327,3 +327,30 @@ ret_draw_map:
 	lw s2, 12(sp)
 	addi sp, sp, 12
 	ret
+
+###########################################################
+# Initializes all players for map 0.
+###########################################################
+INIT_MAP_0:
+	la t0, PLAYERS
+
+	# Initialize players[0] at pos (SCREEN_CENTER_X, 10) as a water ally.
+	li t1, SCREEN_CENTER_X
+	sb t1, PLAYER_BPOS_X(t0)
+	li t1, 10
+	sb t1, PLAYER_BPOS_Y(t0)
+	li t1, 1
+	sb t1, PLAYER_BIS_ALLY(t0)
+	li t1, PLAYER_WATER
+	sb t1, PLAYER_BELEMENT(t0)
+
+	addi t0, t0, PLAYER_BYTE_SIZE
+	# Initialize players[1] at pos (SCREEN_CENTER_X, 3) as a water enemy.
+	li t1, SCREEN_CENTER_X
+	sb t1, PLAYER_BPOS_X(t0)
+	li t1, 10
+	sb t1, PLAYER_BPOS_Y(t0)
+	li t1, 0
+	sb t1, PLAYER_BIS_ALLY(t0)
+	li t1, PLAYER_WATER
+	sb t1, PLAYER_BELEMENT(t0)
