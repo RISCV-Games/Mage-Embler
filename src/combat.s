@@ -12,6 +12,7 @@
 # 15: byte size_y magia
 # 16: tipo de player
 # 17: dano do player
+# 18: endereco para o nome
 # offset: (byte, half word, word) nomeDaVariavel
 
 ####################################################
@@ -23,6 +24,7 @@
 # a0 = endereco para o objeto do player1                # 
 # a1 = endereco para o objeto do player2                # 
 # a2 = is_combat 0 - ninguem 1 player1 2 player2        # 
+# a3 = is_print_dmg
 #########################################################
 
 DRAW_COMBAT:
@@ -41,7 +43,11 @@ DRAW_COMBAT:
     mv s0, a0
     mv s1, a1
     mv s5, a2
+    mv s6, a3
 
+    # #########################
+    # LIFE 
+    # #########################
     # draw left retangule
     li a0, vermelho
     li a1, 0
@@ -63,7 +69,10 @@ DRAW_COMBAT:
     mv a0 ,s2
     li a1, PLAYER1_LIFE_NUMBER_POSITION_X
     li a2, PLAYER1_LIFE_POSITION_Y
-    li a3, PLAYER1_LIFE_COLOR
+    li a3, branco
+    li t0, vermelho
+    slli t0,t0, 8
+    add a3, a3, t0
     jal PRINT_INT
 
     # Draw player life
@@ -132,7 +141,10 @@ start_player2_life_draw_combat:
     mv a0 ,s2
     li a1, PLAYER2_LIFE_NUMBER_POSITION_X
     li a2, PLAYER2_LIFE_POSITION_Y
-    li a3, PLAYER2_LIFE_COLOR
+    li a3, branco
+    li t0, azul
+    slli t0,t0, 8
+    add a3, a3, t0
     jal PRINT_INT
 
     # Draw player life
@@ -180,6 +192,161 @@ player2_missing_life_draw_combat:
     j player2_missing_life_draw_combat
 
 finish_life_draw_combat:
+    # #########################
+    # NAMES
+    # #########################
+    # Name player 1
+    lw a0, PLAYER_W_NOME(s0)
+    li a1, vermelho
+    # vermelho fundo branco
+    li t0, branco
+    slli a1, a1, 8
+    add a1, a1, t0
+    
+    li a2, TAMANHO_X_NOME_PLAYER
+    li a3, TAMANHO_Y_NOME_PLAYER
+    li a4, vermelho
+    li a5, POS_X_NOME_PLAYER_1
+    li a6, POS_Y_NOME_PLAYER_1
+    jal DRAW_DIALOG
+
+    # Name player 2
+    lw a0, PLAYER_W_NOME(s1)
+    li a1, azul
+    # vermelho fundo branco
+    li t0, branco
+    slli a1, a1, 8
+    add a1, a1, t0
+    
+    li a2, TAMANHO_X_NOME_PLAYER
+    li a3, TAMANHO_Y_NOME_PLAYER
+    li a4, azul
+    li a5, POS_X_NOME_PLAYER_2
+    li a6, POS_Y_NOME_PLAYER_2
+    jal DRAW_DIALOG
+
+    # #########################
+    # ELEMENTS
+    # #########################
+    # Player 1
+    lb a0, PLAYER_B_TIPO(s0)
+    jal GET_COMBAT_SPRITES_BY_TYPE
+    mv a0, a4 # Nome do elemento
+    li a1, branco
+    li t0, bege
+    slli t0, t0, 8
+    add a1, a1, t0
+    li a2, TAMANHO_X_ELEMENTO_PLAYER
+    li a3, TAMANHO_Y_ELEMENTO_PLAYER
+    li a4, bege
+    li a5, POS_X_ELEMENTO_PLAYER_1
+    li a6, POS_Y_ELEMENTO_PLAYER_1
+    jal DRAW_DIALOG
+
+    # Player 2
+    lb a0, PLAYER_B_TIPO(s1)
+    jal GET_COMBAT_SPRITES_BY_TYPE
+    mv a0, a4 # Nome do elemento
+    li a1, branco
+    li t0, bege
+    slli t0, t0, 8
+    add a1, a1, t0
+    li a2, TAMANHO_X_ELEMENTO_PLAYER
+    li a3, TAMANHO_Y_ELEMENTO_PLAYER
+    li a4, bege
+    li a5, POS_X_ELEMENTO_PLAYER_2
+    li a6, POS_Y_ELEMENTO_PLAYER_2
+    jal DRAW_DIALOG
+
+    # #########################
+    # DMG
+    # #########################
+    beq s6, zero, draw_players_draw_combat
+    la t0, PRINT_DMG
+    lb t3, 0(t0)
+    # If 0 miss
+    # If positive hit
+    # If negative critical hit
+
+    beq t3, zero, miss_draw_combat
+    bgt t3, zero, hit_draw_combat
+
+    # crit
+    la a0, CRIT_STRING
+    li a1, DMG_STRING_POSITION_X
+    li a2, DMG_STRING_POSITION_Y
+
+    li a3, branco
+    li t0, transp
+    slli t0, t0, 8
+    add a3, a3, t0
+
+    jal PRINT_STRING
+
+    la t0, PRINT_DMG
+    lb t3, 0(t0)
+
+    sub a0, zero, t3 # Inverter
+    li a1, DMG_STRING_POSITION_X
+    li t0, CRIT_STRING_OFFSET
+    add a1, a1, t0
+    li a2, DMG_STRING_POSITION_Y
+
+    li a3, branco
+    li t0, transp
+    slli t0, t0, 8
+    add a3, a3, t0
+
+    jal PRINT_INT
+    
+    j draw_players_draw_combat
+
+hit_draw_combat:
+    la a0, HIT_STRING
+    li a1, DMG_STRING_POSITION_X
+    li a2, DMG_STRING_POSITION_Y
+
+    li a3, branco
+    li t0, transp
+    slli t0, t0, 8
+    add a3, a3, t0
+
+    jal PRINT_STRING
+
+    la t0, PRINT_DMG
+    lb t3, 0(t0)
+
+    mv a0, t3
+    li a1, DMG_STRING_POSITION_X
+    li t0, HIT_STRING_OFFSET
+    add a1, a1, t0
+    li a2, DMG_STRING_POSITION_Y
+
+    li a3, branco
+    li t0, transp
+    slli t0, t0, 8
+    add a3, a3, t0
+
+    jal PRINT_INT
+    
+    j draw_players_draw_combat
+
+miss_draw_combat:
+    la a0, MISS_STRING
+    li a1, DMG_STRING_POSITION_X
+    li a2, DMG_STRING_POSITION_Y
+
+    li a3, branco
+    li t0, transp
+    slli t0, t0, 8
+    add a3, a3, t0
+
+    jal PRINT_STRING
+
+    # #########################
+    # PLAYERS
+    # #########################
+draw_players_draw_combat:
     # Draw players
     lw a0, PLAYER_W_SPRITE(s0)
     li a1, PLAYER1_POSITION_X
@@ -275,9 +442,17 @@ LOGIC_COMBAT:
 
     addi t1, t1, NUMBER_OF_MAX_LIFE
     blt t0, t1, second_reduce_life_logic_combat
+
+    # Termina o combat
+    la t0, IN_COMBAT
+    sb zero, 0(t0)
     j end_logic_combat
     
 idle_logic_combat:
+    # Vaiaveis de estado
+    la t0, IS_PRINT_DMG
+    sb zero, 0(t0)
+
     # Coloca a label dos dois playres como idle
     la t0, PLAYER_ATACKING
     sb zero, 0(t0)
@@ -312,6 +487,9 @@ idle_logic_combat:
 
 
 first_atack_logic_combat:
+    # Vaiaveis de estado
+    la t0, IS_PRINT_DMG
+    sb zero, 0(t0)
 
     li t0, 1
     la t1, IN_COMBAT
@@ -323,6 +501,10 @@ first_atack_logic_combat:
 
 
 second_atack_logic_combat:
+    # Vaiaveis de estado
+    la t0, IS_PRINT_DMG
+    sb zero, 0(t0)
+
     li t0, 1
     la t1, IN_COMBAT
     lb t1, 0(t1)
@@ -519,9 +701,14 @@ magic_inimigo_idle_logic_combat:
 
 
 second_reduce_life_logic_combat:
+    # Vaiaveis de estado
+    la t2, IS_PRINT_DMG
+    li t1, 1
+    sb t1, 0(t2)
+
     # First interaction
     li t1, NUMBER_OF_STEPS_UNTIL_SECOND_LIFE
-    beq t1, t0, calculate_dmg_logic_combat
+    beq t1, t0, calculate_dmg_second_logic_combat
 
     # Coloca a label dos dois playres como idle
     la t0, PLAYER_ATACKING
@@ -562,9 +749,14 @@ second_reduce_life_logic_combat:
     j sub_enemy_life_player_logic
 
 first_reduce_life_logic_combat:
+    # Vaiaveis de estado
+    la t2, IS_PRINT_DMG
+    li t1, 1
+    sb t1, 0(t2)
+
     # First interaction
     li t1, NUMBER_OF_STEPS_UNTIL_FIRST_LIFE
-    beq t1, t0, calculate_dmg_logic_combat
+    beq t1, t0, calculate_dmg_first_logic_combat
 
     # Coloca a label dos dois playres como idle
     la t0, PLAYER_ATACKING
@@ -635,9 +827,8 @@ sub_enemy_life_player_logic:
     sb t3, 0(t1)
     j end_logic_combat
 
-calculate_dmg_logic_combat:
-    # TODO
-    # Just player damage for now
+calculate_dmg_first_logic_combat:
+    # HIT, CRIT, PLAYER DMG
     li t0, 1
     la t1, IN_COMBAT
     lb t1, 0(t1)
@@ -645,20 +836,117 @@ calculate_dmg_logic_combat:
     beq t1, t0, player_calculate_dmg_logic_combat
     j enemy_calculate_dmg_logic_combat 
 
+calculate_dmg_second_logic_combat:
+    # HIT, CRIT, PLAYER DMG
+    li t0, 1
+    la t1, IN_COMBAT
+    lb t1, 0(t1)
+
+    beq t1, t0, enemy_calculate_dmg_logic_combat
+    j player_calculate_dmg_logic_combat
+
+
 player_calculate_dmg_logic_combat:
+    # Check if players hits
+    li a0, 100
+    jal RAND_INT
+
     la t0, PLAYERS_IN_COMBAT
     lw t1, 0(t0)
-    lb t2, PLAYER_B_DAMAGE(t1)
-    la t3, COMBAT_DAMAGE
-    sb t2, 0(t3)
+    lb t2, PLAYER_B_HIT(t1)
+
+    bgt a0, t2, player_miss_calculate_dmg_logic_combat
+    # acertou
+    # Checking if crit
+    li a0, 10
+    jal RAND_INT # number 0 to 9 if 0 or 1 crit
+    li t0, 10
+    bgt a0, t0, no_crit_player_dmg_logic_combat
+    # Has crit
+    lb t2, PLAYER_B_CRIT(t1) # 
+    addi t2, t2, 1
+
+    lb t3, PLAYER_B_DAMAGE(t1)
+    mul t3, t3, t2
+
+    la t2, COMBAT_DAMAGE
+    sb t3, 0(t2)
+
+    la t0, PRINT_DMG
+    sub t3, zero, t3
+    sb t3, 0(t0) # negativo representa critico
+
+    j end_dmg_logic_combat
+
+no_crit_player_dmg_logic_combat:
+    lb t3, PLAYER_B_DAMAGE(t1)
+    la t2, COMBAT_DAMAGE
+    sb t3, 0(t2)
+
+    la t0, PRINT_DMG
+    sb t3, 0(t0)
+
+    j end_dmg_logic_combat
+
+player_miss_calculate_dmg_logic_combat:
+    la t2, COMBAT_DAMAGE
+    sb zero, 0(t2)
+
+    la t0, PRINT_DMG
+    sb zero, 0(t0)
+
     j end_dmg_logic_combat
 
 enemy_calculate_dmg_logic_combat:
+    
+    # Check if players hits
+    li a0, 100
+    jal RAND_INT
+
     la t0, PLAYERS_IN_COMBAT
     lw t1, 4(t0)
-    lb t2, PLAYER_B_DAMAGE(t1)
-    la t3, COMBAT_DAMAGE
-    sb t2, 0(t3)
+    lb t2, PLAYER_B_HIT(t1)
+
+    bgt a0, t2, enemy_miss_calculate_dmg_logic_combat
+    # acertou
+    # Checking if crit
+    li a0, 10
+    jal RAND_INT # number 0 to 9 if 0 or 1 crit
+    li t0, 1
+    bgt a0, t0, no_crit_enemy_dmg_logic_combat
+    # Has crit
+    lb t2, PLAYER_B_CRIT(t1) # 
+    addi t2, t2, 1
+
+    lb t3, PLAYER_B_DAMAGE(t1)
+    mul t3, t3, t2
+
+    la t2, COMBAT_DAMAGE
+    sb t3, 0(t2)
+
+    la t0, PRINT_DMG
+    sub t3, zero, t3
+    sb t3, 0(t0) # negativo representa critico
+
+    j end_dmg_logic_combat
+
+no_crit_enemy_dmg_logic_combat:
+    lb t3, PLAYER_B_DAMAGE(t1)
+    la t2, COMBAT_DAMAGE
+    sb t3, 0(t2)
+
+    la t0, PRINT_DMG
+    sb t3, 0(t0)
+
+    j end_dmg_logic_combat
+
+enemy_miss_calculate_dmg_logic_combat:
+    la t2, COMBAT_DAMAGE
+    sb zero, 0(t2)
+
+    la t0, PRINT_DMG
+    sb zero, 0(t0)
+
     j end_dmg_logic_combat
 
 end_dmg_logic_combat:
@@ -745,34 +1033,40 @@ type_1_get_combat_idle_sprite_by_type:
     la a1, combat_pose_aliado_azul
     la a2, magia_idle
     la a3, projetil
+    la a4, GELO
     ret
 type_2_get_combat_idle_sprite_by_type:
     la a0, combat_idle_aliado_vermelho
     la a1, combat_pose_aliado_vermelho
     la a2, magia_idle
     la a3, projetil
+    la a4, FOGO
     ret
 type_3_get_combat_idle_sprite_by_type:
     la, a0 combat_idle_aliado_marron
     la, a1 combat_pose_aliado_marron
     la a2, magia_idle
     la a3, projetil
+    la a4, TERRA
     ret
 type_4_get_combat_idle_sprite_by_type:
     la, a0 combat_idle_inimigo_azul
     la, a1 combat_pose_inimigo_azul
     la a2, magia_idle
     la a3, projetil
+    la a4, GELO
     ret
 type_5_get_combat_idle_sprite_by_type:
     la, a0 combat_idle_inimigo_vermelho
     la, a1 combat_pose_inimigo_vermelho
     la a2, magia_idle
     la a3, projetil
+    la a4, FOGO
     ret
 type_6_get_combat_idle_sprite_by_type:
     la, a0 combat_idle_inimigo_marron
     la, a1 combat_pose_inimigo_marron
     la a2, magia_idle
     la a3, projetil
+    la a4, TERRA
     ret

@@ -4,19 +4,25 @@
 
 .data:
 
+
+PLAYER_1: .string "Player1"
+PLAYER_2: .string "Player2"
+
 .align 2
-PLAYER1: .word 0 ,0
+PLAYER1: .word,0, 0
 .byte 20, 10
 .half 0, 0 
 .byte 0, 0
+.word PLAYER_1
 .byte AL_VER
-.byte 5
+.byte 5, 50, 1
 PLAYER2: .word 0, 0
 .byte 25, 15 
 .half 0, 0 
 .byte 0, 0
+.word PLAYER_2
 .byte IN_AZUL
-.byte 5
+.byte 5, 50, 1
 
 .text
 jal INIT_VIDEO
@@ -33,8 +39,9 @@ li t1, 2
 sb t1, 0(t0)
 
 GAME:
+    jal LOGIC_COMBAT
     
-	li a0, 0xFFFFFFFF
+	li a0, 0x09090909
 	jal DRAW_BACKGROUND
 
     la t0, IN_COMBAT
@@ -47,9 +54,12 @@ GAME:
 
     la t0, PLAYER_ATACKING
     lb a2, 0(t0)
+    
+    la t0, IS_PRINT_DMG
+    lb a3, 0(t0)
+
     jal DRAW_COMBAT
 
-    jal LOGIC_COMBAT
 
 no_combat:
     jal SWAP_FRAMES
@@ -60,3 +70,6 @@ no_combat:
 .include "../src/video.s"
 .include "../src/cursor.s"
 .include "../src/combat.s"
+.include "../src/dialog.s"
+.include "../src/menu.s"
+.include "../src/utils.s"

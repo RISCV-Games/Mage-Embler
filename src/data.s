@@ -13,12 +13,21 @@ COMBAT_LAST_TIME: .word 0
 PLAYERS_IN_COMBAT: .word 0, 0
 PLAYER_ATACKING: .byte 2
 COMBAT_DAMAGE: .byte 0
+PRINT_DMG: .byte 0
+
+IS_PRINT_DMG: .byte 0
 
 .align 2
 CURSOR_ANIM: .word 2, 0, MIN_WORD, CURSOR_NUM0, CURSOR_NUM1
 
-# TIPE_TO_COMBAT_IDLE_IMAGES: .word combat_idle_aliado_azul, combat_idle_aliado_vermelho, combat_idle_aliado_marron, 
-# combat_idle_inimigo_azul, combat_idle_inimigo_vermelho, combat_idle_inimigo_marron
+# Nome dos elementos
+FOGO: .string "FOGO"
+GELO: .string "GELO"
+TERRA: .string "TERRA"
+
+HIT_STRING: .string "HIT"
+MISS_STRING: .string "MISS"
+CRIT_STRING: .string "CRIT"
 
 # Caracteres para print(string, char)
 LabelTabChar:

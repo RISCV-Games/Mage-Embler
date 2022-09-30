@@ -43,3 +43,11 @@ Criar branch separada para cada tópico, manter a branch main sempre rodando no 
 Ex:  
 feat/<nome-da-feature>
 fix/<nome-do-fix>
+
+# Paleta de cores
+NomeCor  - Valor Normal  - Valor no RISC-V
+Vermelho - FF0000        - 
+Branco   - FFF7CE        - 183
+Azul     - 
+Marron   - 
+BEGE     - b5ad7b        - 100
