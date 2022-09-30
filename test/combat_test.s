@@ -2,20 +2,21 @@
 .include "../src/consts.s"
 .include "../src/macros.s"
 
-.eqv magia_x 60
-.eqv magia_y 110
 .data:
+
 .align 2
 PLAYER1: .word 0 ,0
-.byte 20, 5
+.byte 20, 10
 .half 0, 0 
 .byte 0, 0
-.byte AL_AZUL
+.byte AL_VER
+.byte 5
 PLAYER2: .word 0, 0
-.byte 20, 15 
+.byte 25, 15 
 .half 0, 0 
 .byte 0, 0
-.byte AL_AZUL
+.byte IN_AZUL
+.byte 5
 
 .text
 jal INIT_VIDEO
@@ -28,12 +29,12 @@ sw t0, 0(t2)
 sw t1, 4(t2)
 
 la t0, IN_COMBAT
-li t1, 1
+li t1, 2
 sb t1, 0(t0)
 
 GAME:
     
-	li a0, 0x09090909
+	li a0, 0xFFFFFFFF
 	jal DRAW_BACKGROUND
 
     la t0, IN_COMBAT

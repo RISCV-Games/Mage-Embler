@@ -10,7 +10,8 @@
 # 12: half_word_y magia
 # 14: byte size_x magia
 # 15: byte size_y magia
-# 15: tipo de player
+# 16: tipo de player
+# 17: dano do player
 # offset: (byte, half word, word) nomeDaVariavel
 
 ####################################################
@@ -260,26 +261,20 @@ LOGIC_COMBAT:
     lb t0, 0(t0)
 
     # Passos de idle 2
-    li t1, 2
+    li t1, NUMBER_OF_IDLE_STEPS
     blt t0, t1, idle_logic_combat
 
-    # Passos de atack 2
     addi t1, t1, NUMBER_OF_ATACK_STEPS
     blt t0, t1, first_atack_logic_combat
 
-    addi t1, t1, 5
-    blt t0, t1, first_reduce_life_logic_combat
-    ret
-    li t1, 5
-    beq t0, t1, first_reduce_life_logic_combat
-    li t1, 6
-    beq t0, t1, second_atack_logic_combat
-    li t1, 7
-    beq t0, t1, second_atack_logic_combat
-    li t1, 8
-    beq t0, t1, second_reduce_life_logic_combat
-    li t1, 9
-    beq t0, t1, second_reduce_life_logic_combat
+    addi t1, t1, NUMBER_OF_MAX_LIFE
+    blt t0, t1 first_reduce_life_logic_combat
+
+    addi t1, t1, NUMBER_OF_ATACK_STEPS
+    blt t0, t1, second_atack_logic_combat
+
+    addi t1, t1, NUMBER_OF_MAX_LIFE
+    blt t0, t1, second_reduce_life_logic_combat
     j end_logic_combat
     
 idle_logic_combat:
@@ -317,33 +312,25 @@ idle_logic_combat:
 
 
 first_atack_logic_combat:
+
     li t0, 1
     la t1, IN_COMBAT
     lb t1, 0(t1)
     beq t1, t0, aliado_ataca_logic_combat
 
-    la t0, IN_COMBAT
-    li t1, 0
-    sb t1, 0(t0)
-    j end_logic_combat
+    # Significa que o inimigo_ataca_primeiro
+    j inimigo_ataca_logica_combat
 
-first_reduce_life_logic_combat:
-    la t0, IN_COMBAT
-    li t1, 0
-    sb t1, 0(t0)
-    j end_logic_combat
 
 second_atack_logic_combat:
-    la t0, IN_COMBAT
-    li t1, 0
-    sb t1, 0(t0)
-    j end_logic_combat
+    li t0, 1
+    la t1, IN_COMBAT
+    lb t1, 0(t1)
+    beq t1, t0, inimigo_ataca_logica_combat
 
-second_reduce_life_logic_combat:
-    la t0, IN_COMBAT
-    li t1, 0
-    sb t1, 0(t0)
-    j end_logic_combat
+    # Significa que o inimigo_ataca_primeiro
+    j aliado_ataca_logic_combat
+
 
 
 aliado_ataca_logic_combat:
@@ -399,11 +386,16 @@ aliado_ataca_logic_combat:
     addi t3, t3, NUMBER_OF_ATACK_STEPS
 
     blt t0, t3, first_atack_projetil_alied_logic_combat
-    addi t0, t0, NUMBER_OF_STEPS_UNTIL_SECOND_ATACK # N
+
+    li t4, NUMBER_OF_STEPS_UNTIL_SECOND_ATACK 
+    sub t0, t0, t4# N
+
     j atack_projetil_alied_logic_combat
 
 first_atack_projetil_alied_logic_combat:
-    addi t0, t0, NUMBER_OF_STEPS_UNTIL_FIRST_ATACK # N
+    li t4, NUMBER_OF_STEPS_UNTIL_FIRST_ATACK 
+    sub t0, t0, t4 # N
+
 atack_projetil_alied_logic_combat:
     li t3, DELTA_X_MAGIC
     mul t0, t0, t3 # N * DELTA_X
@@ -451,9 +443,233 @@ inimigo_ataca_logica_combat:
     lb a0, PLAYER_B_TIPO(t2)
     jal GET_COMBAT_SPRITES_BY_TYPE
     sw a1, PLAYER_W_SPRITE(t2)
+
+    # Desenhando o poder baseado no passo se primeiro passo de atack magia em idle resto projetil que se movimenta
+    la t0, COMBAT_STEP
+    lb t1, 0(t0)
+
+    li t2, NUMBER_OF_STEPS_UNTIL_FIRST_ATACK
+    beq t1, t2, magic_inimigo_idle_logic_combat
+
+    li t2, NUMBER_OF_STEPS_UNTIL_SECOND_ATACK
+    beq t1, t2, magic_inimigo_idle_logic_combat
+
+    # Significa que precisamos calcular o x do projetil
+    la t1, PLAYERS_IN_COMBAT
+    lw t2, 4(t1)
+    lb a0, PLAYER_B_TIPO(t2)
+    jal GET_COMBAT_SPRITES_BY_TYPE
+    sw a3, PLAYER_W_SPRITE_MAGIA(t2) # Projetil
+
+    # Tamanhos
+    li t0, MOVING_MAGIC_WIDTH
+    sb t0, PLAYER_B_MAGIA_SIZE_X(t2)
+    li t0, MOVING_MAGIC_HEIGHT
+    sb t0, PLAYER_B_MAGIA_SIZE_Y(t2)
+
+    # Distancia
+    # Adicionando Y
+    li t0, MOVING_MAGIC_POSITION_2_Y
+    sh t0, PLAYER_H_MAGIA_Y(t2)
+    # Adicionando X
+    la t0, COMBAT_STEP
+    lb t0, 0(t0)
+
+    li t3, NUMBER_OF_STEPS_UNTIL_FIRST_ATACK
+    addi t3, t3, NUMBER_OF_ATACK_STEPS
+
+    blt t0, t3, first_atack_projetil_enemy_logic_combat
+    li t4,NUMBER_OF_STEPS_UNTIL_SECOND_ATACK 
+    sub t0, t0, t4# N
+    j atack_projetil_enemy_logic_combat
+
+first_atack_projetil_enemy_logic_combat:
+    li t4, NUMBER_OF_STEPS_UNTIL_FIRST_ATACK 
+    sub t0, t0, t4# N
+
+atack_projetil_enemy_logic_combat:
+    li t3, DELTA_X_MAGIC
+    mul t0, t0, t3 # N * DELTA_X
+    li t4, MOVING_MAGIC_POSITION_2_X 
+    sub t0, t4, t0 # Positon + n
+    sh t0, PLAYER_H_MAGIA_X(t2)
+
+    j end_moving_atack_logic_combat
+
+magic_inimigo_idle_logic_combat:
+    la t1, PLAYERS_IN_COMBAT
+    lw t2, 4(t1)
+    lb a0, PLAYER_B_TIPO(t2)
+    jal GET_COMBAT_SPRITES_BY_TYPE
+    sw a2, PLAYER_W_SPRITE_MAGIA(t2)
+
+    # Setting positions and sizes
+    li t0, IDLE_MAGIC_POSITION_2_X
+    sh t0, PLAYER_H_MAGIA_X(t2)
+
+    li t0, IDLE_MAGIC_POSITION_2_Y
+    sh t0, PLAYER_H_MAGIA_Y(t2)
+
+    li t0, IDLE_MAGIC_WIDTH
+    sb t0, PLAYER_B_MAGIA_SIZE_X(t2)
+    li t0, IDLE_MAGIC_HEIGHT
+    sb t0, PLAYER_B_MAGIA_SIZE_Y(t2)
+
+    j end_idle_atack_logic_combat
+
+
+second_reduce_life_logic_combat:
+    # First interaction
+    li t1, NUMBER_OF_STEPS_UNTIL_SECOND_LIFE
+    beq t1, t0, calculate_dmg_logic_combat
+
+    # Coloca a label dos dois playres como idle
+    la t0, PLAYER_ATACKING
+    sb zero, 0(t0)
+
+    la t1, PLAYERS_IN_COMBAT
+    lw t2, 0(t1)
+
+    lb a0, PLAYER_B_TIPO(t2)
+    jal GET_COMBAT_SPRITES_BY_TYPE
+    sw a0, PLAYER_W_SPRITE(t2)
+
+    lw t2, 4(t1)
+    lb a0, PLAYER_B_TIPO(t2)
+    jal GET_COMBAT_SPRITES_BY_TYPE
+    sw a0, PLAYER_W_SPRITE(t2)
+
+    # Verifica se pode avancar a cena
+	csrr t0, time
+    la t1, COMBAT_LAST_TIME
+    lw t2, 0(t1)
+    li t3, WAIT_LIFE_SUB_TIME
+    sub t2, t0, t2
+    bgtu t3, t2, end_logic_combat
+    sw t0, 0(t1)
+    # Send to combat step to next
+    la t0, COMBAT_STEP
+    lb t1, 0(t0)
+    addi t1, t1, 1
+    sb t1, 0(t0)
+
+    # Subtract dmg and player life by 1
+    li t0, 1
+    la t1, IN_COMBAT
+    lb t1, 0(t1)
+
+    beq t1, t0, sub_player_life_player_logic
+    j sub_enemy_life_player_logic
+
+first_reduce_life_logic_combat:
+    # First interaction
+    li t1, NUMBER_OF_STEPS_UNTIL_FIRST_LIFE
+    beq t1, t0, calculate_dmg_logic_combat
+
+    # Coloca a label dos dois playres como idle
+    la t0, PLAYER_ATACKING
+    sb zero, 0(t0)
+
+    la t1, PLAYERS_IN_COMBAT
+    lw t2, 0(t1)
+
+    lb a0, PLAYER_B_TIPO(t2)
+    jal GET_COMBAT_SPRITES_BY_TYPE
+    sw a0, PLAYER_W_SPRITE(t2)
+
+    lw t2, 4(t1)
+    lb a0, PLAYER_B_TIPO(t2)
+    jal GET_COMBAT_SPRITES_BY_TYPE
+    sw a0, PLAYER_W_SPRITE(t2)
+
+    # Verifica se pode avancar a cena
+	csrr t0, time
+    la t1, COMBAT_LAST_TIME
+    lw t2, 0(t1)
+    li t3, WAIT_LIFE_SUB_TIME
+    sub t2, t0, t2
+    bgtu t3, t2, end_logic_combat
+    sw t0, 0(t1)
+    # Send to combat step to next
+    la t0, COMBAT_STEP
+    lb t1, 0(t0)
+    addi t1, t1, 1
+    sb t1, 0(t0)
+
+    # Subtract dmg and player life by 1
+    li t0, 1
+    la t1, IN_COMBAT
+    lb t1, 0(t1)
+
+    beq t1, t0, sub_enemy_life_player_logic
+    j sub_player_life_player_logic
+    
+
+sub_player_life_player_logic:
+    la t1, PLAYERS_IN_COMBAT
+    lw t2, 0(t1)
+    lb t0, PLAYER_B_VIDA_ATUAL(t2)
+    beq t0, zero, end_logic_combat
+    la t1, COMBAT_DAMAGE
+    lb t3, 0(t1)
+    beq t3, zero, end_logic_combat
+
+    addi t0, t0, -1
+    addi t3, t3, -1
+    sb t0, PLAYER_B_VIDA_ATUAL(t2)
+    sb t3, 0(t1)
     j end_logic_combat
 
+sub_enemy_life_player_logic:
+    la t1, PLAYERS_IN_COMBAT
+    lw t2, 4(t1)
+    lb t0, PLAYER_B_VIDA_ATUAL(t2)
+    beq t0, zero, end_logic_combat
+    la t1, COMBAT_DAMAGE
+    lb t3, 0(t1)
+    beq t3, zero, end_logic_combat
 
+    addi t0, t0, -1
+    addi t3, t3, -1
+    sb t0, PLAYER_B_VIDA_ATUAL(t2)
+    sb t3, 0(t1)
+    j end_logic_combat
+
+calculate_dmg_logic_combat:
+    # TODO
+    # Just player damage for now
+    li t0, 1
+    la t1, IN_COMBAT
+    lb t1, 0(t1)
+
+    beq t1, t0, player_calculate_dmg_logic_combat
+    j enemy_calculate_dmg_logic_combat 
+
+player_calculate_dmg_logic_combat:
+    la t0, PLAYERS_IN_COMBAT
+    lw t1, 0(t0)
+    lb t2, PLAYER_B_DAMAGE(t1)
+    la t3, COMBAT_DAMAGE
+    sb t2, 0(t3)
+    j end_dmg_logic_combat
+
+enemy_calculate_dmg_logic_combat:
+    la t0, PLAYERS_IN_COMBAT
+    lw t1, 4(t0)
+    lb t2, PLAYER_B_DAMAGE(t1)
+    la t3, COMBAT_DAMAGE
+    sb t2, 0(t3)
+    j end_dmg_logic_combat
+
+end_dmg_logic_combat:
+    # Send to combat step to next
+    la t0, COMBAT_STEP
+    lb t1, 0(t0)
+    addi t1, t1, 1
+    sb t1, 0(t0)
+
+    j end_logic_combat
+    
 
 end_idle_atack_logic_combat:
     # Verifica se pode avancar a cena
@@ -472,6 +688,9 @@ end_idle_atack_logic_combat:
 
     j end_logic_combat
 
+
+end_sub_player_logic:
+
 end_moving_atack_logic_combat:
     # Verifica se pode avancar a cena
 	csrr t0, time
@@ -488,6 +707,7 @@ end_moving_atack_logic_combat:
     sb t1, 0(t0)
 
     j end_logic_combat
+
 end_logic_combat:
 
     lw ra 0(sp)
@@ -506,13 +726,6 @@ end_logic_combat:
 # a3 = magic moving
 ##################################################
 GET_COMBAT_SPRITES_BY_TYPE:
-    # DEBUG
-    la a0, combat_mago_idle
-    la a1, combat_mago_pose
-    la a2, magia_idle
-    la a3, projetil
-    ret
-
     li t0, AL_AZUL
     beq a0, t0, type_1_get_combat_idle_sprite_by_type
     li t0, AL_VER
@@ -528,26 +741,38 @@ GET_COMBAT_SPRITES_BY_TYPE:
     j type_1_get_combat_idle_sprite_by_type
 
 type_1_get_combat_idle_sprite_by_type:
-    # la a0, combat_idle_aliado_azul
-    # la a1, combat_pose_aliado_azul
+    la a0, combat_idle_aliado_azul
+    la a1, combat_pose_aliado_azul
+    la a2, magia_idle
+    la a3, projetil
     ret
 type_2_get_combat_idle_sprite_by_type:
-    # la a0, combat_idle_aliado_vermelho
-    # la a1, combat_pose_aliado_vermelho
+    la a0, combat_idle_aliado_vermelho
+    la a1, combat_pose_aliado_vermelho
+    la a2, magia_idle
+    la a3, projetil
     ret
 type_3_get_combat_idle_sprite_by_type:
-    # la, a0 combat_idle_aliado_marron
-    # la, a1 combat_pose_aliado_marron
+    la, a0 combat_idle_aliado_marron
+    la, a1 combat_pose_aliado_marron
+    la a2, magia_idle
+    la a3, projetil
     ret
 type_4_get_combat_idle_sprite_by_type:
-    # la, a0 combat_idle_inimigo_azul
-    # la, a1 combat_pose_inimigo_azul
+    la, a0 combat_idle_inimigo_azul
+    la, a1 combat_pose_inimigo_azul
+    la a2, magia_idle
+    la a3, projetil
     ret
 type_5_get_combat_idle_sprite_by_type:
-    # la, a0 combat_idle_inimigo_vermelho
-    # la, a1 combat_pose_inimigo_vermelho
+    la, a0 combat_idle_inimigo_vermelho
+    la, a1 combat_pose_inimigo_vermelho
+    la a2, magia_idle
+    la a3, projetil
     ret
 type_6_get_combat_idle_sprite_by_type:
-    # la, a0 combat_idle_inimigo_marron
-    # la, a1 combat_pose_inimigo_marron
+    la, a0 combat_idle_inimigo_marron
+    la, a1 combat_pose_inimigo_marron
+    la a2, magia_idle
+    la a3, projetil
     ret

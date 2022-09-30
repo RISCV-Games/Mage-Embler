@@ -12,6 +12,7 @@ COMBAT_LAST_TIME: .word 0
 .align 2
 PLAYERS_IN_COMBAT: .word 0, 0
 PLAYER_ATACKING: .byte 2
+COMBAT_DAMAGE: .byte 0
 
 .align 2
 CURSOR_ANIM: .word 2, 0, MIN_WORD, CURSOR_NUM0, CURSOR_NUM1
@@ -60,3 +61,17 @@ TEMP_BUFFER:
 .include "../sprites/combat_mago_pose.data"
 .include "../sprites/magia_idle.data"
 .include "../sprites/projetil.data"
+
+# Combate
+.include "../sprites/combat/combat_idle_aliado_azul.data"
+.include "../sprites/combat/combat_pose_aliado_azul.data"
+.include "../sprites/combat/combat_idle_aliado_vermelho.data"
+.include "../sprites/combat/combat_pose_aliado_vermelho.data"
+.include "../sprites/combat/combat_idle_aliado_marron.data"
+.include "../sprites/combat/combat_pose_aliado_marron.data"
+.include "../sprites/combat/combat_idle_inimigo_azul.data"
+.include "../sprites/combat/combat_pose_inimigo_azul.data"
+.include "../sprites/combat/combat_idle_inimigo_vermelho.data"
+.include "../sprites/combat/combat_pose_inimigo_vermelho.data"
+.include "../sprites/combat/combat_idle_inimigo_marron.data"
+.include "../sprites/combat/combat_pose_inimigo_marron.data"
