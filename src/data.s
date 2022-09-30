@@ -125,7 +125,7 @@ N_PLAYERS:
 # Allocating PLAYER_BYTE_SIZE * 10 bytes
 .align 0
 PLAYERS:
-.space 40
+.space 260
 
 CORRESPONDENCE_ARR_MAP0:
 .byte 35, 2, 32, 0

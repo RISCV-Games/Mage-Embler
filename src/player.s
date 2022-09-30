@@ -36,33 +36,27 @@ INIT_PLAYERS:
 zero_init_players:
 	la t0, PLAYERS
 	li t1, 4
-	sb t1, PLAYER_BPOS_X(t0)
+	sb t1, PLAYER_B_POS_X(t0)
 	li t1, 10
-	sb t1, PLAYER_BPOS_Y(t0)
-	li t1, 1
-	sb t1, PLAYER_BIS_ALLY(t0)
-	li t1, PLAYER_WATER
-	sb t1, PLAYER_BELEMENT(t0)
+	sb t1, PLAYER_B_POS_Y(t0)
+	li t1, AL_AZUL
+	sb t1, PLAYER_B_TIPO(t0)
 
 	addi t0, t0, PLAYER_BYTE_SIZE
 	li t1, 5
-	sb t1, PLAYER_BPOS_X(t0)
+	sb t1, PLAYER_B_POS_X(t0)
 	li t1, 4
-	sb t1, PLAYER_BPOS_Y(t0)
-	li t1, 1
-	sb t1, PLAYER_BIS_ALLY(t0)
-	li t1, PLAYER_FIRE
-	sb t1, PLAYER_BELEMENT(t0)
+	sb t1, PLAYER_B_POS_Y(t0)
+	li t1, AL_VER
+	sb t1, PLAYER_B_TIPO(t0)
 
 	addi t0, t0, PLAYER_BYTE_SIZE
 	li t1, 16
-	sb t1, PLAYER_BPOS_X(t0)
+	sb t1, PLAYER_B_POS_X(t0)
 	li t1, 4
-	sb t1, PLAYER_BPOS_Y(t0)
-	li t1, 0
-	sb t1, PLAYER_BIS_ALLY(t0)
-	li t1, PLAYER_EARTH
-	sb t1, PLAYER_BELEMENT(t0)
+	sb t1, PLAYER_B_POS_Y(t0)
+	li t1, IN_MAR
+	sb t1, PLAYER_B_TIPO(t0)
 
 	# set N_PLAYERS to correct amount
 	la t0, N_PLAYERS
@@ -103,8 +97,8 @@ loop_get_player_by_pos:
 	bge t1, t2, ret_get_player_by_pos
 
 	add t3, t0, t1
-	lb t4, PLAYER_BPOS_X(t3)
-	lb t5, PLAYER_BPOS_Y(t3)
+	lb t4, PLAYER_B_POS_X(t3)
+	lb t5, PLAYER_B_POS_Y(t3)
 	bne t4, a0, continue_loop_get_player_by_pos
 	bne t5, a1, continue_loop_get_player_by_pos
 	j ret_get_player_by_pos
@@ -136,8 +130,8 @@ start_draw_player:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 
-	lb a2, PLAYER_BPOS_X(a0)
-	lb a3, PLAYER_BPOS_Y(a0)
+	lb a2, PLAYER_B_POS_X(a0)
+	lb a3, PLAYER_B_POS_Y(a0)
 	li a4, PLAYER_STILL_ANIMATION_DELAY
 	jal GET_PLAYER_STILL_ANIM
 	mv a1, a0
@@ -158,46 +152,42 @@ EXECUTE_BLINK_ANIMATION:
 # a0 = player
 #########################################################
 GET_PLAYER_STILL_ANIM:
-	# t0 = player.isAlly, t1 = player.element
-	lb t0, PLAYER_BIS_ALLY(a0)	
-	lb t1, PLAYER_BELEMENT(a0)
-	bne t0, zero, ally_get_player_still_anim
+	# t0 = player.tipo
+	lb t0, PLAYER_B_TIPO(a0)
+	li t1, AL_AZUL
+	beq t0, t1, al_azul_get_player_still_anim
+	li t1, AL_VER
+	beq t0, t1, al_ver_get_player_still_anim
+	li t1, AL_MAR
+	beq t0, t1, al_mar_get_player_still_anim
+	li t1, IN_AZUL
+	beq t0, t1, in_azul_get_player_still_anim
+	li t1, IN_VER
+	beq t0, t1, in_ver_get_player_still_anim
 
-	li t2, PLAYER_WATER
-	beq t1, t2 water_enemy_get_player_still_anim
-	li t2, PLAYER_FIRE
-	beq t1, t2 fire_enemy_get_player_still_anim
-
-	# if player.element is neither water nor fire then it is earth
 	la a0, ENEMY_EARTH_STILL_ANIM
 	ret
 
-water_enemy_get_player_still_anim:
-	la a0, ENEMY_WATER_STILL_ANIM
-	ret
-
-fire_enemy_get_player_still_anim:
-	la a0, ENEMY_FIRE_STILL_ANIM
-	ret
-
-
-ally_get_player_still_anim:
-	li t2, PLAYER_WATER
-	beq t1, t2 water_ally_get_player_still_anim
-	li t2, PLAYER_FIRE
-	beq t1, t2 fire_ally_get_player_still_anim
-
-	# if player.element is neither water nor fire then it is earth
-	la a0, ALLY_EARTH_STILL_ANIM
-	ret
-
-water_ally_get_player_still_anim:
+al_azul_get_player_still_anim:
 	la a0, ALLY_WATER_STILL_ANIM
 	ret
 
-fire_ally_get_player_still_anim:
+al_ver_get_player_still_anim:
 	la a0, ALLY_FIRE_STILL_ANIM
 	ret
+
+al_mar_get_player_still_anim:
+	la a0, ALLY_EARTH_STILL_ANIM
+	ret
+
+in_azul_get_player_still_anim:
+	la a0, ENEMY_WATER_STILL_ANIM
+	ret
+
+in_ver_get_player_still_anim:
+	la a0, ENEMY_FIRE_STILL_ANIM
+	ret
+
 
 
 
@@ -250,8 +240,8 @@ INIT_ACTUALLY_MOVE_PLAYER:
 	sb t1, 0(t0)
 
 	# save player pos
-	lb t0, PLAYER_BPOS_X(a0)
-	lb t1, PLAYER_BPOS_Y(a0)
+	lb t0, PLAYER_B_POS_X(a0)
+	lb t1, PLAYER_B_POS_Y(a0)
 	la t3, ACTUALLY_MOVE_PLAYER_DATA
 	sb t0, ACTUALLY_MOVE_PLAYER_DATA_BPOSX(t3)
 	sb t1, ACTUALLY_MOVE_PLAYER_DATA_BPOSY(t3)
@@ -267,8 +257,8 @@ INIT_ACTUALLY_MOVE_PLAYER:
 	la t1, CURSOR_POS
 	lb t0, 0(t1)
 	lb t1, 1(t1)
-	sb t0, PLAYER_BPOS_X(a0)
-	sb t1, PLAYER_BPOS_Y(a0)
+	sb t0, PLAYER_B_POS_X(a0)
+	sb t1, PLAYER_B_POS_Y(a0)
 	ret
 	
 
@@ -295,8 +285,8 @@ ACTUALLY_MOVE_PLAYER:
 	# calculate smoke position
 	la t0, ACTUALLY_MOVE_PLAYER_DATA
 	lw t2, ACTUALLY_MOVE_PLAYER_DATA_WPLAYER(t0)
-	lb t1, PLAYER_BPOS_X(t2)
-	lb t2, PLAYER_BPOS_Y(t2)
+	lb t1, PLAYER_B_POS_X(t2)
+	lb t2, PLAYER_B_POS_Y(t2)
 	slli t1, t1, 4
 	slli t2, t2, 4
 	addi t1, t1, -16
