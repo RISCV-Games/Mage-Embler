@@ -90,7 +90,7 @@ PLAYERS:
 .space 40
 
 CORRESPONDENCE_ARR_MAP0:
-.byte 3, 2, 1, 0
+.byte 35, 2, 32, 0
 
 .align 2
 # Images
