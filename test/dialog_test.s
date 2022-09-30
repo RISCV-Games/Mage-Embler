@@ -27,3 +27,4 @@ GAME:
 .include "../src/video.s"
 .include "../src/dialog.s"
 .include "../src/menu.s"
+.include "../src/utils.s"

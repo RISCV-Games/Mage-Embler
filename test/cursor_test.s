@@ -62,3 +62,4 @@ fim_input:
 
 .include "../src/video.s"
 .include "../src/cursor.s"
+.include "../src/input.s"

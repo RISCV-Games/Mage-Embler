@@ -21,3 +21,4 @@ GAME:
 .include "../src/video.s"
 .include "../src/input.s"
 .include "../src/cursor.s"
+.include "../src/map.s"
