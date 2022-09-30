@@ -2,7 +2,24 @@
 
 .data
 FRAME_TO_DRAW: .byte 0
+
+CURSOR_POS: .byte SCREEN_CENTER_X SCREEN_CENTER_Y
+
+# Estados
+IN_COMBAT: .byte 0      # 0 - fora de comabate    1 - aliado ataca primeiro    2 - inimigo ataca primeiro
+COMBAT_STEP: .byte 0    # idle - primeiro atack - tira vida - segundo atack - tira vida
+COMBAT_LAST_TIME: .word 0
+
+.align 2
+PLAYERS_IN_COMBAT: .word 0, 0
+PLAYER_ATACKING: .byte 2
+COMBAT_DAMAGE: .byte 0
+PRINT_DMG: .byte 0
+
+IS_PRINT_DMG: .byte 0
+
 CURSOR_POS: .byte SCREEN_CENTER_X, SCREEN_CENTER_Y
+
 .align 2
 CURSOR_ANIM: .word 2, 0, MIN_WORD, CURSOR_NUM0, CURSOR_NUM1
 PLAYER_BLINK_ANIM0: .word 2, 0, MIN_WORD, 1, 2
@@ -26,6 +43,20 @@ ACTUALLY_MOVE_PLAYER_DATA:
 # Player animations data:
 PLAYER_EARTH_STILL_ANIM: .word 2, 0, MIN_WORD, ALLY_EARTH_STILL_FRAME0, ALLY_EARTH_STILL_FRAME1
 
+
+# Nome dos elementos
+FOGO: .string "FOGO"
+GELO: .string "GELO"
+TERRA: .string "TERRA"
+
+HIT_STRING: .string "HIT"
+MISS_STRING: .string "MISS"
+CRIT_STRING: .string "CRIT"
+DMG_STRING: .string "DMG"
+
+INFO_STRING: .string "DMG   \nHIT   \nCRIT   "
+
+
 WALKABLE_BLOCKS: .align 2
 .space TILES_PER_MAP
 
@@ -47,6 +78,7 @@ MAPS:
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
 # Caracteres para print(string, char)
 LabelTabChar:
 .word 	0x00000000, 0x00000000, 0x10101010, 0x00100010, 0x00002828, 0x00000000, 0x28FE2828, 0x002828FE, 
@@ -95,6 +127,29 @@ CORRESPONDENCE_ARR_MAP0:
 .align 2
 # Images
 .include "../sprites/tiles.data"
+
+.include "../sprites/vida_cheia.data"
+.include "../sprites/vida_vazia.data"
+.include "../sprites/combat_mago_idle.data"
+.include "../sprites/combat_mago_pose.data"
+.include "../sprites/magia_idle.data"
+.include "../sprites/projetil.data"
+
+# Combate
+.include "../sprites/combat/combat_idle_aliado_azul.data"
+.include "../sprites/combat/combat_pose_aliado_azul.data"
+.include "../sprites/combat/combat_idle_aliado_vermelho.data"
+.include "../sprites/combat/combat_pose_aliado_vermelho.data"
+.include "../sprites/combat/combat_idle_aliado_marron.data"
+.include "../sprites/combat/combat_pose_aliado_marron.data"
+.include "../sprites/combat/combat_idle_inimigo_azul.data"
+.include "../sprites/combat/combat_pose_inimigo_azul.data"
+.include "../sprites/combat/combat_idle_inimigo_vermelho.data"
+.include "../sprites/combat/combat_pose_inimigo_vermelho.data"
+.include "../sprites/combat/combat_idle_inimigo_marron.data"
+.include "../sprites/combat/combat_pose_inimigo_marron.data"
+
 .include "../images/SMOKE0.data"
 .include "../images/SMOKE1.data"
 .include "../images/walkable.data"
+
