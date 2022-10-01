@@ -512,21 +512,20 @@ CHECK_UNMOVED_ALLIES:
 	# t1 = i = 0
 	li t1, 0
 
-	# t2 = *N_PLAYERS * PLAYERS_BYTE_SIZE
+	# t2 = *N_PLAYERS * PLAYER_BYTE_SIZE
 	la t2, N_PLAYERS
-	lw t2, 0(t2)
-	li t3, PLAYERS_BYTE_SIZE
+	lb t2, 0(t2)
+	li t3, PLAYER_BYTE_SIZE
 	mul t2, t2, t3
 
 	# a0 = false
 	li a0, 0
 
 loop_check_unmoved_allies:
-	bge t1, t2, ret__check_unmoved_allies
+	bge t1, t2, ret_check_unmoved_allies
 
 	# t3 = players[i]
 	add t3, t0, t1
-	lw t3, 0(t3)
 
 	# skip dead players
 	lb t4, PLAYER_B_VIDA_ATUAL(t3)
@@ -538,7 +537,7 @@ loop_check_unmoved_allies:
 	bge t4, t5, continue_loop_check_unmoved_allies
 
 	# skip moved allies
-	li t4, PLAYER_B_MOVED(t3)
+	lb t4, PLAYER_B_MOVED(t3)
 	beq t4, zero, continue_loop_check_unmoved_allies
 
 	# only remaining players are the alive, unmoved allies so return true
@@ -547,8 +546,151 @@ loop_check_unmoved_allies:
 
 
 continue_loop_check_unmoved_allies:
-	addi t1, t1, PLAYERS_BYTE_SIZE
+	addi t1, t1, PLAYER_BYTE_SIZE
 	j loop_check_unmoved_allies
 
 ret_check_unmoved_allies:
+	ret
+
+###################################################################################
+# Boolean valued function which indicates if there are alive enemies that
+# have not moved in the current turn.
+###################################################################################
+CHECK_UNMOVED_ENEMIES:
+	# t0 = players
+	la t0, PLAYERS
+
+	# t1 = i = 0
+	li t1, 0
+
+	# t2 = *N_PLAYERS * PLAYER_BYTE_SIZE
+	la t2, N_PLAYERS
+	lb t2, 0(t2)
+	li t3, PLAYER_BYTE_SIZE
+	mul t2, t2, t3
+
+	# a0 = false
+	li a0, 0
+
+loop_check_unmoved_enemies:
+	bge t1, t2, ret_check_unmoved_enemies
+
+	# t3 = players[i]
+	add t3, t0, t1
+
+	# skip dead players
+	lb t4, PLAYER_B_VIDA_ATUAL(t3)
+	beq t4, zero, continue_loop_check_unmoved_enemies
+
+	# skip allies
+	lb t4, PLAYER_B_TIPO(t3)
+	li t5, IN_AZUL
+	blt t4, t5, continue_loop_check_unmoved_enemies
+
+	# skip moved enemies
+	lb t4, PLAYER_B_MOVED(t3)
+	beq t4, zero, continue_loop_check_unmoved_enemies
+
+	# only remaining players are the alive, unmoved enemies so return true
+	li a0, 1
+	j ret_check_unmoved_enemies
+
+
+continue_loop_check_unmoved_enemies:
+	addi t1, t1, PLAYER_BYTE_SIZE
+	j loop_check_unmoved_enemies
+
+ret_check_unmoved_enemies:
+	ret
+
+###################################################################################
+# Boolean valued function which indicates if there are any alive enemies.
+###################################################################################
+CHECK_ALIVE_ENEMIES:
+	# t0 = players
+	la t0, PLAYERS
+
+	# t1 = i = 0
+	li t1, 0
+
+	# t2 = *N_PLAYERS * PLAYER_BYTE_SIZE
+	la t2, N_PLAYERS
+	lb t2, 0(t2)
+	li t3, PLAYER_BYTE_SIZE
+	mul t2, t2, t3
+
+	# a0 = false
+	li a0, 0
+
+loop_check_alive_enemies:
+	bge t1, t2, ret_check_alive_enemies
+
+	# t3 = players[i]
+	add t3, t0, t1
+
+	# skip dead players
+	lb t4, PLAYER_B_VIDA_ATUAL(t3)
+	beq t4, zero, continue_loop_check_alive_enemies
+
+	# skip allies
+	lb t4, PLAYER_B_TIPO(t3)
+	li t5, IN_AZUL
+	blt t4, t5, continue_loop_check_alive_enemies
+
+	# if player is an alive enemy return true
+	li a0, 1
+	j ret_check_alive_enemies
+
+
+continue_loop_check_alive_enemies:
+	addi t1, t1, PLAYER_BYTE_SIZE
+	j loop_check_alive_enemies
+
+ret_check_alive_enemies:
+	ret
+
+###################################################################################
+# Boolean valued function which indicates if there are alive allies.
+###################################################################################
+CHECK_ALIVE_ALLIES:
+	# t0 = players
+	la t0, PLAYERS
+
+	# t1 = i = 0
+	li t1, 0
+
+	# t2 = *N_PLAYERS * PLAYER_BYTE_SIZE
+	la t2, N_PLAYERS
+	lb t2, 0(t2)
+	li t3, PLAYER_BYTE_SIZE
+	mul t2, t2, t3
+
+	# a0 = false
+	li a0, 0
+
+loop_check_alive_allies:
+	bge t1, t2, ret_check_alive_allies
+
+	# t3 = players[i]
+	add t3, t0, t1
+
+	# skip dead players
+	lb t4, PLAYER_B_VIDA_ATUAL(t3)
+	beq t4, zero, continue_loop_check_alive_allies
+
+	# skip enemies
+	lb t4, PLAYER_B_TIPO(t3)
+	li t5, IN_AZUL
+	bge t4, t5, continue_loop_check_alive_allies
+
+	# if player is an alive ally then return true
+	li a0, 1
+	j ret_check_alive_allies
+
+
+continue_loop_check_alive_allies:
+	addi t1, t1, PLAYER_BYTE_SIZE
+	j loop_check_alive_allies
+
+ret_check_alive_allies:
 	ret

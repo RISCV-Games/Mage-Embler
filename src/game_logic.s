@@ -30,6 +30,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_IN_COMBAT
 	beq t0, t1, in_combat_run_game_logic
 
+	li t1, GAME_STATE_CHECK_TURN
+	beq t0, t1, check_turn_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -74,14 +77,20 @@ x_choose_ally_run_game_logic:
 	jal GET_PLAYER_BY_POS
 
 	# if there is no player at cursor pos then return
-	beq a0, zero, ret_run_game_logic
+	beq a0, zero, ret_x_choose_ally_run_game_logic
+
 	# if player is not an ally then return
 	lb t0, PLAYER_B_TIPO(a0)
 	li t1, IN_AZUL
-	bge t0, t1, ret_run_game_logic
+	bge t0, t1, ret_x_choose_ally_run_game_logic
+
 	# if player is dead then return
 	lb t0, PLAYER_B_VIDA_ATUAL(a0)
-	beq t0, zero, ret_run_game_logic
+	beq t0, zero, ret_x_choose_ally_run_game_logic
+
+	# if player has already moved then return
+	lb t0, PLAYER_B_MOVED(a0)
+	bne t0, zero, ret_x_choose_ally_run_game_logic
 
 
 	# else SELECTED_PLAYER = a0
@@ -104,6 +113,10 @@ x_choose_ally_run_game_logic:
 
 	# return GAME_STATE_MAKING_TRAIL
 	mv a0, t1
+	j ret_run_game_logic
+
+ret_x_choose_ally_run_game_logic:
+	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
 
 making_trail_run_game_logic:
@@ -160,11 +173,6 @@ moving_player_run_game_logic:
 	j ret_run_game_logic
 
 stop_moving_player_run_game_logic:
-	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
-	la t0, GAME_STATE
-	li t1, GAME_STATE_CHOOSE_ALLY
-	sb t1, 0(t0)
-
 	# update PLAYER_B_SPECIAL_TERRAIN
 
 	# t3 = player = *SELECTED_PLAYER
@@ -182,19 +190,25 @@ stop_moving_player_run_game_logic:
 	la t2, CURRENT_MAP
 	lw t2, 0(t2)
 	add t2, t2, t1
-	lw t2, 0(t2)
+	lb t2, 0(t2)
 
 	# set player.specialTerrain to logical bits of t2
 	andi t2, t2, 0x7
 	sb t2, PLAYER_B_SPECIAL_TERRAIN(t3)
+
+	# player.moved = true
+	li t0, 1
+	sb t0, PLAYER_B_MOVED(t3)
 
 	# if player lands next to an enemy then GAME_STATE = GAME_STATE_ACTION_MENU
 	# also moves the cursor on top of the enemy found, if that is the case
 	jal CHECK_ENEMY_NEIGHBORS
 	bne a0, zero, set_action_menu_run_game_logic
 
-	# else check if there any remaining unmoved allies
-	jal CHECK_UNMOVED_ALLIES
+	# *GAME_STATE = GAME_STATE_CHECK_TURN
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHECK_TURN
+	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
@@ -238,9 +252,9 @@ selected_action_menu_run_game_logic:
 	la t0, ACTION_MENU_SELECTED_OPTION
 	sb zero, 0(t0)
 
-	# *GAME_STATE = GAME_STATE_ACTION_MENU
+	# *GAME_STATE = GAME_STATE_CHECK_TURN
 	la t0, GAME_STATE
-	li t1, GAME_STATE_CHOOSE_ALLY
+	li t1, GAME_STATE_CHECK_TURN
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
@@ -318,10 +332,72 @@ in_combat_run_game_logic:
 	j ret_run_game_logic
 
 end_combat_run_game_logic:
+	# *GAME_STATE = GAME_STATE_CHECK_TURN
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHECK_TURN
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+check_turn_run_game_logic:
+	# if every ally is dead set state to GAME_STATE_ALL_ALLIES_DEAD
+	jal CHECK_ALIVE_ALLIES
+	beq a0, zero, allies_dead_check_turn_run_game_logic
+
+	# if every enemy is dead set state to GAME_STATE_CHECK_NEXT_MAP
+	jal CHECK_ALIVE_ENEMIES
+	beq a0, zero, next_map_check_turn_run_game_logic
+
+	# if there is an unmoved ally then set state to GAME_STATE_CHOOSE_ALLY
+	jal CHECK_UNMOVED_ALLIES
+	bne a0, zero, choose_ally_check_turn_run_game_logic
+
+	# if there is an unmoved enemy then set state to GAME_STATE_CHOOSE_ENEMY
+	jal CHECK_UNMOVED_ENEMIES
+	bne a0, zero, choose_enemy_check_turn_run_game_logic
+
+	# otherwise set state to GAME_STATE_NEXT_TURN
+	# *GAME_STATE = GAME_STATE_NEXT_TURN
+	la t0, GAME_STATE
+	li t1, GAME_STATE_NEXT_TURN
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_NEXT_TURN
+	j ret_run_game_logic
+
+choose_ally_check_turn_run_game_logic:
 	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
 	la t0, GAME_STATE
 	li t1, GAME_STATE_CHOOSE_ALLY
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+choose_enemy_check_turn_run_game_logic:
+	# *GAME_STATE = GAME_STATE_CHOOSE_ENEMY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ENEMY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ENEMY
+	j ret_run_game_logic
+
+next_map_check_turn_run_game_logic:
+	# *GAME_STATE = GAME_STATE_CHECK_NEXT_MAP
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHECK_NEXT_MAP
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHECK_NEXT_MAP
+	j ret_run_game_logic
+
+allies_dead_check_turn_run_game_logic:
+	# *GAME_STATE = GAME_STATE_ALL_ALLIES_DEAD
+	la t0, GAME_STATE
+	li t1, GAME_STATE_ALL_ALLIES_DEAD
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_ALL_ALLIES_DEAD
 	j ret_run_game_logic
