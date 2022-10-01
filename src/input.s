@@ -50,6 +50,10 @@ GET_KBD_INPUT:
 	andi t0, t0, 0x0001		      		# mascara o bit menos significativo
 	beq t0, zero, ret_kbd_input	    # não tem tecla pressionada entao retorna
 	lw a0, 4(t1)										# le o valor da tecla
+
+	# save key in KBD_INPUT
+	la t0, KBD_INPUT
+	sb a0, 0(t0)
 	ret
 
 ret_kbd_input:

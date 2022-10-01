@@ -42,10 +42,7 @@ init_run_game_logic:
 	j ret_run_game_logic
 
 choose_ally_run_game_logic:
-	# save keyboard input
 	jal GET_KBD_INPUT
-	la t0, KBD_INPUT
-	sb a0, 0(t0)
 	jal MOVE_CURSOR
 
 	# t0 = *KBD_INPUT
