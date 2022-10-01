@@ -40,5 +40,20 @@ choose_ally_run_game_logic:
 	sb a0, 0(t0)
 	jal MOVE_CURSOR
 
+	# t0 = *KBD_INPUT
+	la t0, KBD_INPUT
+	lb t0, 0(t0)
+
+	# if 'x' is pressed on top of a player go to player
+	li t1, 'x'
+	beq t0, t1, x_choose_ally_run_game_logic
+
 	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
+
+x_choose_ally_run_game_logic:
+	# get player at CURSOR_POS
+	la t0, CURSOR_POS
+	lb a0, 0(t0)
+	lb a1, 1(t0)
+	jal GET_PLAYER_BY_POS

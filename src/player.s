@@ -78,7 +78,8 @@ four_init_players:
 
 
 ###################################################################################
-# Retorna um Player a partir de sua posição (x, y).
+# Retorna um Player a partir de sua posição (x, y). Se não há um player nessa
+# posição retorna 0, caso contrário retorna o player.
 ###################################################################################
 # a0 = x
 # a1 = y
@@ -94,20 +95,24 @@ GET_PLAYER_BY_POS:
 	mul t2, t2, t3
 
 loop_get_player_by_pos:
-	bge t1, t2, ret_get_player_by_pos
+	bge t1, t2, failed_get_player_by_pos
 
 	add t3, t0, t1
 	lb t4, PLAYER_B_POS_X(t3)
 	lb t5, PLAYER_B_POS_Y(t3)
 	bne t4, a0, continue_loop_get_player_by_pos
 	bne t5, a1, continue_loop_get_player_by_pos
-	j ret_get_player_by_pos
+	j found_player_get_player_by_pos
 
 continue_loop_get_player_by_pos:
 	addi t1, t1, PLAYER_BYTE_SIZE
 	j loop_get_player_by_pos
 
-ret_get_player_by_pos:
+failed_get_player_by_pos:
+	li a0, 0
+	ret
+
+found_player_get_player_by_pos:
 	mv a0, t3
 	ret
 
