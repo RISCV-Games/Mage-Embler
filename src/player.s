@@ -53,7 +53,15 @@ zero_init_players:
 	addi t0, t0, PLAYER_BYTE_SIZE
 	li t1, 16
 	sb t1, PLAYER_B_POS_X(t0)
-	li t1, 4
+	li t1, 9
+	sb t1, PLAYER_B_POS_Y(t0)
+	li t1, AL_MAR
+	sb t1, PLAYER_B_TIPO(t0)
+
+	addi t0, t0, PLAYER_BYTE_SIZE
+	li t1, 16
+	sb t1, PLAYER_B_POS_X(t0)
+	li t1, 6
 	sb t1, PLAYER_B_POS_Y(t0)
 	li t1, IN_MAR
 	sb t1, PLAYER_B_TIPO(t0)
@@ -76,7 +84,7 @@ zero_init_players:
 
 	# set N_PLAYERS to correct amount
 	la t0, N_PLAYERS
-	li t1, 5
+	li t1, 6
 	sb t1, 0(t0)
 	ret
 
@@ -368,3 +376,62 @@ set_appear_actually_move_player:
 	sb t1, ACTUALLY_MOVE_PLAYER_DATA_BSTATUS(t0)
 	j ret_actually_move_player
 
+###################################################################################
+# Boolean valued function which indicates wheter a neighbor of the selected player
+# is an enemy.
+###################################################################################
+CHECK_ENEMY_NEIGHBORS:
+	# t0 = player = *SELECTED_PLAYER
+	la t0, SELECTED_PLAYER
+	lw t0, 0(t0)
+
+	# (t4, t5) = player.pos
+	lb t4, PLAYER_B_POS_X(t0)
+	lb t5, PLAYER_B_POS_Y(t0)
+
+	# a0 = false
+	li a0, 0
+
+	# t1 = 0 = i
+	li t1, 0
+
+loop_check_enemy_neighbors:
+	la t2, N_PLAYERS
+	lb t2, 0(t2)
+	bge t1, t2, ret_check_enemy_neighbors
+
+	# t2, t6 = players[i]
+	li t2, PLAYER_BYTE_SIZE
+	mul t2, t2, t1
+	la t3, PLAYERS
+	add t2, t2, t3
+	mv t6, t2
+
+	# (t2, t3) = players[i].pos
+	lb t3, PLAYER_B_POS_Y(t2)
+	lb t2, PLAYER_B_POS_X(t2)
+
+	# t2 = distSq = players[i].pos.distSq(player)
+	sub t2, t2, t4
+	sub t3, t3, t5
+	mul t3, t3, t3
+	mul t2, t2, t2
+	add t2, t2, t3
+
+	# if distSq != 1 continue
+	li t3, 1
+	bne t2, t3, continue_loop_check_enemy_neighbors
+
+	# else if players[i] is an enemy, return true
+	lb t6, PLAYER_B_TIPO(t6)
+	li t5, IN_AZUL
+	blt t6, t5, continue_loop_check_enemy_neighbors
+	li a0, 1
+	j ret_check_enemy_neighbors
+
+continue_loop_check_enemy_neighbors:
+	addi t1, t1, 1
+	j loop_check_enemy_neighbors
+
+ret_check_enemy_neighbors:
+ret

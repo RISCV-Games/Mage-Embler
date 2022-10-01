@@ -104,7 +104,7 @@ making_trail_run_game_logic:
 	lb a1, 1(t0)
 	jal GET_PLAYER_BY_POS
 	bne a0, zero, next_making_trail_run_game_logic
-	
+
 	la t0, KBD_INPUT
 	lb t0, 0(t0)
 	li t1, 'x'
@@ -143,6 +143,8 @@ stop_moving_player_run_game_logic:
 	la t0, GAME_STATE
 	li t1, GAME_STATE_CHOOSE_ALLY
 	sb t1, 0(t0)
+
+	jal CHECK_ENEMY_NEIGHBORS
 
 	li a0, GAME_STATE_CHOOSE_ALLY
 
