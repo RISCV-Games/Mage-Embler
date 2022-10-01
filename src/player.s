@@ -66,9 +66,17 @@ zero_init_players:
 	li t1, IN_AZUL
 	sb t1, PLAYER_B_TIPO(t0)
 
+	addi t0, t0, PLAYER_BYTE_SIZE
+	li t1, 17
+	sb t1, PLAYER_B_POS_X(t0)
+	li t1, 7
+	sb t1, PLAYER_B_POS_Y(t0)
+	li t1, IN_VER
+	sb t1, PLAYER_B_TIPO(t0)
+
 	# set N_PLAYERS to correct amount
 	la t0, N_PLAYERS
-	li t1, 4
+	li t1, 5
 	sb t1, 0(t0)
 	ret
 
