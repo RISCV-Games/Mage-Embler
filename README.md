@@ -20,7 +20,7 @@ V  - Victor
 - [X] Menus
 - [X] Modo de batalha
 - [X] Sistema de dialogos
-- [ ] UI (User interface) (sistema de combate)
+- [X] UI (User interface) (sistema de combate)
 - [ ] IA dos inimigos (Movimentacao)
 - [X] Sistema de combate (Pedra papel tesoura)
 - [ ] Sistema de combate (terreno especial)
