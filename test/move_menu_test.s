@@ -1,5 +1,4 @@
 .include "../src/data.s"
-.include "../src/consts.s"
 .include "../src/macros.s"
 
 .text

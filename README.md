@@ -23,6 +23,8 @@ V  - Victor
 - [X] UI (User interface) (sistema de combate)
 - [ ] IA dos inimigos (Movimentacao)
 - [X] Sistema de combate (Pedra papel tesoura)
-- [ ] Sistema de combate (terreno especial)
+- [X] Sistema de combate (terreno especial)
 - [ ] Historia
+- [ ] Remover jogadores mortos
+- [ ] Alternância de turnos
 - [X] Definicao de estética( Tiles, sprites de animacao )
