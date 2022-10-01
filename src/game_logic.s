@@ -165,6 +165,29 @@ stop_moving_player_run_game_logic:
 	li t1, GAME_STATE_CHOOSE_ALLY
 	sb t1, 0(t0)
 
+	# update PLAYER_B_SPECIAL_TERRAIN
+
+	# t3 = player = *SELECTED_PLAYER
+	la t3, SELECTED_PLAYER
+	lw t3, 0(t3)
+
+	# (t0, t1) = player.pos
+	lb t0, PLAYER_B_POS_X(t3)
+	lb t1, PLAYER_B_POS_Y(t3)
+
+	# t2 = MAP[player position in map]
+	li t2, MAP_WIDTH
+	mul t1, t1, t2
+	add t1, t0, t1
+	la t2, CURRENT_MAP
+	lw t2, 0(t2)
+	add t2, t2, t1
+	lw t2, 0(t2)
+
+	# set player.specialTerrain to logical bits of t2
+	andi t2, t2, 0x7
+	sb t2, PLAYER_B_SPECIAL_TERRAIN(t3)
+
 	# if player lands next to an enemy then GAME_STATE = GAME_STATE_ACTION_MENU
 	# also moves the cursor on top of the enemy found, if that is the case
 	jal CHECK_ENEMY_NEIGHBORS

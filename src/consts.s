@@ -34,10 +34,11 @@
 .eqv GET_DIR_EXCEPTION 1000
 # Constantes para representacao do mapa
 .eqv BLOCK_EMPTY 0
-.eqv BLOCK_OBSTACLE 1
-.eqv BLOCK_ALLY 2
-.eqv BLOCK_ENEMY 3
-.eqv BLOCK_WALKABLE 0
+.eqv BLOCK_BUSH 1
+.eqv BLOCK_RUNE 2
+.eqv BLOCK_OBSTACLE 3
+.eqv BLOCK_ALLY 4
+.eqv BLOCK_ENEMY 5
 # Tiles usadas para desenhar o mapa no modo debug
 .eqv DEBUG_TILE_EMPTY 3
 .eqv DEBUG_TILE_OBSTACLE 1
