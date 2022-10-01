@@ -68,3 +68,4 @@ DO_NOTHING:
 
 .include "../src/video.s"
 .include "../src/menu.s"
+.include "../src/utils.s"
