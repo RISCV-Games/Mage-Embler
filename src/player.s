@@ -34,12 +34,12 @@ INIT_PLAYERS:
 	ret
 
 zero_init_players:
+	INIT_PLAYER(16, 6, IN_MAR)
+	INIT_PLAYER(17, 7, IN_VER)
+	INIT_PLAYER(15, 7, AL_MAR)
 	INIT_PLAYER(4, 10, AL_AZUL)
 	INIT_PLAYER(5, 4, AL_VER)
-	INIT_PLAYER(12, 7, AL_MAR)
-	INIT_PLAYER(16, 6, IN_MAR)
 	INIT_PLAYER(16, 11, IN_AZUL)
-	INIT_PLAYER(17, 7, IN_VER)
 	INIT_PLAYER(3, 7, IN_VER)
 	ret
 
@@ -389,4 +389,89 @@ continue_loop_check_enemy_neighbors:
 	j loop_check_enemy_neighbors
 
 ret_check_enemy_neighbors:
+ret
+
+###################################################################################
+# Update the NEARBY_ENEMIES array according to the selected player's position
+# and the enemies positions.
+###################################################################################
+UPDATE_NEARBY_ENEMIES:
+	# t0 = player = *SELECTED_PLAYER
+	la t0, SELECTED_PLAYER
+	lw t0, 0(t0)
+
+	# (t4, t5) = player.pos
+	lb t4, PLAYER_B_POS_X(t0)
+	lb t5, PLAYER_B_POS_Y(t0)
+
+	# t1 = 0 = i
+	li t1, 0
+
+loop_update_nearby_enemies:
+	la t2, N_PLAYERS
+	lb t2, 0(t2)
+	bge t1, t2, ret_update_nearby_enemies
+
+	# t2, t6 = players[i]
+	li t2, PLAYER_BYTE_SIZE
+	mul t2, t2, t1
+	la t3, PLAYERS
+	add t2, t2, t3
+	mv t6, t2
+
+	# (t2, t3) = players[i].pos
+	lb t3, PLAYER_B_POS_Y(t2)
+	lb t2, PLAYER_B_POS_X(t2)
+
+	# a4 = distSq = players[i].pos.distSq(player), (t2, t3) = (deltaX, deltaY)
+	sub t2, t2, t4
+	sub t3, t3, t5
+	mul a4, t3, t3
+	mul a5, t2, t2
+	add a4, a4, a5
+
+	# if distSq != 1 continue
+	li a5, 1
+	bne a4, a5, continue_loop_update_nearby_enemies
+
+	# else if players[i] is not an enemy then continue
+	lb t6, PLAYER_B_TIPO(t6)
+	li a5, IN_AZUL
+	blt t6, a5, continue_loop_update_nearby_enemies
+
+	li t6, 1
+	beq t2, t6, right_update_nearby_enemies
+
+	li t6, -1
+	beq t2, t6, left_update_nearby_enemies
+
+	li t6, -1
+	beq t3, t6, up_update_nearby_enemies
+
+	li t6, 1
+	la a5, NEARBY_ENEMIES
+	sb t6, CURSOR_ATTACK_DOWN(a5)
+
+continue_loop_update_nearby_enemies:
+	addi t1, t1, 1
+	j loop_update_nearby_enemies
+
+right_update_nearby_enemies:
+	la a5, NEARBY_ENEMIES
+	sb t6, CURSOR_ATTACK_RIGHT(a5)
+	j continue_loop_update_nearby_enemies
+
+left_update_nearby_enemies:
+	li t6, 1
+	la a5, NEARBY_ENEMIES
+	sb t6, CURSOR_ATTACK_LEFT(a5)
+	j continue_loop_update_nearby_enemies
+
+up_update_nearby_enemies:
+	li t6, 1
+	la a5, NEARBY_ENEMIES
+	sb t6, CURSOR_ATTACK_UP(a5)
+	j continue_loop_update_nearby_enemies
+
+ret_update_nearby_enemies:
 ret

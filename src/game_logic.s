@@ -218,6 +218,8 @@ attack_action_menu_run_game_logic:
 	li t1, GAME_STATE_CHOOSE_ENEMY
 	sb t1, 0(t0)
 
+	jal UPDATE_NEARBY_ENEMIES
+
 	li a0, GAME_STATE_CHOOSE_ENEMY
 	j ret_run_game_logic
 

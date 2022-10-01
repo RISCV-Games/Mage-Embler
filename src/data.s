@@ -46,6 +46,8 @@ ACTION_MENU_IS_SELECTED: .byte 0
 .align 2
 ACTION_MENU_STRINGS: .word ACTION_MENU_STRING_ATTACK, ACTION_MENU_STRING_WAIT
 
+NEARBY_ENEMIES: .byte 0, 0, 0, 0
+
 ACTUALLY_MOVE_PLAYER_DATA: 
 .align 2
 .word 0 # player
@@ -65,8 +67,8 @@ ENEMY_EARTH_STILL_ANIM: .word 2, 0, MIN_WORD, ENEMY_EARTH_STILL_FRAME0, ENEMY_EA
 
 
 # Nome dos elementos
-FOGO: .string "FOGO"
-GELO: .string "GELO"
+FOGO:  .string "FOGO"
+GELO:  .string "GELO"
 TERRA: .string "TERRA"
 
 HIT_STRING: .string "HIT"
