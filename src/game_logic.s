@@ -18,6 +18,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_MAKING_TRAIL
 	beq t0, t1, making_trail_run_game_logic
 
+	li t1, GAME_STATE_MOVING_PLAYER
+	beq t0, t1, moving_player_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -45,11 +48,9 @@ choose_ally_run_game_logic:
 	jal GET_KBD_INPUT
 	jal MOVE_CURSOR
 
-	# t0 = *KBD_INPUT
+	# if 'x' is pressed on top of a player go to player
 	la t0, KBD_INPUT
 	lb t0, 0(t0)
-
-	# if 'x' is pressed on top of a player go to player
 	li t1, 'x'
 	beq t0, t1, x_choose_ally_run_game_logic
 
@@ -66,7 +67,11 @@ x_choose_ally_run_game_logic:
 	# if there is no player at cursor pos then return
 	beq a0, zero, ret_run_game_logic
 
-	# else update walkable blocks
+	# else SELECTED_PLAYER = a0
+	la t0, SELECTED_PLAYER
+	sw a0, 0(t0)
+
+	# update walkable blocks
 	la t0, CURSOR_POS
 	lb a0, 0(t0)
 	lb a1, 1(t0)
@@ -74,7 +79,7 @@ x_choose_ally_run_game_logic:
 	lw a2, 0(a2)
 	jal UPDATE_WALKABLE_BLOCKS
 
-	# else change state to GAME_STATE_MAKING_TRAIL
+	# change state to GAME_STATE_MAKING_TRAIL
 	jal INIT_CURSOR_TRAIL
 	la t0, GAME_STATE
 	li t1, GAME_STATE_MAKING_TRAIL
@@ -88,5 +93,45 @@ making_trail_run_game_logic:
 	jal GET_KBD_INPUT
 	jal MAKE_TRAIL_LOGIC
 
+	# if 'x' is pressed move player
+	la t0, KBD_INPUT
+	lb t0, 0(t0)
+	li t1, 'x'
+	beq t0, t1, x_making_trail_run_game_logic
+
 	li a0, GAME_STATE_MAKING_TRAIL
+	j ret_run_game_logic
+
+x_making_trail_run_game_logic:
+	# Get selected player and start blink animation
+	la a0, SELECTED_PLAYER
+	lw a0, 0(a0)
+	jal INIT_ACTUALLY_MOVE_PLAYER
+
+	# *GAME_STATE = GAME_STATE_MOVING_PLAYER
+	la t0, GAME_STATE
+	li t1, GAME_STATE_MOVING_PLAYER
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_MOVING_PLAYER
+	j ret_run_game_logic
+
+moving_player_run_game_logic:
+	# if blink animation is over goto next state
+	la t0, BLINK_ANIMATION
+	lb t0, 0(t0)
+	beq t0, zero, stop_moving_player_run_game_logic
+
+	# else keep at drawing blink animation
+	li a0, GAME_STATE_MOVING_PLAYER
+	j ret_run_game_logic
+
+stop_moving_player_run_game_logic:
+	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+
 	j ret_run_game_logic

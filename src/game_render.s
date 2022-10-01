@@ -17,6 +17,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_MAKING_TRAIL
 	beq a0, t0, making_trail_run_game_render
 
+	li t0, GAME_STATE_MOVING_PLAYER
+	beq a0, t0, moving_player_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -40,6 +43,13 @@ making_trail_run_game_render:
 	jal DRAW_CURSOR_TRAIL
 	jal DRAW_PLAYERS
 	jal DRAW_CURSOR
+
+	jal SWAP_FRAMES
+	j ret_run_game_render
+
+moving_player_run_game_render:
+	jal DRAW_MAP
+	jal DRAW_PLAYERS
 
 	jal SWAP_FRAMES
 	j ret_run_game_render

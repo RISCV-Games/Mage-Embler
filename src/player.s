@@ -126,10 +126,13 @@ DRAW_PLAYER:
 	# if a1 != 0 draw player regardess of BLINK_ANIMATION
 	bne a1, zero, start_draw_player
 
-	# if blink animation is not ongoing, run the "standing still" animation
+	# if the player = *SELECTED_PLAYER and BLINK_ANIMATION = true then execute blink animation
 	la t0, BLINK_ANIMATION
 	lb t0, 0(t0)
-	bne t0, zero, EXECUTE_BLINK_ANIMATION
+	beq t0, zero, start_draw_player
+	la t0, SELECTED_PLAYER
+	lw t0, 0(t0)
+	beq a0, t0, EXECUTE_BLINK_ANIMATION
 
 start_draw_player:
 	addi sp, sp, -4

@@ -57,5 +57,8 @@ GET_KBD_INPUT:
 	ret
 
 ret_kbd_input:
+	# save 0 in KBD_INPUT
 	mv a0, zero
+	la t0, KBD_INPUT
+	sb a0, 0(t0)
 	ret
