@@ -244,7 +244,7 @@ x_choose_enemy_run_game_logic:
 	# get selected enemy
 	la a1, CURSOR_POS
 	lb a0, 0(a1)
-	lb a1, 0(a1)
+	lb a1, 1(a1)
 	jal GET_PLAYER_BY_POS
 
 	# t1 = *SELECTED_PLAYER

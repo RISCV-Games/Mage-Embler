@@ -24,11 +24,15 @@ PLAYER2: .word 0, 0
 .byte IN_VER
 .byte 5, 120, 1
 
+
 .text
+la s0, PLAYER_1
+INIT_PLAYER(s0, 5, 5, AL_AZUL, 25, 25, 1, 1, 1)
+INIT_PLAYER(s0, 5, 5, IN_VER, 25, 25, 1, 1, 1)
 jal INIT_VIDEO
 
-la t0, PLAYER1
-la t1, PLAYER2
+la t0, PLAYERS
+addi t1, t0, PLAYER_BYTE_SIZE
 la t2, PLAYERS_IN_COMBAT
 
 sw t0, 0(t2)

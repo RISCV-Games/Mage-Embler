@@ -1261,6 +1261,8 @@ end_logic_combat:
 finish_logic_combat:
     la t0, IN_COMBAT
     sb zero, 0(t0)
+	la t0, COMBAT_STEP
+	sb zero, 0(t0)
     j end_logic_combat
     
 

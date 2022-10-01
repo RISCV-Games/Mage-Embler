@@ -138,6 +138,9 @@ TEMP_BUFFER:
 N_PLAYERS:
 .byte 0
 
+PLAYER_1: .string "Player1"
+PLAYER_2: .string "Player2"
+
 # Allocating PLAYER_BYTE_SIZE * 10 bytes
 .align 2
 PLAYERS:

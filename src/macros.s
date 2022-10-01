@@ -20,7 +20,7 @@
 .end_macro
 
 ######### Initialize a Player and increment N_PLAYERS (altera registradores t) ###############
-.macro INIT_PLAYER(%posX, %posY, %tipo, %magiaX, %magiaY, %vidaTotal, %vidaAtual, %magiaSizeX, %magiaSizeY, %damage, %hit, %crit)
+.macro INIT_PLAYER(%nome, %posX, %posY, %tipo, %vidaTotal, %vidaAtual, %damage, %hit, %crit)
 	# t0 = PLAYERS[N_PLAYERS]
 	la t0, PLAYERS
 	la t1, N_PLAYERS
@@ -30,24 +30,17 @@
 	add t0, t0, t1
 
 	# initialize
+	sw %nome, PLAYER_W_NOME(t0)
 	li t1, %posX
 	sb t1, PLAYER_B_POS_X(t0)
 	li t1, %posY
 	sb t1, PLAYER_B_POS_Y(t0)
 	li t1, %tipo
 	sb t1, PLAYER_B_TIPO(t0)
-	li t1, %magiaX
-	sh t1, PLAYER_H_MAGIA_X(t0)
-	li t1, %magiaY
-	sh t1, PLAYER_H_MAGIA_Y(t0)
 	li t1, %vidaTotal
 	sb t1, PLAYER_B_VIDA_TOTAL(t0)
 	li t1, %vidaAtual
 	sb t1, PLAYER_B_VIDA_ATUAL(t0)
-	li t1, %magiaSizeX
-	sb t1, PLAYER_B_MAGIA_SIZE_X(t0)
-	li t1, %magiaSizeY
-	sb t1, PLAYER_B_MAGIA_SIZE_Y(t0)
 	li t1, %damage
 	sb t1, PLAYER_B_DAMAGE(t0)
 	li t1, %hit
