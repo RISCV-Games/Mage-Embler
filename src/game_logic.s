@@ -152,6 +152,7 @@ stop_moving_player_run_game_logic:
 	sb t1, 0(t0)
 
 	# if player lands next to an enemy then GAME_STATE = GAME_STATE_ACTION_MENU
+	# also moves the cursor on top of the enemy found, if that is the case
 	jal CHECK_ENEMY_NEIGHBORS
 	bne a0, zero, set_action_menu_run_game_logic
 

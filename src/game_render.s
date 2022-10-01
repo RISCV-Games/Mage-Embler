@@ -23,6 +23,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_ACTION_MENU
 	beq a0, t0, action_menu_run_game_render
 
+	li t0, GAME_STATE_CHOOSE_ENEMY
+	beq a0, t0, choose_enemy_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -81,6 +84,19 @@ action_menu_run_game_render:
 	la t0, ACTION_MENU_SELECTED_OPTION
 	lb s8, 0(t0)        			     # String selecionada (0 index)
 	jal DRAW_MENU
+
+	jal SWAP_FRAMES
+	j ret_run_game_render
+
+choose_enemy_run_game_render:
+	jal DRAW_MAP
+	jal DRAW_PLAYERS
+
+	# draw cursor in attack mode
+	li a0, 1
+	jal DRAW_CURSOR
+
+	#jal HIGHLIGHT_NEARBY_ENEMIES
 
 	jal SWAP_FRAMES
 	j ret_run_game_render

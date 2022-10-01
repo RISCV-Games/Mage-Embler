@@ -505,17 +505,17 @@ MOVE_CURSOR_ATTACK_MODE:
 	lb t0, PLAYER_B_POS_X(t1)
 	lb t1, PLAYER_B_POS_Y(t1)
 
-	li t0, 'w'
-	beq a0, t0, w_move_cursor_attack_mode
+	li t2, 'w'
+	beq a0, t2, w_move_cursor_attack_mode
 
-	li t0, 'a'
-	beq a0, t0, a_move_cursor_attack_mode
+	li t2, 'a'
+	beq a0, t2, a_move_cursor_attack_mode
 
-	li t0, 's'
-	beq a0, t0, s_move_cursor_attack_mode
+	li t2, 's'
+	beq a0, t2, s_move_cursor_attack_mode
 
-	li t0, 'd'
-	beq a0, t0, d_move_cursor_attack_mode
+	li t2, 'd'
+	beq a0, t2, d_move_cursor_attack_mode
 
 	j ret_move_cursor_attack_mode
 

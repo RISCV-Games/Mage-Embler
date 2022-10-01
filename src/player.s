@@ -333,7 +333,7 @@ set_appear_actually_move_player:
 
 ###################################################################################
 # Boolean valued function which indicates wheter a neighbor of the selected player
-# is an enemy.
+# is an enemy. Also moves the cursor to the first enemy neighbor found.
 ###################################################################################
 CHECK_ENEMY_NEIGHBORS:
 	# t0 = player = *SELECTED_PLAYER
@@ -360,7 +360,9 @@ loop_check_enemy_neighbors:
 	mul t2, t2, t1
 	la t3, PLAYERS
 	add t2, t2, t3
+	# save t2 in a1 and t6
 	mv t6, t2
+	mv a1, t2
 
 	# (t2, t3) = players[i].pos
 	lb t3, PLAYER_B_POS_Y(t2)
@@ -381,6 +383,13 @@ loop_check_enemy_neighbors:
 	lb t6, PLAYER_B_TIPO(t6)
 	li t5, IN_AZUL
 	blt t6, t5, continue_loop_check_enemy_neighbors
+
+	# move cursor and return true
+	lb t0, PLAYER_B_POS_X(a1)
+	lb t1, PLAYER_B_POS_Y(a1)
+	la t2, CURSOR_POS
+	sb t0, 0(t2)
+	sb t1, 1(t2)
 	li a0, 1
 	j ret_check_enemy_neighbors
 
