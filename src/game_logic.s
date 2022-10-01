@@ -24,6 +24,10 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_ACTION_MENU
 	beq t0, t1, action_menu_run_game_logic
 
+	li t1, GAME_STATE_CHOOSE_ENEMY
+	beq t0, t1, choose_enemy_run_game_logic
+
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -203,3 +207,18 @@ selected_action_menu_run_game_logic:
 	j ret_run_game_logic
 
 attack_action_menu_run_game_logic:
+	# restart menu
+	la t0, ACTION_MENU_IS_SELECTED
+	sb zero, 0(t0)
+	la t0, ACTION_MENU_SELECTED_OPTION
+	sb zero, 0(t0)
+
+	# *GAME_STATE = GAME_STATE_CHOOSE_ENEMY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ENEMY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ENEMY
+	j ret_run_game_logic
+
+choose_enemy_run_game_logic:

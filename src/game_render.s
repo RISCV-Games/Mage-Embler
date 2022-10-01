@@ -35,6 +35,9 @@ init_run_game_render:
 choose_ally_run_game_render:
 	jal DRAW_MAP
 	jal DRAW_PLAYERS
+
+	# attackMode = false
+	li a0, 0
 	jal DRAW_CURSOR
 
 	jal SWAP_FRAMES
@@ -45,6 +48,9 @@ making_trail_run_game_render:
 	jal DRAW_WALKABLE_BLOCKS
 	jal DRAW_CURSOR_TRAIL
 	jal DRAW_PLAYERS
+
+	# attackMode = false
+	li a0, 0
 	jal DRAW_CURSOR
 
 	jal SWAP_FRAMES

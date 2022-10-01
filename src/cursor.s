@@ -1,11 +1,16 @@
 #########################################################
-#	Desenha o cursor em CURSOR_POS.                        
+# Desenha o cursor em CURSOR_POS. a0 determina
+# se a cor do cursor será vermelha ou não
+#########################################################
+# a0 = attackMode
 #########################################################
 DRAW_CURSOR:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 
-	la a0, CURSOR_IMG
+	bne a0, zero, attack_mode_draw_cursor
+
+	la a0, tiles
 	la a1, CURSOR_ANIM
 	la t0, CURSOR_POS
 	lbu a2, 0(t0)
@@ -13,9 +18,20 @@ DRAW_CURSOR:
 	li a4, CURSOR_ANIM_DELAY
 	jal DRAW_ANIMATION_TILE
 
+ret_draw_cursor:
 	lw ra, 0(sp)
 	addi sp, sp, 4
 	ret
+
+attack_mode_draw_cursor:
+	la a0, tiles
+	la a1, CURSOR_ATTACK_ANIM
+	la t0, CURSOR_POS
+	lbu a2, 0(t0)
+	lbu a3, 1(t0)
+	li a4, CURSOR_ANIM_DELAY
+	jal DRAW_ANIMATION_TILE
+	j ret_draw_cursor
 
 #########################################################
 # Inicializa o trail do cursor com sua posição inicial.

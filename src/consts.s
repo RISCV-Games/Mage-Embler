@@ -3,12 +3,14 @@
 .eqv BUFFER_ADRESS 0xFF000000
 .eqv NUMBER_OF_PIXELS 0x12C00
 .eqv TILE_SIZE 16
-.eqv NUMBER_OF_TILES_IN_IMAGE 36
+.eqv NUMBER_OF_TILES_IN_IMAGE 39
 .eqv SCREEN_SIZE 320
 .eqv KBD_CONTROL 0xFF200000
 .eqv CURSOR_IMG tiles
 .eqv CURSOR_NUM0 4 # tile number of first frame of cursor animation
 .eqv CURSOR_NUM1 5 # tile number of second frame of cursor animation
+.eqv CURSOR_ATTACK_NUM0 37
+.eqv CURSOR_ATTACK_NUM1 38
 .eqv CURSOR_ANIM_DELAY 200 # time between each frame of cursor animation
 .eqv SCREEN_CENTER_X 9
 .eqv SCREEN_CENTER_Y 7
@@ -214,6 +216,7 @@
 .eqv GAME_STATE_MOVING_ENEMY 5
 .eqv GAME_STATE_IN_COMBAT 6
 .eqv GAME_STATE_ACTION_MENU 7
+.eqv GAME_STATE_CHOOSE_ENEMY 8
 
 # Constantes do ACTIONS_MENU
 .eqv ACTIONS_MENU_STRING_COL 0x000009ff
