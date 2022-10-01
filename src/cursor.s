@@ -1,11 +1,16 @@
 #########################################################
-#	Desenha o cursor em CURSOR_POS.                        
+# Desenha o cursor em CURSOR_POS. a0 determina
+# se a cor do cursor será vermelha ou não
+#########################################################
+# a0 = attackMode
 #########################################################
 DRAW_CURSOR:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 
-	la a0, CURSOR_IMG
+	bne a0, zero, attack_mode_draw_cursor
+
+	la a0, tiles
 	la a1, CURSOR_ANIM
 	la t0, CURSOR_POS
 	lbu a2, 0(t0)
@@ -13,9 +18,20 @@ DRAW_CURSOR:
 	li a4, CURSOR_ANIM_DELAY
 	jal DRAW_ANIMATION_TILE
 
+ret_draw_cursor:
 	lw ra, 0(sp)
 	addi sp, sp, 4
 	ret
+
+attack_mode_draw_cursor:
+	la a0, tiles
+	la a1, CURSOR_ATTACK_ANIM
+	la t0, CURSOR_POS
+	lbu a2, 0(t0)
+	lbu a3, 1(t0)
+	li a4, CURSOR_ANIM_DELAY
+	jal DRAW_ANIMATION_TILE
+	j ret_draw_cursor
 
 #########################################################
 # Inicializa o trail do cursor com sua posição inicial.
@@ -239,13 +255,12 @@ ret_draw_cursor_trail:
 	addi sp, sp, 8
 	ret
 
-
 #####################################################
-# Monta e desenha o caminho feito pelo cursor na tela
+# Monta o caminho feito pelo cursor na tela
 #####################################################
 # a0 = keyCode
 #####################################################
-MAKE_TRAIL:
+MAKE_TRAIL_LOGIC:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 
@@ -254,25 +269,27 @@ MAKE_TRAIL:
 	la a1, WALKABLE_BLOCKS
 	jal MOVE_CURSOR_LIMITED
 
+	# if cursor moved then add position to trail else return
+	beq a0, zero, ret_make_trail_logic
+
+	# t0 = CURSOR_TRAIL
 	la t0, CURSOR_TRAIL
-	beq a0, zero, draw_trail_make_trail
-	# if cursor moved then add position to trail
 
 	# t6 = trail.length
 	li t6, 0
 
-loop_make_trail:
+loop_make_trail_logic:
 	lb t1, 0(t0)
 	li t2, -1
-	beq t1, t2, exit_loop_make_trail
+	beq t1, t2, exit_loop_make_trail_logic
 
 	addi t6, t6, 1
 	addi t0, t0, 2
-	j loop_make_trail
+	j loop_make_trail_logic
 
-exit_loop_make_trail:
+exit_loop_make_trail_logic:
 	li t1, 2
-	blt t6, t1, add_pos_make_trail
+	blt t6, t1, add_pos_make_trail_logic
 
 	# (t2, t3) = (mouseX, mouseY), (t4, t5) = trail[trail.length-2]
 	la t1, CURSOR_POS
@@ -283,12 +300,12 @@ exit_loop_make_trail:
 	xor t2, t2, t4
 	xor t3, t3, t5
 	add t2, t2, t3
-	bne t2, zero, add_pos_make_trail
+	bne t2, zero, add_pos_make_trail_logic
 	li t1, -1
 	sb t1, -2(t0)
-	j draw_trail_make_trail
+	j ret_make_trail_logic
 
-add_pos_make_trail:
+add_pos_make_trail_logic:
 	# add new mouse pos to trail
 	la t1, CURSOR_POS
 	lb t2, 0(t1)
@@ -298,9 +315,7 @@ add_pos_make_trail:
 	sb t3, 1(t0)
 	sb t4, 2(t0)
 
-draw_trail_make_trail:
-	jal DRAW_CURSOR_TRAIL
-
+ret_make_trail_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
 	ret
@@ -472,4 +487,95 @@ loop_get_last_trail_pos:
 ret_last_trail_pos:
 	lb a0, -2(t0)
 	lb a1, -1(t0)
+	ret
+
+#####################################################
+# Movimenta o cursor no modo ataque com base
+# na posição do SELECTED_PLAYER e da NEARBY_ENEMIES.
+#####################################################
+# a0 = keyCode
+#####################################################
+MOVE_CURSOR_ATTACK_MODE:
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	# (t0, t1) = SELECTED_PLAYER->pos
+	la t1, SELECTED_PLAYER
+	lw t1, 0(t1)
+	lb t0, PLAYER_B_POS_X(t1)
+	lb t1, PLAYER_B_POS_Y(t1)
+
+	li t2, 'w'
+	beq a0, t2, w_move_cursor_attack_mode
+
+	li t2, 'a'
+	beq a0, t2, a_move_cursor_attack_mode
+
+	li t2, 's'
+	beq a0, t2, s_move_cursor_attack_mode
+
+	li t2, 'd'
+	beq a0, t2, d_move_cursor_attack_mode
+
+	j ret_move_cursor_attack_mode
+
+w_move_cursor_attack_mode:
+	# if there is an enemy above the player move the cursor there.
+	la t2, NEARBY_ENEMIES
+	lb t2, CURSOR_ATTACK_UP(t2)
+	beq t2, zero, ret_move_cursor_attack_mode
+
+	# move cursor above the player
+	la t2, CURSOR_POS
+	addi t1, t1, -1
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+
+	j ret_move_cursor_attack_mode
+
+a_move_cursor_attack_mode:
+	# if there is an enemy to the left of the player move the cursor there.
+	la t2, NEARBY_ENEMIES
+	lb t2, CURSOR_ATTACK_LEFT(t2)
+	beq t2, zero, ret_move_cursor_attack_mode
+
+	# move cursor above the player
+	la t2, CURSOR_POS
+	addi t0, t0, -1
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+	
+	j ret_move_cursor_attack_mode
+
+s_move_cursor_attack_mode:
+	# if there is an enemy above the player move the cursor there.
+	la t2, NEARBY_ENEMIES
+	lb t2, CURSOR_ATTACK_DOWN(t2)
+	beq t2, zero, ret_move_cursor_attack_mode
+
+	# move cursor above the player
+	la t2, CURSOR_POS
+	addi t1, t1, 1
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+	
+	j ret_move_cursor_attack_mode
+
+d_move_cursor_attack_mode:
+	# if there is an enemy above the player move the cursor there.
+	la t2, NEARBY_ENEMIES
+	lb t2, CURSOR_ATTACK_RIGHT(t2)
+	beq t2, zero, ret_move_cursor_attack_mode
+
+	# move cursor above the player
+	la t2, CURSOR_POS
+	addi t0, t0, 1
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+	
+	j ret_move_cursor_attack_mode
+
+ret_move_cursor_attack_mode:
+	lw ra, 0(sp)
+	addi sp, sp, 4
 	ret

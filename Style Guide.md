@@ -45,9 +45,10 @@ feat/<nome-da-feature>
 fix/<nome-do-fix>
 
 # Paleta de cores
-NomeCor  - Valor Normal  - Valor no RISC-V
-Vermelho - FF0000        - 
-Branco   - FFF7CE        - 183
-Azul     - 
-Marron   - 
-BEGE     - b5ad7b        - 100
+NomeCor    - Valor Normal  - Valor no RISC-V
+Vermelho   - FF0000        - 
+Branco     - FFF7CE        - 183
+Azul       - 
+Marron     - 5C4033
+BEGE       - b5ad7b        - 100
+AttackRed  - 641e23        - 75
