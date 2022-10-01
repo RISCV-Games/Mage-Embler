@@ -193,8 +193,10 @@ stop_moving_player_run_game_logic:
 	jal CHECK_ENEMY_NEIGHBORS
 	bne a0, zero, set_action_menu_run_game_logic
 
-	li a0, GAME_STATE_CHOOSE_ALLY
+	# else check if there any remaining unmoved allies
+	jal CHECK_UNMOVED_ALLIES
 
+	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
 
 set_action_menu_run_game_logic:

@@ -500,3 +500,55 @@ up_update_nearby_enemies:
 
 ret_update_nearby_enemies:
 ret
+
+###################################################################################
+# Boolean valued function which indicates if there are alive allies that
+# have not moved in the current turn.
+###################################################################################
+CHECK_UNMOVED_ALLIES:
+	# t0 = players
+	la t0, PLAYERS
+
+	# t1 = i = 0
+	li t1, 0
+
+	# t2 = *N_PLAYERS * PLAYERS_BYTE_SIZE
+	la t2, N_PLAYERS
+	lw t2, 0(t2)
+	li t3, PLAYERS_BYTE_SIZE
+	mul t2, t2, t3
+
+	# a0 = false
+	li a0, 0
+
+loop_check_unmoved_allies:
+	bge t1, t2, ret__check_unmoved_allies
+
+	# t3 = players[i]
+	add t3, t0, t1
+	lw t3, 0(t3)
+
+	# skip dead players
+	lb t4, PLAYER_B_VIDA_ATUAL(t3)
+	beq t4, zero, continue_loop_check_unmoved_allies
+
+	# skip enemies
+	lb t4, PLAYER_B_TIPO(t3)
+	li t5, IN_AZUL
+	bge t4, t5, continue_loop_check_unmoved_allies
+
+	# skip moved allies
+	li t4, PLAYER_B_MOVED(t3)
+	beq t4, zero, continue_loop_check_unmoved_allies
+
+	# only remaining players are the alive, unmoved allies so return true
+	li a0, 1
+	j ret_check_unmoved_allies
+
+
+continue_loop_check_unmoved_allies:
+	addi t1, t1, PLAYERS_BYTE_SIZE
+	j loop_check_unmoved_allies
+
+ret_check_unmoved_allies:
+	ret
