@@ -77,7 +77,7 @@
 
 # delay in milliseconds between each frame of animations
 .eqv PLAYER_STILL_ANIMATION_DELAY 200
-.eqv SMOKE_ANIMATION_DELAY 80
+.eqv SMOKE_ANIMATION_DELAY 100
 
 .eqv SMOKE_TILE_SIZE 48
 .eqv NoteData 0xFF200178
