@@ -239,13 +239,12 @@ ret_draw_cursor_trail:
 	addi sp, sp, 8
 	ret
 
-
 #####################################################
-# Monta e desenha o caminho feito pelo cursor na tela
+# Monta o caminho feito pelo cursor na tela
 #####################################################
 # a0 = keyCode
 #####################################################
-MAKE_TRAIL:
+MAKE_TRAIL_LOGIC:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 
@@ -254,25 +253,27 @@ MAKE_TRAIL:
 	la a1, WALKABLE_BLOCKS
 	jal MOVE_CURSOR_LIMITED
 
+	# if cursor moved then add position to trail else return
+	beq a0, zero, ret_make_trail_logic
+
+	# t0 = CURSOR_TRAIL
 	la t0, CURSOR_TRAIL
-	beq a0, zero, draw_trail_make_trail
-	# if cursor moved then add position to trail
 
 	# t6 = trail.length
 	li t6, 0
 
-loop_make_trail:
+loop_make_trail_logic:
 	lb t1, 0(t0)
 	li t2, -1
-	beq t1, t2, exit_loop_make_trail
+	beq t1, t2, exit_loop_make_trail_logic
 
 	addi t6, t6, 1
 	addi t0, t0, 2
-	j loop_make_trail
+	j loop_make_trail_logic
 
-exit_loop_make_trail:
+exit_loop_make_trail_logic:
 	li t1, 2
-	blt t6, t1, add_pos_make_trail
+	blt t6, t1, add_pos_make_trail_logic
 
 	# (t2, t3) = (mouseX, mouseY), (t4, t5) = trail[trail.length-2]
 	la t1, CURSOR_POS
@@ -283,12 +284,12 @@ exit_loop_make_trail:
 	xor t2, t2, t4
 	xor t3, t3, t5
 	add t2, t2, t3
-	bne t2, zero, add_pos_make_trail
+	bne t2, zero, add_pos_make_trail_logic
 	li t1, -1
 	sb t1, -2(t0)
-	j draw_trail_make_trail
+	j ret_make_trail_logic
 
-add_pos_make_trail:
+add_pos_make_trail_logic:
 	# add new mouse pos to trail
 	la t1, CURSOR_POS
 	lb t2, 0(t1)
@@ -298,9 +299,7 @@ add_pos_make_trail:
 	sb t3, 1(t0)
 	sb t4, 2(t0)
 
-draw_trail_make_trail:
-	jal DRAW_CURSOR_TRAIL
-
+ret_make_trail_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
 	ret

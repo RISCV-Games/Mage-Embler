@@ -284,15 +284,19 @@ DRAW_BLOCK:
 ######################################################################
 # Desenha o mapa.
 ######################################################################
-# a0 = endereco do mapa
-# a1 = lista de correspondencia de tiles.
-######################################################################
 DRAW_MAP:
 	addi sp, sp, -16
 	sw ra, 0(sp)
 	sw s0, 4(sp)
 	sw s1, 8(sp)
 	sw s2, 12(sp)
+
+	# a0 = MAPS[CURRENT_MAP]
+	la a0, CURRENT_MAP
+	lw a0, 0(a0)
+
+	# TODO: fix hardcoded value in a1
+	la a1, CORRESPONDENCE_ARR_MAP0
 
 	# s0 = map, s1 = i = 0, s2 = correspondence list
 	mv s0, a0
@@ -325,5 +329,5 @@ ret_draw_map:
 	lw s0, 4(sp)
 	lw s1, 8(sp)
 	lw s2, 12(sp)
-	addi sp, sp, 12
+	addi sp, sp, 16
 	ret

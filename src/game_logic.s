@@ -15,6 +15,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_CHOOSE_ALLY
 	beq t0, t1, choose_ally_run_game_logic
 
+	li t1, GAME_STATE_MAKING_TRAIL
+	beq t0, t1, making_trail_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -29,6 +32,11 @@ init_run_game_logic:
 	la t0, GAME_STATE
 	li t1, GAME_STATE_CHOOSE_ALLY
 	sb t1, 0(t0)
+
+	# CURRENT_MAP = MAPS[0]
+	la t0, MAPS
+	la t1, CURRENT_MAP
+	sw t0, 0(t1)
 	
 	li a0, GAME_STATE_INIT
 	j ret_run_game_logic
@@ -57,3 +65,31 @@ x_choose_ally_run_game_logic:
 	lb a0, 0(t0)
 	lb a1, 1(t0)
 	jal GET_PLAYER_BY_POS
+
+	# if there is no player at cursor pos then return
+	beq a0, zero, ret_run_game_logic
+
+	# else update walkable blocks
+	la t0, CURSOR_POS
+	lb a0, 0(t0)
+	lb a1, 1(t0)
+	la a2, CURRENT_MAP
+	lw a2, 0(a2)
+	jal UPDATE_WALKABLE_BLOCKS
+
+	# else change state to GAME_STATE_MAKING_TRAIL
+	jal INIT_CURSOR_TRAIL
+	la t0, GAME_STATE
+	li t1, GAME_STATE_MAKING_TRAIL
+	sb t1, 0(t0)
+
+	# return GAME_STATE_MAKING_TRAIL
+	mv a0, t1
+	j ret_run_game_logic
+
+making_trail_run_game_logic:
+	jal GET_KBD_INPUT
+	jal MAKE_TRAIL_LOGIC
+
+	li a0, GAME_STATE_MAKING_TRAIL
+	j ret_run_game_logic
