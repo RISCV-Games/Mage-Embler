@@ -27,6 +27,8 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_CHOOSE_ENEMY
 	beq t0, t1, choose_enemy_run_game_logic
 
+	li t1, GAME_STATE_IN_COMBAT
+	beq t0, t1, in_combat_run_game_logic
 
 ret_run_game_logic:
 	lw ra, 0(sp)
@@ -228,5 +230,62 @@ choose_enemy_run_game_logic:
 	jal GET_KBD_INPUT
 	jal MOVE_CURSOR_ATTACK_MODE
 
+	# if 'x' is pressed go to combat mode
+	la t0, KBD_INPUT
+	lb t0, 0(t0)
+	li t1, 'x'
+	beq t0, t1, x_choose_enemy_run_game_logic
+
+
 	li a0, GAME_STATE_CHOOSE_ENEMY
+	j ret_run_game_logic
+
+x_choose_enemy_run_game_logic:
+	# get selected enemy
+	la a1, CURSOR_POS
+	lb a0, 0(a1)
+	lb a1, 0(a1)
+	jal GET_PLAYER_BY_POS
+
+	# t1 = *SELECTED_PLAYER
+	la t1, SELECTED_PLAYER
+	lw t1, 0(t1)
+
+	# Set players in combat to SELECTED_PLAYER, SELECTED_ENEMY
+	la t0, PLAYERS_IN_COMBAT
+	sw t1, 0(t0)
+	sw a0, 4(t0)
+
+	# IN_COMBAT = true
+	la t0, IN_COMBAT
+	li t1, 1
+	sb t1, 0(t0)
+
+	# *GAME_STATE = GAME_STATE_IN_COMBAT
+	la t0, GAME_STATE
+	li t1, GAME_STATE_IN_COMBAT
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+in_combat_run_game_logic:
+	# if combat ended go back to choose ally
+	la t0, IN_COMBAT
+    lb t0, 0(t0)
+    beq t0, zero, end_combat_run_game_logic
+
+	# else run combat logic
+	jal LOGIC_COMBAT
+
+	li a0, GAME_STATE_IN_COMBAT
+	j ret_run_game_logic
+
+end_combat_run_game_logic:
+	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic

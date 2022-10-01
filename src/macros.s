@@ -36,7 +36,7 @@
 .eqv PLAYER_B_POS_Y 25
 
 ######### Initialize a Player and increment N_PLAYERS (altera registradores t) ###############
-.macro INIT_PLAYER(%pos_x, %pos_y, %tipo)
+.macro INIT_PLAYER(%posX, %posY, %tipo, %magiaX, %magiaY, %vidaTotal, %vidaAtual, %magiaSizeX, %magiaSizeY, %damage, %hit, %crit)
 	# t0 = PLAYERS[N_PLAYERS]
 	la t0, PLAYERS
 	la t1, N_PLAYERS
@@ -46,12 +46,30 @@
 	add t0, t0, t1
 
 	# initialize
-	li t1, %pos_x
+	li t1, %posX
 	sb t1, PLAYER_B_POS_X(t0)
-	li t1, %pos_y
+	li t1, %posY
 	sb t1, PLAYER_B_POS_Y(t0)
 	li t1, %tipo
 	sb t1, PLAYER_B_TIPO(t0)
+	li t1, %magiaX
+	sh t1, PLAYER_H_MAGIA_X(t0)
+	li t1, %magiaY
+	sh t1, PLAYER_H_MAGIA_Y(t0)
+	li t1, %vidaTotal
+	sb t1, PLAYER_B_VIDA_TOTAL(t0)
+	li t1, %vidaAtual
+	sb t1, PLAYER_B_VIDA_ATUAL(t0)
+	li t1, %magiaSizeX
+	sb t1, PLAYER_B_MAGIA_SIZE_X(t0)
+	li t1, %magiaSizeY
+	sb t1, PLAYER_B_MAGIA_SIZE_Y(t0)
+	li t1, %damage
+	sb t1, PLAYER_B_DAMAGE(t0)
+	li t1, %hit
+	sb t1, PLAYER_B_HIT(t0)
+	li t1, %crit
+	sb t1, PLAYER_B_CRIT(t0)
 
 	# increment N_PLAYERS
 	la t0, N_PLAYERS

@@ -88,6 +88,7 @@ ret_draw_block_debug:
 # Desenha os blocos atingíveis de acordo com WALKABLE_BLOCKS.
 ######################################################################
 DRAW_WALKABLE_BLOCKS:
+	# TODO: improve this function to draw blue corners on the walkable blocks.
 	addi sp, sp, -8
 	sw ra, 0(sp)
 	sw s0, 4(sp)

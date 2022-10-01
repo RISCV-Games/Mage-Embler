@@ -17,5 +17,7 @@ j GAME
 .include "../src/map.s"
 .include "../src/utils.s"
 .include "../src/menu.s"
+.include "../src/combat.s"
+.include "../src/dialog.s"
 .include "../src/game_render.s"
 .include "../src/game_logic.s"

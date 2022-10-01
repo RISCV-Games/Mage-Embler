@@ -1,18 +1,10 @@
 ############################################################
-# Player (8 bytes)
+# Player
 # Alterar PLAYERS e PLAYER_BYTE_SIZE ao mudar o tamanho.
 ############################################################
 # Classe representando os jogadores, tanto aliados
 # quanto inimigos.
 ############################################################
-# 0: byte posX
-# 1: byte posY
-# 2: byte isAlly
-# 3: byte element (PLAYER_WATER, PLAYER_FIRE, PLAYER_EARTH)
-#############################################################
-
-
-
 
 
 ############################################################
@@ -34,13 +26,13 @@ INIT_PLAYERS:
 	ret
 
 zero_init_players:
-	INIT_PLAYER(16, 6, IN_MAR)
-	INIT_PLAYER(17, 7, IN_VER)
-	INIT_PLAYER(15, 7, AL_MAR)
-	INIT_PLAYER(4, 10, AL_AZUL)
-	INIT_PLAYER(5, 4, AL_VER)
-	INIT_PLAYER(16, 11, IN_AZUL)
-	INIT_PLAYER(3, 7, IN_VER)
+	INIT_PLAYER( 16,  6, IN_MAR , 0 , 0 , 25, 25, 10, 10, 1 , 1 , 1 )
+	INIT_PLAYER( 17,  7, IN_VER , 0 , 0 , 25, 25, 10, 10, 1 , 1 , 1 )
+	INIT_PLAYER( 15,  7, AL_MAR , 0 , 0 , 25, 25, 10, 10, 1 , 1 , 1 )
+	INIT_PLAYER( 4 , 10, AL_AZUL, 0 , 0 , 25, 25, 10, 10, 1 , 1 , 1 )
+	INIT_PLAYER( 5 ,  4, AL_VER , 0 , 0 , 25, 25, 10, 10, 1 , 1 , 1 )
+	INIT_PLAYER( 16, 11, IN_AZUL, 0 , 0 , 25, 25, 10, 10, 1 , 1 , 1 )
+	INIT_PLAYER( 3 , 7 , IN_VER , 0 , 0 , 25, 25, 10, 10, 1 , 1 , 1 )
 	ret
 
 one_init_players:

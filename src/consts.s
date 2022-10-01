@@ -108,6 +108,7 @@
 .eqv transp 199
 .eqv verde 56
 .eqv amarelo 47
+.eqv COMBAT_BACKGROUND 0xCCCCCCCC
 
 .eqv TAMANHO_X_NOME_PLAYER 60
 .eqv TAMANHO_Y_NOME_PLAYER 16
@@ -164,7 +165,8 @@
 .eqv DELTA_X_MAGIC 10
 
 # Player
-.eqv PLAYER_BYTE_SIZE 26
+.eqv PLAYER_BYTE_SIZE 28   # player byte size rounded to the nearest word
+.eqv PLAYERS_BYTE_SIZE 280 # always set this to 10 * PLAYER_BYTE_SIZE
 
 .eqv PLAYER_W_SPRITE 0
 .eqv PLAYER_W_SPRITE_MAGIA 4

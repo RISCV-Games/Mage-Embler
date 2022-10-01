@@ -26,6 +26,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_CHOOSE_ENEMY
 	beq a0, t0, choose_enemy_run_game_render
 
+	li t0, GAME_STATE_IN_COMBAT
+	beq a0, t0, in_combat_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -96,7 +99,28 @@ choose_enemy_run_game_render:
 	li a0, 1
 	jal DRAW_CURSOR
 
+	# TODO: implement this function
 	#jal HIGHLIGHT_NEARBY_ENEMIES
 
+	jal SWAP_FRAMES
+	j ret_run_game_render
+
+in_combat_run_game_render:
+	li a0, COMBAT_BACKGROUND
+	jal DRAW_BACKGROUND
+
+	# calls DRAW_COMBAT and SWAP_FRAME
+
+	la t0, PLAYERS_IN_COMBAT
+	lw a0, 0(t0)
+	lw a1, 4(t0)
+
+	la t0, PLAYER_ATACKING
+	lb a2, 0(t0)
+
+	la t0, IS_PRINT_DMG
+    lb a3, 0(t0)
+
+	jal DRAW_COMBAT
 	jal SWAP_FRAMES
 	j ret_run_game_render
