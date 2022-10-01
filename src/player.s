@@ -36,7 +36,7 @@ zero_init_players:
 	INIT_PLAYER( s0, 15,  7, AL_MAR , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 4 , 10, AL_AZUL, 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 5 ,  4, AL_VER , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 16, 11, IN_AZUL, 25, 25, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 16, 11, IN_AZUL, 25,  5, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 3 , 7 , IN_VER , 25, 25, 5 , 80 , 1 )
 
 	lw s0, 0(sp)
@@ -57,7 +57,7 @@ four_init_players:
 
 
 ###################################################################################
-# Retorna um Player a partir de sua posição (x, y). Se não há um player nessa
+# Retorna um Player a partir de sua posição (x, y). Se não há um player vivo nessa
 # posição retorna 0, caso contrário retorna o player.
 ###################################################################################
 # a0 = x
@@ -76,7 +76,12 @@ GET_PLAYER_BY_POS:
 loop_get_player_by_pos:
 	bge t1, t2, failed_get_player_by_pos
 
+	# t3 = PLAYERS[I]
 	add t3, t0, t1
+	# skip dead players
+	lb t6, PLAYER_B_VIDA_ATUAL(t3)
+	beq t6, zero, continue_loop_get_player_by_pos
+
 	lb t4, PLAYER_B_POS_X(t3)
 	lb t5, PLAYER_B_POS_Y(t3)
 	bne t4, a0, continue_loop_get_player_by_pos
@@ -200,12 +205,16 @@ loop_draw_players:
 	mul t0, t0, s0
 	add a0, a0, t0
 
+	# skip dead players
+	lb t0, PLAYER_B_VIDA_ATUAL(a0)
+	beq t0, zero, continue_loop_draw_players
+
 	# a1 = force draw player = false
 	li a1, 0
 	jal DRAW_PLAYER
 
+continue_loop_draw_players:
 	addi s0, s0, 1
-
 	j loop_draw_players
 
 ret_draw_players:
@@ -363,6 +372,9 @@ loop_check_enemy_neighbors:
 	# save t2 in a1 and t6
 	mv t6, t2
 	mv a1, t2
+	# skip dead players
+	lb a2, PLAYER_B_VIDA_ATUAL(a1)
+	beq a2, zero, continue_loop_check_enemy_neighbors
 
 	# (t2, t3) = players[i].pos
 	lb t3, PLAYER_B_POS_Y(t2)
@@ -427,6 +439,10 @@ loop_update_nearby_enemies:
 	la t3, PLAYERS
 	add t2, t2, t3
 	mv t6, t2
+
+	# skip dead players
+	lb a2, PLAYER_B_VIDA_ATUAL(t6)
+	beq a2, zero, continue_loop_update_nearby_enemies
 
 	# (t2, t3) = players[i].pos
 	lb t3, PLAYER_B_POS_Y(t2)

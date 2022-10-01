@@ -79,6 +79,9 @@ x_choose_ally_run_game_logic:
 	lb t0, PLAYER_B_TIPO(a0)
 	li t1, IN_AZUL
 	bge t0, t1, ret_run_game_logic
+	# if player is dead then return
+	lb t0, PLAYER_B_VIDA_ATUAL(a0)
+	beq t0, zero, ret_run_game_logic
 
 
 	# else SELECTED_PLAYER = a0
@@ -107,13 +110,14 @@ making_trail_run_game_logic:
 	jal GET_KBD_INPUT
 	jal MAKE_TRAIL_LOGIC
 
-	# if 'x' is pressed and no player is at the cursor pos then move player
+	# if 'x' is pressed and no alive player is at the cursor pos then move player
 	la t0, CURSOR_POS
 	lb a0, 0(t0)
 	lb a1, 1(t0)
 	jal GET_PLAYER_BY_POS
-	bne a0, zero, next_making_trail_run_game_logic
+	bne a0, zero, check_dead_making_trail_run_game_logic
 
+check_x_making_trail_run_game_logic:
 	la t0, KBD_INPUT
 	lb t0, 0(t0)
 	li t1, 'x'
@@ -122,6 +126,14 @@ making_trail_run_game_logic:
 next_making_trail_run_game_logic:
 	li a0, GAME_STATE_MAKING_TRAIL
 	j ret_run_game_logic
+
+check_dead_making_trail_run_game_logic:
+	# if player at cursor pos is dead then allow player to move to cursor pos
+	lb t0, PLAYER_B_VIDA_ATUAL(a0)
+	beq t0, zero, check_x_making_trail_run_game_logic
+
+	# else return
+	j next_making_trail_run_game_logic
 
 x_making_trail_run_game_logic:
 	# Get selected player and start blink animation
@@ -235,7 +247,6 @@ choose_enemy_run_game_logic:
 	lb t0, 0(t0)
 	li t1, 'x'
 	beq t0, t1, x_choose_enemy_run_game_logic
-
 
 	li a0, GAME_STATE_CHOOSE_ENEMY
 	j ret_run_game_logic
