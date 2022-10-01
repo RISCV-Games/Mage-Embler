@@ -30,7 +30,10 @@ MAKING_TRAIL: .byte 0
 # Indicates if player blink animation is in progress
 BLINK_ANIMATION: .byte 0
 # indica o estado atual do jogo
-GAME_STATUS: .byte 0
+GAME_STATE: .byte GAME_STATE_INIT
+
+KBD_INPUT: .byte 0
+CURRENT_MAP: .byte 0
 
 ACTUALLY_MOVE_PLAYER_DATA: 
 .align 2
@@ -72,7 +75,7 @@ MAPS:
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0x11,0x11,0,0,0,0,0,0,
-0,0,0, 0,0,0,0,0,0,0,0,0,0x11,0x11,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0x11,0x11,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0x11,0x11,0x11,0x11,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0x11,0,0,0,0,0,0,0,0,0,
