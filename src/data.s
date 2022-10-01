@@ -161,7 +161,6 @@ CORRESPONDENCE_ARR_MAP0:
 .include "../sprites/combat/combat_pose_inimigo_marron.data"
 
 .include "../images/SMOKE0.data"
-#.include "../images/SMOKE1.data"
-.include "../images/SMOKE1_TEST.data"
+.include "../images/SMOKE1.data"
 .include "../images/walkable.data"
 
