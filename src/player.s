@@ -40,6 +40,7 @@ zero_init_players:
 	INIT_PLAYER(16, 6, IN_MAR)
 	INIT_PLAYER(16, 11, IN_AZUL)
 	INIT_PLAYER(17, 7, IN_VER)
+	INIT_PLAYER(3, 7, IN_VER)
 	ret
 
 one_init_players:

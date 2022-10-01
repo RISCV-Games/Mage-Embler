@@ -21,6 +21,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_MOVING_PLAYER
 	beq t0, t1, moving_player_run_game_logic
 
+	li t1, GAME_STATE_ACTION_MENU
+	beq t0, t1, action_menu_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -146,7 +149,21 @@ stop_moving_player_run_game_logic:
 
 	# if player lands next to an enemy then GAME_STATE = GAME_STATE_ACTION_MENU
 	jal CHECK_ENEMY_NEIGHBORS
+	bne a0, zero, set_action_menu_run_game_logic
 
 	li a0, GAME_STATE_CHOOSE_ALLY
 
+	j ret_run_game_logic
+
+set_action_menu_run_game_logic:
+	# *GAME_STATE = GAME_STATE_ACTION_MENU
+	la t0, GAME_STATE
+	li t1, GAME_STATE_ACTION_MENU
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_ACTION_MENU
+	j ret_run_game_logic
+
+action_menu_run_game_logic:
+	li a0, GAME_STATE_ACTION_MENU
 	j ret_run_game_logic

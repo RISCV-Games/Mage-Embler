@@ -20,6 +20,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_MOVING_PLAYER
 	beq a0, t0, moving_player_run_game_render
 
+	li t0, GAME_STATE_ACTION_MENU
+	beq a0, t0, action_menu_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -50,6 +53,28 @@ making_trail_run_game_render:
 moving_player_run_game_render:
 	jal DRAW_MAP
 	jal DRAW_PLAYERS
+
+	jal SWAP_FRAMES
+	j ret_run_game_render
+
+action_menu_run_game_render:
+	jal DRAW_MAP
+	jal DRAW_PLAYERS
+
+	# Render
+	jal GET_ACTION_MENU_POS
+	mv a6, a0         				     # Posicao x do menu
+	mv a7, a1           			     # Posicao y do menu
+	li a0, 2           				     # Quantidade de strings
+	la a1, ACTION_MENU_STRINGS           # endereco para a label com as strings
+	li a2, ACTIONS_MENU_STRING_COL       # Cor das strings
+	li a3, ACTIONS_MENU_TAMANHO_X        # Tamanho x do menu
+	li a4, ACTIONS_MENU_TAMANHO_Y        # Tamanho y do menu
+	li a5, ACTIONS_MENU_BG_COL  	     # Cor de fundo do menu
+
+	la t0, ACTION_MENU_SELECTED_OPTION
+	lb s8, 0(t0)        			     # String selecionada (0 index)
+	jal DRAW_MENU
 
 	jal SWAP_FRAMES
 	j ret_run_game_render
