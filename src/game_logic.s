@@ -165,5 +165,41 @@ set_action_menu_run_game_logic:
 	j ret_run_game_logic
 
 action_menu_run_game_logic:
+	# Input
+	li a0, 2                     			  # Quantidade de opcoes
+	la a1, ACTION_MENU_SELECTED_OPTION        # label que segura opcao selecionada
+	la a2, ACTION_MENU_IS_SELECTED            # label que segura se foi selecionado ou nao
+	jal INPUT_MENU
+
+	# if an option was selected then handle it
+	la t0, ACTION_MENU_IS_SELECTED
+	lb t0, 0(t0)
+	bne t0, zero, selected_action_menu_run_game_logic
+
 	li a0, GAME_STATE_ACTION_MENU
 	j ret_run_game_logic
+
+selected_action_menu_run_game_logic:
+	# t0 = *ACTION_MENU_SELECTED_OPTION
+	la t0, ACTION_MENU_SELECTED_OPTION
+	lb t0, 0(t0)
+
+	# checks if attack was selected
+	beq t0, zero, attack_action_menu_run_game_logic
+
+	# if attack was not selected, then wait was selected
+	# restart menu
+	la t0, ACTION_MENU_IS_SELECTED
+	sb zero, 0(t0)
+	la t0, ACTION_MENU_SELECTED_OPTION
+	sb zero, 0(t0)
+
+	# *GAME_STATE = GAME_STATE_ACTION_MENU
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+attack_action_menu_run_game_logic:
