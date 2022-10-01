@@ -294,10 +294,36 @@ finish_life_draw_combat:
     lb a0, PLAYER_B_TIPO(s0)
     lb a1, PLAYER_B_TIPO(s1)
     jal CONFRONT_TYPE
-    beq a0, zero, print1_normal_hit_draw_combat
-    bgt a0, zero, print1_green_hit_draw_combat
+    beq a0, zero, check1_if_enemy_in_bush_normal_hit_draw_combat
+    bgt a0, zero, check1_if_enemy_in_bush_green_hit_draw_combat
+    j check1_if_enemy_in_bush_yellow_hit_draw_combat
 
-    # print amarelo
+check1_if_enemy_in_bush_normal_hit_draw_combat:
+    lb t0, PLAYER_B_SPECIAL_TERRAIN(s1)
+    beq t0, zero, print1_normal_hit_draw_combat
+    li t1, 2
+    beq t0, t1, print1_normal_hit_draw_combat
+
+    li a0, -20
+    j print1_yellow_hit_draw_combat
+
+check1_if_enemy_in_bush_green_hit_draw_combat:
+    lb t0, PLAYER_B_SPECIAL_TERRAIN(s1)
+    beq t0, zero, print1_green_hit_draw_combat
+    li t1, 2
+    beq t0, t1, print1_green_hit_draw_combat
+
+    j print1_normal_hit_draw_combat
+
+check1_if_enemy_in_bush_yellow_hit_draw_combat:
+    lb t0, PLAYER_B_SPECIAL_TERRAIN(s1)
+    beq t0, zero, print1_yellow_hit_draw_combat
+    li t1, 2
+    beq t0, t1, print1_yellow_hit_draw_combat
+    addi a0, a0, -20
+    j print1_yellow_hit_draw_combat
+
+print1_yellow_hit_draw_combat:
     lb t0, PLAYER_B_HIT(s0)
     add a0, t0, a0
     li a1, POS_X_INFO_BOX_PLAYER_1
@@ -351,14 +377,27 @@ print_crit_draw_combat:
     jal PRINT_STRING
 
     lb a0, PLAYER_B_CRIT(s0)
-    li a1, POS_X_INFO_BOX_PLAYER_1
-    addi a1, a1, 40
-    li a2, POS_Y_INFO_BOX_PLAYER
-    addi a2, a2, 20
     li a3, branco
     li t0, vermelho
     slli t0, t0, 8
     add a3, a3, t0
+
+    # Check if in special terrain
+    lb t0, PLAYER_B_SPECIAL_TERRAIN(s0)
+    li t1, 2
+    bne t0, t1, print1_normal_crit
+
+    # Rune crit
+    li a3, verde
+    li t0, vermelho
+    slli t0, t0, 8
+    add a3, a3, t0
+
+print1_normal_crit:
+    li a1, POS_X_INFO_BOX_PLAYER_1
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 20
     jal PRINT_INT
 
     # Player 2
@@ -412,10 +451,36 @@ print_crit_draw_combat:
     lb a0, PLAYER_B_TIPO(s1)
     lb a1, PLAYER_B_TIPO(s0)
     jal CONFRONT_TYPE
-    beq a0, zero, print2_normal_hit_draw_combat
-    bgt a0, zero, print2_green_hit_draw_combat
+    beq a0, zero, check2_if_enemy_in_bush_normal_hit_draw_combat
+    bgt a0, zero, check2_if_enemy_in_bush_green_hit_draw_combat
+    j check2_if_enemy_in_bush_yellow_hit_draw_combat
 
-    # print amarelo
+check2_if_enemy_in_bush_normal_hit_draw_combat:
+    lb t0, PLAYER_B_SPECIAL_TERRAIN(s0)
+    beq t0, zero, print2_normal_hit_draw_combat
+    li t1, 2
+    beq t0, t1, print2_normal_hit_draw_combat
+
+    li a0, -20
+    j print2_yellow_hit_draw_combat
+
+check2_if_enemy_in_bush_green_hit_draw_combat:
+    lb t0, PLAYER_B_SPECIAL_TERRAIN(s0)
+    beq t0, zero, print2_green_hit_draw_combat
+    li t1, 2
+    beq t0, t1, print2_green_hit_draw_combat
+
+    j print2_normal_hit_draw_combat
+
+check2_if_enemy_in_bush_yellow_hit_draw_combat:
+    lb t0, PLAYER_B_SPECIAL_TERRAIN(s0)
+    beq t0, zero, print2_yellow_hit_draw_combat
+    li t1, 2
+    beq t0, t1, print2_yellow_hit_draw_combat
+    addi a0, a0, -20
+    j print2_yellow_hit_draw_combat
+
+print2_yellow_hit_draw_combat:
     lb t0, PLAYER_B_HIT(s1)
     add a0, t0, a0
     li a1, POS_X_INFO_BOX_PLAYER_2
@@ -469,14 +534,28 @@ print_crit2_draw_combat:
     jal PRINT_STRING
 
     lb a0, PLAYER_B_CRIT(s1)
-    li a1, POS_X_INFO_BOX_PLAYER_2
-    addi a1, a1, 40
-    li a2, POS_Y_INFO_BOX_PLAYER
-    addi a2, a2, 20
     li a3, branco
     li t0, azul
     slli t0, t0, 8
     add a3, a3, t0
+
+    # Check if in special terrain
+    lb t0, PLAYER_B_SPECIAL_TERRAIN(s1)
+    li t1, 2
+    bne t0, t1, print2_normal_crit
+
+    # Rune crit
+    li a3, verde
+    li t0, azul
+    slli t0, t0, 8
+    add a3, a3, t0
+
+print2_normal_crit:
+    li a1, POS_X_INFO_BOX_PLAYER_2
+    addi a1, a1, 40
+    li a2, POS_Y_INFO_BOX_PLAYER
+    addi a2, a2, 20
+
     jal PRINT_INT
 
     # #########################
@@ -1101,8 +1180,17 @@ player_calculate_dmg_logic_combat:
     lw t1, 4(t0)
     lb a1, PLAYER_B_TIPO(t1)
     jal CONFRONT_TYPE
+
     add t2, t2, a0 # Hit + type
 
+    # Checking if in bush
+    lb t3, PLAYER_B_SPECIAL_TERRAIN(t1)
+    li t4, 1
+    bne t3, t4, check_if_hits_player_dmg # 1 if terrain is bush
+    # oponente esta em bush
+    addi t2, t2, -20
+
+check_if_hits_player_dmg:
     li a0, 100
     jal RAND_INT
 
@@ -1111,7 +1199,15 @@ player_calculate_dmg_logic_combat:
     # Checking if crit
     li a0, 10
     jal RAND_INT # number 0 to 9 if 0 or 1 crit
-    li t0, 10
+
+    # Check if in rune
+    li t0, 1
+    lb t2, PLAYER_B_SPECIAL_TERRAIN(t1)
+    li t3, 2
+    bne t2, t3, not_in_rune_calculate_dmg_player
+    addi t0, t0, 2
+
+not_in_rune_calculate_dmg_player:
     bgt a0, t0, no_crit_player_dmg_logic_combat
     # Has crit
     lb t2, PLAYER_B_CRIT(t1) # 
@@ -1162,6 +1258,14 @@ enemy_calculate_dmg_logic_combat:
 
     add t2, t2, a0 # Hit + type
 
+    # Checking if in bush
+    lb t3, PLAYER_B_SPECIAL_TERRAIN(t1)
+    li t4, 1
+    bne t3, t4, check_if_hits_enemy_dmg # 1 if terrain is bush
+    # oponente esta em bush
+    addi t2, t2, -20
+
+check_if_hits_enemy_dmg:
     li a0, 100
     jal RAND_INT
 
@@ -1170,7 +1274,15 @@ enemy_calculate_dmg_logic_combat:
     # Checking if crit
     li a0, 10
     jal RAND_INT # number 0 to 9 if 0 or 1 crit
+
+    # Check if in rune
     li t0, 1
+    lb t2, PLAYER_B_SPECIAL_TERRAIN(t1)
+    li t3, 2
+    bne t2, t3, not_in_rune_calculate_dmg_enemy
+    addi t0, t0, 2
+
+not_in_rune_calculate_dmg_enemy:
     bgt a0, t0, no_crit_enemy_dmg_logic_combat
     # Has crit
     lb t2, PLAYER_B_CRIT(t1) # 
