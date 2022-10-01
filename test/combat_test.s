@@ -10,19 +10,19 @@ PLAYER_2: .string "Player2"
 
 .align 2
 PLAYER1: .word,0, 0
-.byte 20, 5
+.byte 20, 20
 .half 0, 0 
 .byte 0, 0
 .word PLAYER_1
 .byte AL_AZUL
-.byte 5, 80, 1
+.byte 5, 50, 1
 PLAYER2: .word 0, 0
-.byte 25, 5 
+.byte 25, 15
 .half 0, 0 
 .byte 0, 0
 .word PLAYER_2
-.byte IN_VER
-.byte 5, 120, 1
+.byte IN_MAR
+.byte 5, 50, 1
 
 .text
 jal INIT_VIDEO
@@ -41,7 +41,7 @@ sb t1, 0(t0)
 GAME:
     jal LOGIC_COMBAT
     
-	li a0, 0x09090909
+	li a0, 0xCCCCCCCC
 	jal DRAW_BACKGROUND
 
     la t0, IN_COMBAT

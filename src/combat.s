@@ -1341,7 +1341,6 @@ des_confront_type:
     ret
 
 
-
 ##################################################
 # Recebe o tipo e retorna a sprite de idle      
 ##################################################
@@ -1370,42 +1369,42 @@ GET_COMBAT_SPRITES_BY_TYPE:
 type_1_get_combat_idle_sprite_by_type:
     la a0, combat_idle_aliado_azul
     la a1, combat_pose_aliado_azul
-    la a2, magia_idle
-    la a3, projetil
+    la a2, magic_idle_azul
+    la a3, magic_moving_azul
     la a4, GELO
     ret
 type_2_get_combat_idle_sprite_by_type:
     la a0, combat_idle_aliado_vermelho
     la a1, combat_pose_aliado_vermelho
-    la a2, magia_idle
-    la a3, projetil
+    la a2, magic_idle_vermelho
+    la a3, magic_moving_vermelho
     la a4, FOGO
     ret
 type_3_get_combat_idle_sprite_by_type:
-    la, a0 combat_idle_aliado_marron
-    la, a1 combat_pose_aliado_marron
-    la a2, magia_idle
-    la a3, projetil
+    la a0, combat_idle_aliado_marron
+    la a1, combat_pose_aliado_marron
+    la a2, magic_idle_marron
+    la a3, magic_moving_marron
     la a4, TERRA
     ret
 type_4_get_combat_idle_sprite_by_type:
-    la, a0 combat_idle_inimigo_azul
-    la, a1 combat_pose_inimigo_azul
-    la a2, magia_idle
-    la a3, projetil
+    la a0, combat_idle_inimigo_azul
+    la a1, combat_pose_inimigo_azul
+    la a2, magic_idle_azul
+    la a3, magic_moving_azul
     la a4, GELO
     ret
 type_5_get_combat_idle_sprite_by_type:
-    la, a0 combat_idle_inimigo_vermelho
-    la, a1 combat_pose_inimigo_vermelho
-    la a2, magia_idle
-    la a3, projetil
+    la a0, combat_idle_inimigo_vermelho
+    la a1, combat_pose_inimigo_vermelho
+    la a2, magic_idle_vermelho
+    la a3, magic_moving_vermelho
     la a4, FOGO
     ret
 type_6_get_combat_idle_sprite_by_type:
-    la, a0 combat_idle_inimigo_marron
-    la, a1 combat_pose_inimigo_marron
-    la a2, magia_idle
-    la a3, projetil
+    la a0, combat_idle_inimigo_marron
+    la a1, combat_pose_inimigo_marron
+    la a2, magic_idle_marron
+    la a3, magic_moving_marron
     la a4, TERRA
     ret

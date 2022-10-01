@@ -45,17 +45,14 @@ PLAYER_EARTH_STILL_ANIM: .word 2, 0, MIN_WORD, ALLY_EARTH_STILL_FRAME0, ALLY_EAR
 
 
 # Nome dos elementos
-FOGO: .string "FOGO"
-GELO: .string "GELO"
-TERRA: .string "TERRA"
+FOGO: .string "FIRE"
+GELO: .string "WATER"
+TERRA: .string "EARTH"
 
 HIT_STRING: .string "HIT"
 MISS_STRING: .string "MISS"
 CRIT_STRING: .string "CRIT"
 DMG_STRING: .string "DMG"
-
-INFO_STRING: .string "DMG   \nHIT   \nCRIT   "
-
 
 WALKABLE_BLOCKS: .align 2
 .space TILES_PER_MAP
@@ -130,10 +127,6 @@ CORRESPONDENCE_ARR_MAP0:
 
 .include "../sprites/vida_cheia.data"
 .include "../sprites/vida_vazia.data"
-.include "../sprites/combat_mago_idle.data"
-.include "../sprites/combat_mago_pose.data"
-.include "../sprites/magia_idle.data"
-.include "../sprites/projetil.data"
 
 # Combate
 .include "../sprites/combat/combat_idle_aliado_azul.data"
@@ -148,6 +141,14 @@ CORRESPONDENCE_ARR_MAP0:
 .include "../sprites/combat/combat_pose_inimigo_vermelho.data"
 .include "../sprites/combat/combat_idle_inimigo_marron.data"
 .include "../sprites/combat/combat_pose_inimigo_marron.data"
+
+# Magic
+.include "../sprites/magic/magic_idle_azul.data"
+.include "../sprites/magic/magic_idle_vermelho.data"
+.include "../sprites/magic/magic_idle_marron.data"
+.include "../sprites/magic/magic_moving_azul.data"
+.include "../sprites/magic/magic_moving_vermelho.data"
+.include "../sprites/magic/magic_moving_marron.data"
 
 .include "../images/SMOKE0.data"
 .include "../images/SMOKE1.data"
