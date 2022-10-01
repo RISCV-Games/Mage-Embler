@@ -488,3 +488,94 @@ ret_last_trail_pos:
 	lb a0, -2(t0)
 	lb a1, -1(t0)
 	ret
+
+#####################################################
+# Movimenta o cursor no modo ataque com base
+# na posição do SELECTED_PLAYER e da NEARBY_ENEMIES.
+#####################################################
+# a0 = keyCode
+#####################################################
+MOVE_CURSOR_ATTACK_MODE:
+	addi sp, sp, -4
+	sw ra, 0(sp)
+
+	# (t0, t1) = SELECTED_PLAYER->pos
+	la t1, SELECTED_PLAYER
+	lw t1, 0(t1)
+	lb t0, PLAYER_B_POS_X(t1)
+	lb t1, PLAYER_B_POS_Y(t1)
+
+	li t0, 'w'
+	beq a0, t0, w_move_cursor_attack_mode
+
+	li t0, 'a'
+	beq a0, t0, a_move_cursor_attack_mode
+
+	li t0, 's'
+	beq a0, t0, s_move_cursor_attack_mode
+
+	li t0, 'd'
+	beq a0, t0, d_move_cursor_attack_mode
+
+	j ret_move_cursor_attack_mode
+
+w_move_cursor_attack_mode:
+	# if there is an enemy above the player move the cursor there.
+	la t2, NEARBY_ENEMIES
+	lb t2, CURSOR_ATTACK_UP(t2)
+	beq t2, zero, ret_move_cursor_attack_mode
+
+	# move cursor above the player
+	la t2, CURSOR_POS
+	addi t1, t1, -1
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+
+	j ret_move_cursor_attack_mode
+
+a_move_cursor_attack_mode:
+	# if there is an enemy to the left of the player move the cursor there.
+	la t2, NEARBY_ENEMIES
+	lb t2, CURSOR_ATTACK_LEFT(t2)
+	beq t2, zero, ret_move_cursor_attack_mode
+
+	# move cursor above the player
+	la t2, CURSOR_POS
+	addi t0, t0, -1
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+	
+	j ret_move_cursor_attack_mode
+
+s_move_cursor_attack_mode:
+	# if there is an enemy above the player move the cursor there.
+	la t2, NEARBY_ENEMIES
+	lb t2, CURSOR_ATTACK_DOWN(t2)
+	beq t2, zero, ret_move_cursor_attack_mode
+
+	# move cursor above the player
+	la t2, CURSOR_POS
+	addi t1, t1, 1
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+	
+	j ret_move_cursor_attack_mode
+
+d_move_cursor_attack_mode:
+	# if there is an enemy above the player move the cursor there.
+	la t2, NEARBY_ENEMIES
+	lb t2, CURSOR_ATTACK_RIGHT(t2)
+	beq t2, zero, ret_move_cursor_attack_mode
+
+	# move cursor above the player
+	la t2, CURSOR_POS
+	addi t0, t0, 1
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+	
+	j ret_move_cursor_attack_mode
+
+ret_move_cursor_attack_mode:
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret

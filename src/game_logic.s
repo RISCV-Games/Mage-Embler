@@ -224,3 +224,8 @@ attack_action_menu_run_game_logic:
 	j ret_run_game_logic
 
 choose_enemy_run_game_logic:
+	jal GET_KBD_INPUT
+	jal MOVE_CURSOR_ATTACK_MODE
+
+	li a0, GAME_STATE_CHOOSE_ENEMY
+	j ret_run_game_logic
