@@ -144,6 +144,7 @@ stop_moving_player_run_game_logic:
 	li t1, GAME_STATE_CHOOSE_ALLY
 	sb t1, 0(t0)
 
+	# if player lands next to an enemy then GAME_STATE = GAME_STATE_ACTION_MENU
 	jal CHECK_ENEMY_NEIGHBORS
 
 	li a0, GAME_STATE_CHOOSE_ALLY

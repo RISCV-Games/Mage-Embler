@@ -34,58 +34,12 @@ INIT_PLAYERS:
 	ret
 
 zero_init_players:
-	la t0, PLAYERS
-	li t1, 4
-	sb t1, PLAYER_B_POS_X(t0)
-	li t1, 10
-	sb t1, PLAYER_B_POS_Y(t0)
-	li t1, AL_AZUL
-	sb t1, PLAYER_B_TIPO(t0)
-
-	addi t0, t0, PLAYER_BYTE_SIZE
-	li t1, 5
-	sb t1, PLAYER_B_POS_X(t0)
-	li t1, 4
-	sb t1, PLAYER_B_POS_Y(t0)
-	li t1, AL_VER
-	sb t1, PLAYER_B_TIPO(t0)
-
-	addi t0, t0, PLAYER_BYTE_SIZE
-	li t1, 16
-	sb t1, PLAYER_B_POS_X(t0)
-	li t1, 9
-	sb t1, PLAYER_B_POS_Y(t0)
-	li t1, AL_MAR
-	sb t1, PLAYER_B_TIPO(t0)
-
-	addi t0, t0, PLAYER_BYTE_SIZE
-	li t1, 16
-	sb t1, PLAYER_B_POS_X(t0)
-	li t1, 6
-	sb t1, PLAYER_B_POS_Y(t0)
-	li t1, IN_MAR
-	sb t1, PLAYER_B_TIPO(t0)
-
-	addi t0, t0, PLAYER_BYTE_SIZE
-	li t1, 16
-	sb t1, PLAYER_B_POS_X(t0)
-	li t1, 11
-	sb t1, PLAYER_B_POS_Y(t0)
-	li t1, IN_AZUL
-	sb t1, PLAYER_B_TIPO(t0)
-
-	addi t0, t0, PLAYER_BYTE_SIZE
-	li t1, 17
-	sb t1, PLAYER_B_POS_X(t0)
-	li t1, 7
-	sb t1, PLAYER_B_POS_Y(t0)
-	li t1, IN_VER
-	sb t1, PLAYER_B_TIPO(t0)
-
-	# set N_PLAYERS to correct amount
-	la t0, N_PLAYERS
-	li t1, 6
-	sb t1, 0(t0)
+	INIT_PLAYER(4, 10, AL_AZUL)
+	INIT_PLAYER(5, 4, AL_VER)
+	INIT_PLAYER(12, 7, AL_MAR)
+	INIT_PLAYER(16, 6, IN_MAR)
+	INIT_PLAYER(16, 11, IN_AZUL)
+	INIT_PLAYER(17, 7, IN_VER)
 	ret
 
 one_init_players:
