@@ -36,7 +36,7 @@ zero_init_players:
 	INIT_PLAYER( s0, 4 , 10, AL_AZUL, 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 5 ,  4, AL_VER , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 15,  7, AL_MAR , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 3 , 7 , IN_VER , 25, 25, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 3 , 8 , IN_VER , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 16, 11, IN_AZUL, 25,  5, 5 , 80 , 1 )
 
 	lw s0, 0(sp)
@@ -489,6 +489,9 @@ ret_check_ally_neighbors:
 # and the enemies positions.
 ###################################################################################
 UPDATE_NEARBY_ENEMIES:
+	la t0, NEARBY_ENEMIES
+	sw zero, 0(t0) 
+
 	# t0 = player = *SELECTED_PLAYER
 	la t0, SELECTED_PLAYER
 	lw t0, 0(t0)

@@ -106,8 +106,10 @@ choose_enemy_run_game_render:
 	j ret_run_game_render
 
 in_combat_run_game_render:
-	li a0, COMBAT_BACKGROUND
-	jal DRAW_BACKGROUND
+	#li a0, COMBAT_BACKGROUND
+	#jal DRAW_BACKGROUND
+
+	jal DRAW_MAP
 
 	# calls DRAW_COMBAT and SWAP_FRAME
 

@@ -267,7 +267,9 @@ DRAW_BLOCK:
 	sw ra, 0(sp)
 
 	# t0 = tile number
+	li t0, 0x0000001f
 	srli a1, a1, 3
+	and a1, a1, t0
 	add t0, a0, a1
 	lb t0, 0(t0)
 
