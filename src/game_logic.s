@@ -45,6 +45,12 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_ENTER_COMBAT
 	beq t0, t1, enter_combat_run_game_logic
 
+	li t1, GAME_STATE_ENEMY_DELAY
+	beq t0, t1, enemy_delay_run_game_logic
+
+	li t1, GAME_STATE_ENEMY_ENTER_COMBAT
+	beq t0, t1, enemy_enter_combat_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -494,7 +500,7 @@ enter_combat_run_game_logic:
 	# check if selected player is enemy
 	lb t1, PLAYER_B_TIPO(t1)
 	li t0, IN_AZUL
-	bge t1, t0, enenmy_enter_combat_run_game_logic
+	bge t1, t0, enemy_setup_combat_run_game_logic
 
 	# get selected enemy
 	la a1, CURSOR_POS
@@ -525,8 +531,52 @@ finish_enter_combat_run_game_logic:
 	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
 
-enenmy_enter_combat_run_game_logic:
+enemy_setup_combat_run_game_logic:
+	# *ENEMY_DELAY = time
+	la t0, ENEMY_DELAY
+	csrr t1, time
+	sw t1, 0(t0)
+
+	# *GAME_STATE = GAME_STATE_ENEMY_DELAY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_ENEMY_DELAY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_ENEMY_DELAY
+	j ret_run_game_logic
+
+enemy_delay_run_game_logic:
+	# t0 = time passed
+	csrr t0, time
+	la t1, ENEMY_DELAY
+	lw t1, 0(t1)
+	sub t0, t0, t1
+
+	# if t0 < WAIT_ENEMY_DELAY continue
+	li t1, WAIT_ENEMY_DELAY
+	blt t0, t1, continue_enemy_delay_run_game_logic
+
+	# *GAME_STATE = GAME_STATE_ENEMY_ENTER_COMBAT
+	la t0, GAME_STATE
+	li t1, GAME_STATE_ENEMY_ENTER_COMBAT
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+continue_enemy_delay_run_game_logic:
+	li a0, GAME_STATE_ENEMY_DELAY
+	j ret_run_game_logic
+
+enemy_enter_combat_run_game_logic:
 	jal CHECK_ALLY_NEIGHBORS
+
+	la t0, CURSOR_POS
+	lb t1, PLAYER_B_POS_X(a0)
+	lb t2, PLAYER_B_POS_Y(a0)
+	sb t1, 0(t0)
+	sb t2, 1(t0)
+
 	# t1 = *SELECTED_PLAYER
 	la t1, SELECTED_PLAYER
 	lw t1, 0(t1)

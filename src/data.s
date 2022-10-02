@@ -33,6 +33,9 @@ BLINK_ANIMATION: .byte 0
 # indica o estado atual do jogo
 GAME_STATE: .byte GAME_STATE_INIT
 
+.align 2
+ENEMY_DELAY: .word 0
+
 KBD_INPUT: .byte 0
 .align 2
 CURRENT_MAP: .word 0

@@ -29,6 +29,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_IN_COMBAT
 	beq a0, t0, in_combat_run_game_render
 
+	li t0, GAME_STATE_ENEMY_DELAY
+	beq a0, t0, enemy_delay_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -124,5 +127,16 @@ in_combat_run_game_render:
     lb a3, 0(t0)
 
 	jal DRAW_COMBAT
+	jal SWAP_FRAMES
+	j ret_run_game_render
+
+enemy_delay_run_game_render:
+	jal DRAW_MAP
+	jal DRAW_PLAYERS
+
+	# draw cursor in attack mode
+	li a0, 1
+	jal DRAW_CURSOR
+
 	jal SWAP_FRAMES
 	j ret_run_game_render
