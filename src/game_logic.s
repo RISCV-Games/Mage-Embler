@@ -406,3 +406,4 @@ allies_dead_check_turn_run_game_logic:
 	j ret_run_game_logic
 
 move_enemy_run_game_logic:
+	

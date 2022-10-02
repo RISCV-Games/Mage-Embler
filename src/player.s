@@ -393,8 +393,8 @@ loop_check_enemy_neighbors:
 
 	# else if players[i] is an enemy, return true
 	lb t6, PLAYER_B_TIPO(t6)
-	li t5, IN_AZUL
-	blt t6, t5, continue_loop_check_enemy_neighbors
+	li a3, IN_AZUL
+	blt t6, a3, continue_loop_check_enemy_neighbors
 
 	# move cursor and return true
 	lb t0, PLAYER_B_POS_X(a1)
@@ -410,7 +410,7 @@ continue_loop_check_enemy_neighbors:
 	j loop_check_enemy_neighbors
 
 ret_check_enemy_neighbors:
-ret
+	ret
 
 ###################################################################################
 # Update the NEARBY_ENEMIES array according to the selected player's position
@@ -503,7 +503,8 @@ ret
 
 ###################################################################################
 # Boolean valued function which indicates if there are alive allies that
-# have not moved in the current turn.
+# have not moved in the current turn. Returns 0 if every ally has moved,
+# returns an ally that has not moved otherwise.
 ###################################################################################
 CHECK_UNMOVED_ALLIES:
 	# t0 = players
@@ -540,8 +541,8 @@ loop_check_unmoved_allies:
 	lb t4, PLAYER_B_MOVED(t3)
 	bne t4, zero, continue_loop_check_unmoved_allies
 
-	# only remaining players are the alive, unmoved allies so return true
-	li a0, 1
+	# only remaining players are the alive, unmoved allies so return players[i]
+	mv a0, t3
 	j ret_check_unmoved_allies
 
 
@@ -554,7 +555,8 @@ ret_check_unmoved_allies:
 
 ###################################################################################
 # Boolean valued function which indicates if there are alive enemies that
-# have not moved in the current turn.
+# have not moved in the current turn. Returns 0 if every enemy has moved,
+# returns an enemy that has not moved otherwise.
 ###################################################################################
 CHECK_UNMOVED_ENEMIES:
 	# t0 = players
@@ -591,8 +593,8 @@ loop_check_unmoved_enemies:
 	lb t4, PLAYER_B_MOVED(t3)
 	bne t4, zero, continue_loop_check_unmoved_enemies
 
-	# only remaining players are the alive, unmoved enemies so return true
-	li a0, 1
+	# only remaining players are the alive, unmoved enemies so return players[i]
+	mv a0, t3
 	j ret_check_unmoved_enemies
 
 
