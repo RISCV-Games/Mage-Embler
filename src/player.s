@@ -841,3 +841,103 @@ GET_PLAYER_DIST:
 	mul t1, t1, t1
 	add a0, t0, t1
 	ret
+
+###################################################################################
+# Returns the square of the euclidean distance between two positions.
+###################################################################################
+# a0 = pos1.x
+# a1 = pos1.y
+# a2 = pos2.x
+# a3 = pos2.y
+###################################################################################
+GET_POS_DIST:
+	sub a0, a0, a2
+	sub a1, a1, a3
+	mul a0, a0, a0
+	mul a1, a1, a1
+	add a0, a0, a1
+
+	ret
+
+###################################################################################
+# Finds the walkable square that is closest to the closest ally.
+###################################################################################
+# a0 = ally
+# a1 = enemy
+###################################################################################
+GET_CLOSEST_WALKABLE:
+	addi sp, sp, -24
+	sw ra, 0(sp)
+	sw a0, 4(sp)
+	sw a1, 8(sp)
+	sw s0, 12(sp)
+	sw s1, 16(sp)
+	sw s2, 20(sp)
+
+	# (a0, a1) = enemy.pos
+	lb a0, PLAYER_B_POS_X(a1)
+	lb a1, PLAYER_B_POS_Y(a1)
+
+	# a2 = map
+	la a2, CURRENT_MAP
+	lw a2, 0(a2)
+
+	# update walkable blocks with respect to the enemy
+	jal UPDATE_WALKABLE_BLOCKS
+
+	# s0 = i = 0
+	li s0, 0
+
+	# s1 = closestSquare
+	li s1, -1
+
+	# s2 = minDist = biggest 12 bit immediate
+	li s2, 0x7ff
+
+loop_get_closest_walkable:
+	li t0, MAP_SIZE
+	bge s0, t0, ret_get_closest_walkable
+
+	# skip non-walkable squares
+	la t0, WALKABLE_BLOCKS
+	add t0, t0, s0
+	lb t0, 0(t0)
+	beq t0, zero, continue_loop_get_closest_walkable
+
+	# (a0, a1) = squarePos
+	li t0, MAP_WIDTH
+	rem a0, s0, t0
+	div a1, s0, t0
+
+	# (a2, a3) = ally.pos
+	lw t0, 4(sp)
+	lb a2, PLAYER_B_POS_X(t0)
+	lb a3, PLAYER_B_POS_Y(t0)
+
+	# a0 = currDist = distSq(ally, square)
+	jal GET_POS_DIST
+
+	# if currDist >= minDist then continue
+	bge a0, s2, continue_loop_get_closest_walkable
+
+	# else minDist = currDist and closestSquare = square
+	mv s2, a0
+	mv s1, s0
+
+continue_loop_get_closest_walkable:
+	addi s0, s0, 1
+	j loop_get_closest_walkable
+
+ret_get_closest_walkable:
+	# (a0, a1) = (closestSquare.x, closestSquare.y)
+	li t0, MAP_WIDTH
+	rem a0, s1, t0
+	div a1, s1, t0
+
+	# restore stack
+	lw ra, 0(sp)
+	lw s0, 12(sp)
+	lw s1, 16(sp)
+	lw s2, 20(sp)
+	addi sp, sp, 24
+	ret

@@ -406,20 +406,29 @@ allies_dead_check_turn_run_game_logic:
 	j ret_run_game_logic
 
 move_enemy_run_game_logic:
-	# Gets an unmoved enemy
+	addi sp, sp, -4
+	sw s0, 0(sp)
+	# Gets an unmoved enemy and saves it
 	jal CHECK_UNMOVED_ENEMIES
-	# finds the closest ally to this enemy.
+	# s0 = enemy
+	mv s0, a0
+	# finds the closest ally to this enemy
 	jal GET_CLOSEST_ALLY
-	lb t0, PLAYER_B_POS_X(a0)
-	lb t1, PLAYER_B_POS_Y(a0)
-	la t2, CURSOR_POS
-	sb t0, 0(t2)
-	sb t1, 1(t2)
+	# finds the walkable square that is closest to the closest ally
+	mv a1, s0
+	jal GET_CLOSEST_WALKABLE
+
+	la t0, CURSOR_POS
+	sb a0, 0(t0)
+	sb a1, 1(t0)
 
 	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
 	la t0, GAME_STATE
 	li t1, GAME_STATE_CHOOSE_ALLY
 	sb t1, 0(t0)
+
+	lw s0, 0(sp)
+	addi sp, sp, 4
 
 	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
