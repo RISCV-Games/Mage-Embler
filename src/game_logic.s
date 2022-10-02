@@ -406,4 +406,20 @@ allies_dead_check_turn_run_game_logic:
 	j ret_run_game_logic
 
 move_enemy_run_game_logic:
-	
+	# Gets an unmoved enemy
+	jal CHECK_UNMOVED_ENEMIES
+	# finds the closest ally to this enemy.
+	jal GET_CLOSEST_ALLY
+	lb t0, PLAYER_B_POS_X(a0)
+	lb t1, PLAYER_B_POS_Y(a0)
+	la t2, CURSOR_POS
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+
+	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic

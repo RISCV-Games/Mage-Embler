@@ -31,13 +31,13 @@ zero_init_players:
 
 	la s0, PLAYER_1
 
-	INIT_PLAYER( s0, 16,  6, IN_MAR , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 17,  7, IN_VER , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 15,  7, AL_MAR , 25, 25, 5 , 80 , 1 )
+	#INIT_PLAYER( s0, 16,  6, IN_MAR , 25, 25, 5 , 80 , 1 )
+	#INIT_PLAYER( s0, 17,  7, IN_VER , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 4 , 10, AL_AZUL, 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 5 ,  4, AL_VER , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 16, 11, IN_AZUL, 25,  5, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 15,  7, AL_MAR , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 3 , 7 , IN_VER , 25, 25, 5 , 80 , 1 )
+	#INIT_PLAYER( s0, 16, 11, IN_AZUL, 25,  5, 5 , 80 , 1 )
 
 	lw s0, 0(sp)
 	addi sp, sp, 4
@@ -754,4 +754,90 @@ ret_log_players_debug:
 	lw ra, 0(sp)
 	lw s0, 4(sp)
 	addi sp, sp, 8
+	ret
+
+###################################################################################
+# Returns the closest ally to a given enemy.
+###################################################################################
+# a0 = enemy
+###################################################################################
+GET_CLOSEST_ALLY:
+	addi sp, sp, -20
+	sw s0, 0(sp)
+	sw s1, 4(sp)
+	sw ra, 8(sp)
+	sw a0, 12(sp)
+	sw s2, 16(sp)
+
+	# s0 = i = 0
+	li s0, 0
+
+	# s2 = closestPlayer
+	li s2, 0
+
+	# s1 = minDist = biggest possible 12 bit immediate
+	li s1, 0x7ff
+
+loop_get_closest_ally:
+	la t0, N_PLAYERS
+	lb t0, 0(t0)
+	bge s0, t0, ret_get_closest_ally
+
+	# a1 = players[i]
+	li a1, PLAYER_BYTE_SIZE
+	mul a1, a1, s0
+	la t0, PLAYERS
+	add a1, a1, t0
+
+	# skip dead players
+	lb t0, PLAYER_B_VIDA_ATUAL(a1)
+	beq t0, zero, continue_loop_get_closest_ally
+
+	# skip enemies
+	lb t0, PLAYER_B_TIPO(a1)
+	li t1, IN_AZUL
+	bge t0, t1, continue_loop_get_closest_ally
+
+	# a0 = enemy
+	lw a0, 12(sp)
+	jal GET_PLAYER_DIST
+	# if distance between ally and enemy >= minDist then continue
+	bge a0, s1, continue_loop_get_closest_ally
+
+	# else set minDist = a0 and closestPlayer = players[i] = a1
+	mv s1, a0
+	mv s2, a1
+
+continue_loop_get_closest_ally:
+	addi s0, s0, 1
+	j loop_get_closest_ally
+
+ret_get_closest_ally:
+	# return closest player
+	mv a0, s2
+
+	lw s0, 0(sp)
+	lw s1, 4(sp)
+	lw ra, 8(sp)
+	lw s2, 16(sp)
+	addi sp, sp, 20
+	ret
+
+###################################################################################
+# Returns the square of the euclidean distance between two players.
+###################################################################################
+# a0 = player0
+# a1 = player1
+###################################################################################
+GET_PLAYER_DIST:
+	lb t0, PLAYER_B_POS_X(a0)
+	lb t1, PLAYER_B_POS_Y(a0)
+	lb t2, PLAYER_B_POS_X(a1)
+	lb t3, PLAYER_B_POS_Y(a1)
+
+	sub t0, t0, t2
+	sub t1, t1, t3
+	mul t0, t0, t0
+	mul t1, t1, t1
+	add a0, t0, t1
 	ret

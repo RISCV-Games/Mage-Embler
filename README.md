@@ -25,6 +25,6 @@ V  - Victor
 - [X] Sistema de combate (Pedra papel tesoura)
 - [X] Sistema de combate (terreno especial)
 - [ ] Historia
-- [ ] Remover jogadores mortos
+- [X] Remover jogadores mortos
 - [ ] Alternância de turnos
 - [X] Definicao de estética( Tiles, sprites de animacao )
