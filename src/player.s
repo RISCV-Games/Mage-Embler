@@ -950,3 +950,29 @@ ret_get_closest_walkable:
 	lw s2, 20(sp)
 	addi sp, sp, 24
 	ret
+
+###################################################################################
+# Marks every player as unmoved.
+###################################################################################
+UNMOVE_PLAYERS:
+	# t0 = i = 0
+	li t0, 0
+loop_unmove_players:
+	la t1, N_PLAYERS
+	lb t1, 0(t1)
+	bge t0, t1, ret_unmove_players
+
+	# t1 = players[i]
+	li t1, PLAYER_BYTE_SIZE
+	mul t1, t0, t1
+	la t2, PLAYERS
+	add t1, t1, t2
+
+	# players[i].moved = false
+	sb zero, PLAYER_B_MOVED(t1)
+
+	addi t0, t0, 1
+	j loop_unmove_players
+
+ret_unmove_players:
+	ret

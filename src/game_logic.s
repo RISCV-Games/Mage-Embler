@@ -33,8 +33,14 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_CHECK_TURN
 	beq t0, t1, check_turn_run_game_logic
 
+	li t1, GAME_STATE_NEXT_TURN
+	beq t0, t1, next_turn_run_game_logic
+
 	li t1, GAME_STATE_MOVE_ENEMY
 	beq t0, t1, move_enemy_run_game_logic
+
+	li t1, GAME_STATE_AFTER_MOVE
+	beq t0, t1, after_move_run_game_logic
 
 ret_run_game_logic:
 	lw ra, 0(sp)
@@ -206,14 +212,9 @@ stop_moving_player_run_game_logic:
 	li t0, 1
 	sb t0, PLAYER_B_MOVED(t3)
 
-	# if player lands next to an enemy then GAME_STATE = GAME_STATE_ACTION_MENU
-	# also moves the cursor on top of the enemy found, if that is the case
-	jal CHECK_ENEMY_NEIGHBORS
-	bne a0, zero, set_action_menu_run_game_logic
-
-	# *GAME_STATE = GAME_STATE_CHECK_TURN
+	# *GAME_STATE = GAME_STATE_AFTER_MOVE
 	la t0, GAME_STATE
-	li t1, GAME_STATE_CHECK_TURN
+	li t1, GAME_STATE_AFTER_MOVE
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
@@ -417,7 +418,7 @@ move_enemy_run_game_logic:
 
 	# s0 = enemy
 	mv s0, a0
-	
+
 	# *SELECTED_PLAYER = enemy
 	la t0, SELECTED_PLAYER
 	sw s0, 0(t0)
@@ -445,4 +446,52 @@ move_enemy_run_game_logic:
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_MOVING_PLAYER
+	j ret_run_game_logic
+
+after_move_run_game_logic:
+	la t0, SELECTED_PLAYER
+	lw t0, 0(t0)
+
+	# check if player is ally
+	lb t1, PLAYER_B_TIPO(t0)
+	li t2, IN_AZUL
+	blt t1, t2, ally_after_move_run_game_logic
+
+	# if there are ally neighbors nearby pick one of them and fight
+	#jal CHECK_ALLY_NEIGHBORS
+	beq a0, zero, next_after_move_run_game_logic
+	bne a0, zero, next_after_move_run_game_logic
+
+ally_after_move_run_game_logic:
+	# if ally is next to an enemy prompt it with an action menu
+	jal CHECK_ENEMY_NEIGHBORS
+	bne a0, zero, action_menu_after_move_run_game_logic
+
+next_after_move_run_game_logic:
+	# *GAME_STATE = GAME_STATE_CHECK_TURN
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHECK_TURN
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+action_menu_after_move_run_game_logic:
+	# *GAME_STATE = GAME_STATE_ACTION_MENU
+	la t0, GAME_STATE
+	li t1, GAME_STATE_ACTION_MENU
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_ACTION_MENU
+	j ret_run_game_logic
+
+next_turn_run_game_logic:
+	jal UNMOVE_PLAYERS
+
+	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
