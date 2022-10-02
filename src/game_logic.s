@@ -42,6 +42,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_AFTER_MOVE
 	beq t0, t1, after_move_run_game_logic
 
+	li t1, GAME_STATE_ENTER_COMBAT
+	beq t0, t1, enter_combat_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -298,29 +301,9 @@ choose_enemy_run_game_logic:
 	j ret_run_game_logic
 
 x_choose_enemy_run_game_logic:
-	# get selected enemy
-	la a1, CURSOR_POS
-	lb a0, 0(a1)
-	lb a1, 1(a1)
-	jal GET_PLAYER_BY_POS
-
-	# t1 = *SELECTED_PLAYER
-	la t1, SELECTED_PLAYER
-	lw t1, 0(t1)
-
-	# Set players in combat to SELECTED_PLAYER, SELECTED_ENEMY
-	la t0, PLAYERS_IN_COMBAT
-	sw t1, 0(t0)
-	sw a0, 4(t0)
-
-	# IN_COMBAT = true
-	la t0, IN_COMBAT
-	li t1, 1
-	sb t1, 0(t0)
-
-	# *GAME_STATE = GAME_STATE_IN_COMBAT
+	# *GAME_STATE = GAME_STATE_ENTER_COMBAT
 	la t0, GAME_STATE
-	li t1, GAME_STATE_IN_COMBAT
+	li t1, GAME_STATE_ENTER_COMBAT
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
@@ -458,9 +441,16 @@ after_move_run_game_logic:
 	blt t1, t2, ally_after_move_run_game_logic
 
 	# if there are ally neighbors nearby pick one of them and fight
-	#jal CHECK_ALLY_NEIGHBORS
+	jal CHECK_ALLY_NEIGHBORS
 	beq a0, zero, next_after_move_run_game_logic
-	bne a0, zero, next_after_move_run_game_logic
+
+	# *GAME_STATE = GAME_STATE_ENTER_COMBAT
+	la t0, GAME_STATE
+	li t1, GAME_STATE_ENTER_COMBAT
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
 
 ally_after_move_run_game_logic:
 	# if ally is next to an enemy prompt it with an action menu
@@ -491,6 +481,69 @@ next_turn_run_game_logic:
 	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
 	la t0, GAME_STATE
 	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+enter_combat_run_game_logic:
+	# t1 = *SELECTED_PLAYER
+	la t1, SELECTED_PLAYER
+	lw t1, 0(t1)
+
+	# check if selected player is enemy
+	lb t1, PLAYER_B_TIPO(t1)
+	li t0, IN_AZUL
+	bge t1, t0, enenmy_enter_combat_run_game_logic
+
+	# get selected enemy
+	la a1, CURSOR_POS
+	lb a0, 0(a1)
+	lb a1, 1(a1)
+	jal GET_PLAYER_BY_POS
+
+finish_enter_combat_run_game_logic:
+	# t1 = *SELECTED_PLAYER
+	la t1, SELECTED_PLAYER
+	lw t1, 0(t1)
+
+	# Set players in combat to SELECTED_PLAYER, SELECTED_ENEMY
+	la t0, PLAYERS_IN_COMBAT
+	sw t1, 0(t0)
+	sw a0, 4(t0)
+
+	# IN_COMBAT = 1
+	la t0, IN_COMBAT
+	li t1, 1
+	sb t1, 0(t0)
+
+	# *GAME_STATE = GAME_STATE_IN_COMBAT
+	la t0, GAME_STATE
+	li t1, GAME_STATE_IN_COMBAT
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+enenmy_enter_combat_run_game_logic:
+	jal CHECK_ALLY_NEIGHBORS
+	# t1 = *SELECTED_PLAYER
+	la t1, SELECTED_PLAYER
+	lw t1, 0(t1)
+
+	# Set players in combat to SELECTED_PLAYER, SELECTED_ENEMY
+	la t0, PLAYERS_IN_COMBAT
+	sw a0, 0(t0)
+	sw t1, 4(t0)
+
+	# IN_COMBAT = 2
+	la t0, IN_COMBAT
+	li t1, 2
+	sb t1, 0(t0)
+
+	# *GAME_STATE = GAME_STATE_IN_COMBAT
+	la t0, GAME_STATE
+	li t1, GAME_STATE_IN_COMBAT
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY

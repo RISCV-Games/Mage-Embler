@@ -412,6 +412,79 @@ ret_check_enemy_neighbors:
 	ret
 
 ###################################################################################
+# Returns zero if no neighbor of the selected player is an ally, otherwise
+# returns one neighbor which is an ally. Also moves the cursor to this ally,
+# in case one is found.
+###################################################################################
+CHECK_ALLY_NEIGHBORS:
+	# t0 = player = *SELECTED_PLAYER
+	la t0, SELECTED_PLAYER
+	lw t0, 0(t0)
+
+	# (t4, t5) = player.pos
+	lb t4, PLAYER_B_POS_X(t0)
+	lb t5, PLAYER_B_POS_Y(t0)
+
+	# a0 = false
+	li a0, 0
+
+	# t1 = i = 0
+	li t1, 0
+
+loop_check_ally_neighbors:
+	la t2, N_PLAYERS
+	lb t2, 0(t2)
+	bge t1, t2, ret_check_ally_neighbors
+
+	# t2, t6 = players[i]
+	li t2, PLAYER_BYTE_SIZE
+	mul t2, t2, t1
+	la t3, PLAYERS
+	add t2, t2, t3
+	# save t2 in a1 and t6
+	mv t6, t2
+	mv a1, t2
+	# skip dead players
+	lb a2, PLAYER_B_VIDA_ATUAL(a1)
+	beq a2, zero, continue_loop_check_ally_neighbors
+
+	# (t2, t3) = players[i].pos
+	lb t3, PLAYER_B_POS_Y(t2)
+	lb t2, PLAYER_B_POS_X(t2)
+
+	# t2 = distSq = players[i].pos.distSq(player)
+	sub t2, t2, t4
+	sub t3, t3, t5
+	mul t3, t3, t3
+	mul t2, t2, t2
+	add t2, t2, t3
+
+	# if distSq != 1 continue
+	li t3, 1
+	bne t2, t3, continue_loop_check_ally_neighbors
+
+	# else if players[i] is an ally, return this ally
+	lb t6, PLAYER_B_TIPO(t6)
+	li a3, IN_AZUL
+	bge t6, a3, continue_loop_check_ally_neighbors
+
+	# move cursor and return ally
+	lb t0, PLAYER_B_POS_X(a1)
+	lb t1, PLAYER_B_POS_Y(a1)
+	la t2, CURSOR_POS
+	sb t0, 0(t2)
+	sb t1, 1(t2)
+	mv a0, a1
+	j ret_check_ally_neighbors
+
+continue_loop_check_ally_neighbors:
+	addi t1, t1, 1
+	j loop_check_ally_neighbors
+
+ret_check_ally_neighbors:
+	ret
+
+###################################################################################
 # Update the NEARBY_ENEMIES array according to the selected player's position
 # and the enemies positions.
 ###################################################################################
