@@ -31,13 +31,13 @@ zero_init_players:
 
 	la s0, PLAYER_1
 
-	#INIT_PLAYER( s0, 16,  6, IN_MAR , 25, 25, 5 , 80 , 1 )
-	#INIT_PLAYER( s0, 17,  7, IN_VER , 25, 25, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 16,  6, IN_MAR , 25, 25, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 17,  7, IN_VER , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 4 , 10, AL_AZUL, 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 5 ,  4, AL_VER , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 15,  7, AL_MAR , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 3 , 7 , IN_VER , 25, 25, 5 , 80 , 1 )
-	#INIT_PLAYER( s0, 16, 11, IN_AZUL, 25,  5, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 16, 11, IN_AZUL, 25,  5, 5 , 80 , 1 )
 
 	lw s0, 0(sp)
 	addi sp, sp, 4
@@ -228,6 +228,8 @@ ret_draw_players:
 # movimenta o jogador logicamente.
 ###################################################################################
 # a0 = player
+# a1 = newPosX
+# a2 = newPosY
 ###################################################################################
 INIT_ACTUALLY_MOVE_PLAYER:
 	# indicate that blink animation started
@@ -249,12 +251,9 @@ INIT_ACTUALLY_MOVE_PLAYER:
 	# save player
 	sw a0, ACTUALLY_MOVE_PLAYER_DATA_WPLAYER(t3)
 
-	# move player to cursor position
-	la t1, CURSOR_POS
-	lb t0, 0(t1)
-	lb t1, 1(t1)
-	sb t0, PLAYER_B_POS_X(a0)
-	sb t1, PLAYER_B_POS_Y(a0)
+	# move player to new pos
+	sb a1, PLAYER_B_POS_X(a0)
+	sb a2, PLAYER_B_POS_Y(a0)
 	ret
 	
 
@@ -860,7 +859,7 @@ GET_POS_DIST:
 	ret
 
 ###################################################################################
-# Finds the walkable square that is closest to the closest ally.
+# Finds the empty walkable square that is closest to the closest ally.
 ###################################################################################
 # a0 = ally
 # a1 = enemy
@@ -904,6 +903,16 @@ loop_get_closest_walkable:
 	lb t0, 0(t0)
 	beq t0, zero, continue_loop_get_closest_walkable
 
+	# skip squares with alive players
+	li t0, MAP_WIDTH
+	rem a0, s0, t0
+	div a1, s0, t0
+	jal GET_PLAYER_BY_POS
+	beq a0, zero, empty_get_closest_walkable
+	lb t0, PLAYER_B_VIDA_ATUAL(a0)
+	bne t0, zero, continue_loop_get_closest_walkable
+
+empty_get_closest_walkable:
 	# (a0, a1) = squarePos
 	li t0, MAP_WIDTH
 	rem a0, s0, t0

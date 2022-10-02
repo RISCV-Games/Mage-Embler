@@ -155,6 +155,9 @@ x_making_trail_run_game_logic:
 	# Get selected player and start blink animation
 	la a0, SELECTED_PLAYER
 	lw a0, 0(a0)
+	la a2, CURSOR_POS
+	lb a1, 0(a2)
+	lb a2, 1(a2)
 	jal INIT_ACTUALLY_MOVE_PLAYER
 
 	# *GAME_STATE = GAME_STATE_MOVING_PLAYER
@@ -408,27 +411,38 @@ allies_dead_check_turn_run_game_logic:
 move_enemy_run_game_logic:
 	addi sp, sp, -4
 	sw s0, 0(sp)
+
 	# Gets an unmoved enemy and saves it
 	jal CHECK_UNMOVED_ENEMIES
+
 	# s0 = enemy
 	mv s0, a0
+	
+	# *SELECTED_PLAYER = enemy
+	la t0, SELECTED_PLAYER
+	sw s0, 0(t0)
+
+
 	# finds the closest ally to this enemy
 	jal GET_CLOSEST_ALLY
+
 	# finds the walkable square that is closest to the closest ally
 	mv a1, s0
 	jal GET_CLOSEST_WALKABLE
 
-	la t0, CURSOR_POS
-	sb a0, 0(t0)
-	sb a1, 1(t0)
-
-	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
-	la t0, GAME_STATE
-	li t1, GAME_STATE_CHOOSE_ALLY
-	sb t1, 0(t0)
+	# a0 = enemy, (a1, a2) = closestSquare
+	mv a2, a1
+	mv a1, a0
+	mv a0, s0
+	jal INIT_ACTUALLY_MOVE_PLAYER
 
 	lw s0, 0(sp)
 	addi sp, sp, 4
 
-	li a0, GAME_STATE_CHOOSE_ALLY
+	# *GAME_STATE = GAME_STATE_MOVING_PLAYER
+	la t0, GAME_STATE
+	li t1, GAME_STATE_MOVING_PLAYER
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_MOVING_PLAYER
 	j ret_run_game_logic
