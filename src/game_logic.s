@@ -33,6 +33,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_CHECK_TURN
 	beq t0, t1, check_turn_run_game_logic
 
+	li t1, GAME_STATE_MOVE_ENEMY
+	beq t0, t1, move_enemy_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -355,7 +358,7 @@ check_turn_run_game_logic:
 
 	# if there is an unmoved enemy then set state to GAME_STATE_CHOOSE_ENEMY
 	jal CHECK_UNMOVED_ENEMIES
-	bne a0, zero, choose_enemy_check_turn_run_game_logic
+	bne a0, zero, move_enemy_check_turn_run_game_logic
 
 	# otherwise set state to GAME_STATE_NEXT_TURN
 	# *GAME_STATE = GAME_STATE_NEXT_TURN
@@ -375,13 +378,13 @@ choose_ally_check_turn_run_game_logic:
 	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
 
-choose_enemy_check_turn_run_game_logic:
-	# *GAME_STATE = GAME_STATE_CHOOSE_ENEMY
+move_enemy_check_turn_run_game_logic:
+	# *GAME_STATE = GAME_STATE_MOVE_ENEMY
 	la t0, GAME_STATE
-	li t1, GAME_STATE_CHOOSE_ENEMY
+	li t1, GAME_STATE_MOVE_ENEMY
 	sb t1, 0(t0)
 
-	li a0, GAME_STATE_CHOOSE_ENEMY
+	li a0, GAME_STATE_MOVE_ENEMY
 	j ret_run_game_logic
 
 next_map_check_turn_run_game_logic:
@@ -401,3 +404,5 @@ allies_dead_check_turn_run_game_logic:
 
 	li a0, GAME_STATE_ALL_ALLIES_DEAD
 	j ret_run_game_logic
+
+move_enemy_run_game_logic:

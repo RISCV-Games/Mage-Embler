@@ -538,7 +538,7 @@ loop_check_unmoved_allies:
 
 	# skip moved allies
 	lb t4, PLAYER_B_MOVED(t3)
-	beq t4, zero, continue_loop_check_unmoved_allies
+	bne t4, zero, continue_loop_check_unmoved_allies
 
 	# only remaining players are the alive, unmoved allies so return true
 	li a0, 1
@@ -589,7 +589,7 @@ loop_check_unmoved_enemies:
 
 	# skip moved enemies
 	lb t4, PLAYER_B_MOVED(t3)
-	beq t4, zero, continue_loop_check_unmoved_enemies
+	bne t4, zero, continue_loop_check_unmoved_enemies
 
 	# only remaining players are the alive, unmoved enemies so return true
 	li a0, 1
@@ -693,4 +693,63 @@ continue_loop_check_alive_allies:
 	j loop_check_alive_allies
 
 ret_check_alive_allies:
+	ret
+
+###################################################################################
+# Função de debug que loga alguns atributos dos players.
+###################################################################################
+LOG_PLAYERS_DEBUG:
+	addi sp, sp, -8
+	sw ra, 0(sp)
+	sw s0, 4(sp)
+
+	li a0, '\n'
+	li a7, 11
+	ecall
+
+	# s0 = i = 0
+	li s0, 0
+
+loop_log_players_debug:
+	# if i >= *N_PLAYERS then return
+	la t0, N_PLAYERS
+	lb t0, 0(t0)
+	bge s0, t0, ret_log_players_debug
+
+	# t0 = players[i]
+	li t0, PLAYER_BYTE_SIZE
+	mul t0, s0, t0
+	la t1, PLAYERS
+	add t0, t0, t1
+
+	# print tipo
+	lb a0, PLAYER_B_TIPO(t0)
+	li a7, 1
+	ecall
+
+	li a0, ' '
+	li a7, 11
+	ecall
+
+	# t0 = players[i]
+	li t0, PLAYER_BYTE_SIZE
+	mul t0, s0, t0
+	la t1, PLAYERS
+	add t0, t0, t1
+
+	# print moved
+	lb a0, PLAYER_B_MOVED(t0)
+	li a7, 1
+	ecall
+
+	li a0, '\n'
+	li a7, 11
+	ecall
+	addi s0, s0, 1
+	j loop_log_players_debug
+
+ret_log_players_debug:
+	lw ra, 0(sp)
+	lw s0, 4(sp)
+	addi sp, sp, 8
 	ret
