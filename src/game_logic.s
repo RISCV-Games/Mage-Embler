@@ -78,10 +78,10 @@ choose_ally_run_game_logic:
 	jal GET_KBD_INPUT
 	jal MOVE_CURSOR
 
-	# if 'x' is pressed on top of a player go to player
+	# if '\n' is pressed on top of a player go to player
 	la t0, KBD_INPUT
 	lb t0, 0(t0)
-	li t1, 'x'
+	li t1, '\n'
 	beq t0, t1, x_choose_ally_run_game_logic
 
 	li a0, GAME_STATE_CHOOSE_ALLY
@@ -141,7 +141,7 @@ making_trail_run_game_logic:
 	jal GET_KBD_INPUT
 	jal MAKE_TRAIL_LOGIC
 
-	# if 'x' is pressed and no alive player is at the cursor pos then move player
+	# if '\n' is pressed and no alive player is at the cursor pos then move player
 	la t0, CURSOR_POS
 	lb a0, 0(t0)
 	lb a1, 1(t0)
@@ -151,7 +151,7 @@ making_trail_run_game_logic:
 check_x_making_trail_run_game_logic:
 	la t0, KBD_INPUT
 	lb t0, 0(t0)
-	li t1, 'x'
+	li t1, '\n'
 	beq t0, t1, x_making_trail_run_game_logic
 
 next_making_trail_run_game_logic:
@@ -297,10 +297,10 @@ choose_enemy_run_game_logic:
 	jal GET_KBD_INPUT
 	jal MOVE_CURSOR_ATTACK_MODE
 
-	# if 'x' is pressed go to combat mode
+	# if '\n' is pressed go to combat mode
 	la t0, KBD_INPUT
 	lb t0, 0(t0)
-	li t1, 'x'
+	li t1, '\n'
 	beq t0, t1, x_choose_enemy_run_game_logic
 
 	li a0, GAME_STATE_CHOOSE_ENEMY

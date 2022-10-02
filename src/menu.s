@@ -133,7 +133,7 @@ INPUT_MENU:
 	beq t2, t0, inc_input_menu
 	li t0, 'w'          
 	beq t2, t0, dec_input_menu
-	li t0, 'x'          
+	li t0, '\n'          
 	beq t2, t0, selected_input_menu
 	j fim_input_menu
 
