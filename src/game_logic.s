@@ -78,6 +78,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_VICTORY_DIALOGUE
 	beq t0, t1, victory_dialogue_run_game_logic
 
+	li t1, GAME_STATE_VICTORY_MENU
+	beq t0, t1, victory_menu_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -87,7 +90,7 @@ init_run_game_logic:
 
 	# Set MAP_NUM = 0
 	la t0, MAP_NUM
-	li t1, 4
+	li t1, 0
 	sb t1, 0(t0)
 
 	# CURRENT_MAP = MAPS[MAP_NUM]
@@ -1019,19 +1022,16 @@ victory_dialogue_run_game_logic:
 	j ret_run_game_logic
 
 next_victory_dialogue_run_game_logic:
-	li a7, 1
-	li a0, 1000
-	ecall
+	la t0, DIALOGUE_STRING_NUM
+	lb t1, 0(t0)
+	addi t1, t1, 1
+	sb t1, 0(t0)
 
 	la t0, DIALOGUE_STRING_NUM
 	lb t1, 0(t0)
 	li t0, VICTORY_NSTRINGS
 	bge t1, t0, exit_victory_dialogue_run_game_logic
 
-	la t0, DIALOGUE_STRING_NUM
-	lb t1, 0(t0)
-	addi t1, t1, 1
-	sb t1, 0(t0)
 
 	li a0, GAME_STATE_VICTORY_DIALOGUE
 	j ret_run_game_logic
@@ -1042,5 +1042,39 @@ exit_victory_dialogue_run_game_logic:
 	li t1, GAME_STATE_VICTORY_MENU
 	sb t1, 0(t0)
 
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+victory_menu_run_game_logic:
+	# Input
+	li a0, 2                     			  	 # Quantidade de opcoes
+	la a1, WIN_MENU_SELECTED_OPTION        # label que segura opcao selecionada
+	la a2, WIN_MENU_IS_SELECTED            # label que segura se foi selecionado ou nao
+	jal INPUT_MENU
+
+	# Some logic
+  la t0, WIN_MENU_IS_SELECTED
+  lb t1, 0(t0)
+  beq t1, zero, unselected_victory_menu_run_game_logic
+
+	la t0, WIN_MENU_SELECTED_OPTION
+	lb t0, 0(t0)
+
+	beq t0, zero, restart_victory_menu_run_game_logic
+	j exit_run_game_logic
+	# otherwise exit
+exit_run_game_logic:
+	j exit_run_game_logic
+
+unselected_victory_menu_run_game_logic:
 	li a0, GAME_STATE_VICTORY_MENU
+	j ret_run_game_logic
+
+restart_victory_menu_run_game_logic:
+	# *GAME_STATE = GAME_STATE_INIT
+	la t0, GAME_STATE
+	li t1, GAME_STATE_INIT
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_INIT
 	j ret_run_game_logic

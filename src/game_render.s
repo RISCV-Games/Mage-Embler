@@ -50,6 +50,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_VICTORY_DIALOGUE
 	beq a0, t0, victory_dialogue_run_game_render
 
+	li t0, GAME_STATE_VICTORY_MENU
+	beq a0, t0, victory_menu_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -301,6 +304,24 @@ victory_dialogue_run_game_render:
 	li a5, 10         # Posicao x do menu
 	li a6, 20          # Posicao y do menu
 	jal DRAW_DIALOG
+
+	jal SWAP_FRAMES
+	j ret_run_game_render
+
+victory_menu_run_game_render:
+	# Render
+	li a0, 2           				     # Quantidade de strings
+	la a1, WIN_MENU_STRINGS           # endereco para a label com as strings
+	li a2, ACTIONS_MENU_STRING_COL       # Cor das strings
+	li a3, 319        # Tamanho x do menu
+	li a4, 239        # Tamanho y do menu
+	li a5, ACTIONS_MENU_BG_COL  	     # Cor de fundo do menu
+  li a6, 0        # Posicao x do menu
+  li a7, 0          # Posicao y do menu
+
+	la t0, WIN_MENU_SELECTED_OPTION
+	lb s8, 0(t0)        			     # String selecionada (0 index)
+	jal DRAW_MENU
 
 	jal SWAP_FRAMES
 	j ret_run_game_render
