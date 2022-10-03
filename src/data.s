@@ -244,6 +244,7 @@ N_PLAYERS:
 
 QUEUE_ALLY_TRANSITION: .byte 0
 QUEUE_ENEMY_TRANSITION: .byte 0
+DIALOGUE_STRING_NUM: .byte 0
 
 PLAYER_1: .string "Player1"
 PLAYER_2: .string "Player2"
@@ -252,6 +253,17 @@ PLAYER_2: .string "Player2"
 .align 2
 PLAYERS:
 .space PLAYERS_BYTE_SIZE
+
+map0_string0: .string "Bem vindo a estrada da magia!\nVoce eh o comandante dos chapeis\nde palha! Seu objetivo eh eliminar\na guilda dos chapeis roxo!"
+map0_string1: .string "Para se movimentar use a tecla ENTER\nem algum mago chapeu de palha!\nUtilize  'W A S D' para mover a seta\nAperte ENTER na posicao desejada!"
+map0_string2: .string "Eh importante prestar atencao nos\nelementos:\n\n      AGUA ganha de FOGO\n      FOGO ganha de TERRA\n      TERRA ganha de AGUA"
+map0_string3: .string "A estrela no chao eh uma runa!\nEla aumenta sua chance de critico!\n\nUtilize as arvores no cenario\nElas diminuem a chance do inimigo\nte acertar!\n\n            BOA SORTE!"
+
+map0_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
+map1_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
+map2_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
+map3_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
+map4_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
 
 .align 2
 # Images

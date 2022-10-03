@@ -44,6 +44,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_ENEMY_PHASE_TRANSITION
 	beq a0, t0, enemy_phase_transition_run_game_render
 
+	li t0, GAME_STATE_DIALOGUE
+	beq a0, t0, dialogue_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -158,7 +161,7 @@ ally_phase_transition_run_game_render:
 	jal DRAW_PLAYERS
 
 	la a0, ALLY_PHASE_STRING
-	li a1, WIN_STRING_COLOR  # Cor das strings
+	li a1, MENU_STRING_COLOR  # Cor das strings
     li a2, 100          # Tamanho x do menu
     li a3, 20          # Tamanho y do menu
     li a4, 0x09090909  # Cor de fundo do menu
@@ -174,10 +177,10 @@ win_map_run_game_render:
 	jal DRAW_PLAYERS
 
 	la a0, YOU_WIN_STRING
-	li a1, WIN_STRING_COLOR  # Cor das strings
+	li a1, MENU_STRING_COLOR  # Cor das strings
     li a2, 100          # Tamanho x do menu
     li a3, 20          # Tamanho y do menu
-    li a4, 0x09090909  # Cor de fundo do menu
+    li a4, MENU_BG_COLOR  # Cor de fundo do menu
     li a5, 110         # Posicao x do menu
     li a6, 100          # Posicao y do menu
     jal DRAW_DIALOG
@@ -193,7 +196,7 @@ enemy_wins_run_game_render:
 	li a1, LOOSE_STRING_COLOR  # Cor das strings
     li a2, 100          # Tamanho x do menu
     li a3, 20          # Tamanho y do menu
-    li a4, 0x09090909  # Cor de fundo do menu
+    li a4, MENU_BG_COLOR  # Cor de fundo do menu
     li a5, 110         # Posicao x do menu
     li a6, 100          # Posicao y do menu
     jal DRAW_DIALOG
@@ -206,13 +209,75 @@ enemy_phase_transition_run_game_render:
 	jal DRAW_PLAYERS
 
 	la a0, ENEMY_PHASE_STRING
-	li a1, WIN_STRING_COLOR  # Cor das strings
+	li a1, MENU_STRING_COLOR  # Cor das strings
     li a2, 100          # Tamanho x do menu
     li a3, 20          # Tamanho y do menu
-    li a4, 0x09090909  # Cor de fundo do menu
+    li a4, MENU_BG_COLOR  # Cor de fundo do menu
     li a5, 110         # Posicao x do menu
     li a6, 100          # Posicao y do menu
     jal DRAW_DIALOG
 
 	jal SWAP_FRAMES
 	j ret_run_game_render
+
+dialogue_run_game_render:
+	jal DRAW_MAP
+
+	la t0, MAP_NUM
+	lb t0, 0(t0)
+
+	beq t0, zero, map0_dialogue_run_render_game
+
+	li t1, 1
+	beq t0, t1, map1_dialogue_run_render_game
+
+	li t1, 2
+	beq t0, t1, map2_dialogue_run_render_game
+
+	li t1, 3
+	beq t0, t1, map3_dialogue_run_render_game
+
+	li t1, 4
+	beq t0, t1, map4_dialogue_run_render_game
+
+draw_dialogue_run_game_render:
+
+	# t1 = string array offset
+	la t1, DIALOGUE_STRING_NUM
+	lb t1, 0(t1)
+	slli t1, t1, 2
+	add a0, a0, t1
+	lw a0, 0(a0)
+
+    li a1, 0x000009ff  # Cor das strings
+    li a2, 300          # Tamanho x do menu
+    li a3, 100          # Tamanho y do menu
+    li a4, MENU_BG_COLOR  # Cor de fundo do menu
+    li a5, 10         # Posicao x do menu
+    li a6, 20          # Posicao y do menu
+    jal DRAW_DIALOG
+
+	jal SWAP_FRAMES
+	j ret_run_game_render
+
+
+
+map0_dialogue_run_render_game:
+	la a0, map0_dialog
+	j draw_dialogue_run_game_render
+
+map1_dialogue_run_render_game:
+	la a0, map1_dialog
+	j draw_dialogue_run_game_render
+
+map2_dialogue_run_render_game:
+	la a0, map2_dialog
+	j draw_dialogue_run_game_render
+
+map3_dialogue_run_render_game:
+	la a0, map3_dialog
+	j draw_dialogue_run_game_render
+
+map4_dialogue_run_render_game:
+	la a0, map4_dialog
+	j draw_dialogue_run_game_render

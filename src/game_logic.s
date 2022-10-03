@@ -72,6 +72,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_ENEMY_PHASE_TRANSITION
 	beq t0, t1, enemy_phase_transition_run_game_logic
 
+	li t1, GAME_STATE_DIALOGUE
+	beq t0, t1, dialogue_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -91,12 +94,16 @@ init_run_game_logic:
 	la t1, QUEUE_ALLY_TRANSITION
 	sb t0, 0(t1)
 
-	# change state to GAME_STATE_CHOOSE_ALLY
+	# DIALOGUE_STRING_NUM = 0
+	la t0, DIALOGUE_STRING_NUM
+	sb zero, 0(t0)
+
+	# change state to GAME_STATE_DIALOGUE
 	la t0, GAME_STATE
-	li t1, GAME_STATE_CHOOSE_ALLY
+	li t1, GAME_STATE_DIALOGUE
 	sb t1, 0(t0)
 	
-	li a0, GAME_STATE_CHOOSE_ALLY
+	li a0, GAME_STATE_DIALOGUE
 	j ret_run_game_logic
 
 choose_ally_run_game_logic:
@@ -847,12 +854,16 @@ start_map_run_game_logic:
 	la t1, QUEUE_ALLY_TRANSITION
 	sb t0, 0(t1)
 
-	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
-	la t0, GAME_STATE
-	li t1, GAME_STATE_CHOOSE_ALLY
-	sb t1, 0(t0)
+	# DIALOGUE_STRING_NUM = 0
+	la t0, DIALOGUE_STRING_NUM
+	sb zero, 0(t0)
 
-	li a0, GAME_STATE_CHOOSE_ALLY
+	# change state to GAME_STATE_DIALOGUE
+	la t0, GAME_STATE
+	li t1, GAME_STATE_DIALOGUE
+	sb t1, 0(t0)
+	
+	li a0, GAME_STATE_DIALOGUE
 	j ret_run_game_logic
 
 enemy_phase_transition_run_game_logic:
@@ -877,3 +888,83 @@ enemy_phase_transition_run_game_logic:
 continue_enemy_phase_transition_run_game_logic:
 	li a0, GAME_STATE_ENEMY_PHASE_TRANSITION
 	j ret_run_game_logic
+
+dialogue_run_game_logic:
+	la t0, MAP_NUM
+	lb t0, 0(t0)
+
+	beq t0, zero, map0_dialogue_run_game_logic
+	
+	li t1, 1
+	beq t0, t1, map1_dialogue_run_game_logic
+
+	li t1, 2
+	beq t0, t1, map2_dialogue_run_game_logic
+
+	li t1, 3
+	beq t0, t1, map3_dialogue_run_game_logic
+
+	li t1, 4
+	beq t0, t1, map4_dialogue_run_game_logic
+
+exit_dialogue_run_game_logic:
+	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+input_dialogue_run_game_logic:
+	jal GET_KBD_INPUT
+	li t0, '\n'
+	beq a0, t0, next_dialogue_run_game_logic
+	
+	li a0, GAME_STATE_DIALOGUE
+	j ret_run_game_logic
+
+next_dialogue_run_game_logic:
+	# DIALOGUE_STRING_NUM++
+	la t0, DIALOGUE_STRING_NUM
+	lb t1, 0(t0)
+	addi t1, t1, 1
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_DIALOGUE
+	j ret_run_game_logic
+
+map0_dialogue_run_game_logic:
+	li t0, MAP0_NSTRINGS
+	la t1, DIALOGUE_STRING_NUM
+	lb t1, 0(t1)
+	bge t1, t0, exit_dialogue_run_game_logic
+	j input_dialogue_run_game_logic
+
+map1_dialogue_run_game_logic:
+	li t0, MAP1_NSTRINGS
+	la t1, DIALOGUE_STRING_NUM
+	lb t1, 0(t1)
+	bge t1, t0, exit_dialogue_run_game_logic
+	j input_dialogue_run_game_logic
+
+map2_dialogue_run_game_logic:
+	li t0, MAP2_NSTRINGS
+	la t1, DIALOGUE_STRING_NUM
+	lb t1, 0(t1)
+	bge t1, t0, exit_dialogue_run_game_logic
+	j input_dialogue_run_game_logic
+
+map3_dialogue_run_game_logic:
+	li t0, MAP3_NSTRINGS
+	la t1, DIALOGUE_STRING_NUM
+	lb t1, 0(t1)
+	bge t1, t0, exit_dialogue_run_game_logic
+	j input_dialogue_run_game_logic
+
+map4_dialogue_run_game_logic:
+	li t0, MAP4_NSTRINGS
+	la t1, DIALOGUE_STRING_NUM
+	lb t1, 0(t1)
+	bge t1, t0, exit_dialogue_run_game_logic
+	j input_dialogue_run_game_logic
