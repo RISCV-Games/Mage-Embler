@@ -84,7 +84,7 @@ init_run_game_logic:
 
 	# Set MAP_NUM = 0
 	la t0, MAP_NUM
-	li t1, 1
+	li t1, 0
 	sb t1, 0(t0)
 
 	# CURRENT_MAP = MAPS[MAP_NUM]
@@ -99,7 +99,7 @@ init_run_game_logic:
 
 	# initialize players
 	jal INIT_PLAYERS
-	
+
 	# queue ally transition
 	li t0, 1
 	la t1, QUEUE_ALLY_TRANSITION
@@ -130,6 +130,19 @@ choose_ally_run_game_logic:
 	lb t0, 0(t0)
 	li t1, '\n'
 	beq t0, t1, x_choose_ally_run_game_logic
+
+	# if 'p' is pressed go to next map
+	li t1, 'p'
+	beq t0, t1, cheat_choose_ally
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+cheat_choose_ally:
+	# *GAME_STATE = GAME_STATE_CHECK_NEXT_MAP
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHECK_NEXT_MAP
+	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
