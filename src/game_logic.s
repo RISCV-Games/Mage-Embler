@@ -256,6 +256,11 @@ x_making_trail_run_game_logic:
 	lb a2, 1(a2)
 	jal INIT_ACTUALLY_MOVE_PLAYER
 
+	# queue enemy transition
+	li t0, 1
+	la t1, QUEUE_ENEMY_TRANSITION
+	sb t0, 0(t1)
+
 	# *GAME_STATE = GAME_STATE_MOVING_PLAYER
 	la t0, GAME_STATE
 	li t1, GAME_STATE_MOVING_PLAYER
@@ -315,10 +320,6 @@ stop_moving_player_run_game_logic:
 	j ret_run_game_logic
 
 enemy_transition_stop_moving_player_run_game_logic:
-	li t0, 1
-	la t1, QUEUE_ENEMY_TRANSITION
-	sb t0, 0(t1)
-
 	# *GAME_STATE = GAME_STATE_AFTER_MOVE
 	la t0, GAME_STATE
 	li t1, GAME_STATE_AFTER_MOVE
