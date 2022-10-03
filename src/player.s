@@ -61,6 +61,10 @@ one_init_players:
     ret
 
 two_init_players:
+	addi sp, sp, -4
+	sw s0, 0(sp)
+
+	la s0, PLAYER_1
 	INIT_PLAYER( s0,  1, 13, AL_AZUL , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0,  0, 9, AL_MAR , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0,  11, 2, AL_VER , 25, 25, 5 , 80 , 1 )
@@ -70,9 +74,15 @@ two_init_players:
 	INIT_PLAYER( s0, 8,  8, IN_MAR , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 19,  9, IN_AZUL , 25, 25, 5 , 80 , 1 )
 	
+	lw s0, 0(sp)
+	addi sp, sp, 4
 	ret
 
 three_init_players:
+	addi sp, sp, -4
+	sw s0, 0(sp)
+
+	la s0, PLAYER_1
 	INIT_PLAYER( s0, 6 ,  13, AL_AZUL , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 8,  13, AL_VER , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 10 ,  13, AL_MAR , 25, 25, 5 , 80 , 1 )
@@ -83,9 +93,15 @@ three_init_players:
 	INIT_PLAYER( s0, 12,  4, IN_AZUL , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 15,  9, IN_VER , 25, 25, 5 , 80 , 1 )
 	
+	lw s0, 0(sp)
+	addi sp, sp, 4
 	ret
 
 four_init_players:
+	addi sp, sp, -4
+	sw s0, 0(sp)
+
+	la s0, PLAYER_1
 	INIT_PLAYER( s0,  7, 14, AL_AZUL , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0,  9, 14, AL_VER , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0,  10, 14, AL_MAR , 25, 25, 5 , 80 , 1 )
@@ -99,6 +115,8 @@ four_init_players:
 	
 	INIT_PLAYER( s0,  10, 5, IN_AZUL , 25, 25, 5 , 80 , 1 )
 	
+	lw s0, 0(sp)
+	addi sp, sp, 4
 	ret
 
 
