@@ -13,18 +13,21 @@ V  - Victor
 
 - [X] Render de tiles
 - [X] Animacao cursor
-- [E] Movimentacao do jogador 
+- [X] Movimentacao do jogador 
 - [X] Animacao do jogador (Mundo)
 - [X] Audio
-- [ ] Adicionar .datas com músicas
 - [X] Menus
 - [X] Modo de batalha
 - [X] Sistema de dialogos
 - [X] UI (User interface) (sistema de combate)
-- [ ] IA dos inimigos (Movimentacao)
+- [X] IA dos inimigos (Movimentacao)
 - [X] Sistema de combate (Pedra papel tesoura)
 - [X] Sistema de combate (terreno especial)
-- [ ] Historia
 - [X] Remover jogadores mortos
-- [ ] Alternância de turnos
+- [X] Alternância de turnos
 - [X] Definicao de estética( Tiles, sprites de animacao )
+- [R] Historia
+- [ ] Adicionar .datas com músicas
+- [ ] Menu de início e fim do jogo
+- [ ] Dialogo final
+- [ ] Menu durante o jogo de restart e exit
