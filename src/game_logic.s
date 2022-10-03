@@ -69,6 +69,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_START_MAP
 	beq t0, t1, start_map_run_game_logic
 
+	li t1, GAME_STATE_ENEMY_PHASE_TRANSITION
+	beq t0, t1, enemy_phase_transition_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -78,20 +81,29 @@ init_run_game_logic:
 	# initialize players
 	jal INIT_PLAYERS
 
-	# change state to GAME_STATE_CHOOSE_ALLY
-	la t0, GAME_STATE
-	li t1, GAME_STATE_CHOOSE_ALLY
-	sb t1, 0(t0)
-
 	# CURRENT_MAP = MAPS[0]
 	la t0, MAPS
 	la t1, CURRENT_MAP
 	sw t0, 0(t1)
+
+	# queue ally transition
+	li t0, 1
+	la t1, QUEUE_ALLY_TRANSITION
+	sb t0, 0(t1)
+
+	# change state to GAME_STATE_CHOOSE_ALLY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
 	
-	li a0, GAME_STATE_INIT
+	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
 
 choose_ally_run_game_logic:
+	la t0, QUEUE_ALLY_TRANSITION
+	lb t0, 0(t0)
+	bne t0, zero, transition_choose_ally_run_game_logic
+
 	jal GET_KBD_INPUT
 	jal MOVE_CURSOR
 
@@ -102,6 +114,24 @@ choose_ally_run_game_logic:
 	beq t0, t1, x_choose_ally_run_game_logic
 
 	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+transition_choose_ally_run_game_logic:
+	# unqueue ally transition
+	la t0, QUEUE_ALLY_TRANSITION
+	sb zero, 0(t0)
+
+	# PHASE_DELAY = current time
+	la t0, PHASE_DELAY
+	csrr t1, time
+	sw t1, 0(t0)
+
+	# *GAME_STATE = GAME_STATE_ALLY_PHASE_TRANSITION
+	la t0, GAME_STATE
+	li t1, GAME_STATE_ALLY_PHASE_TRANSITION
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_ALLY_PHASE_TRANSITION
 	j ret_run_game_logic
 
 x_choose_ally_run_game_logic:
@@ -238,12 +268,29 @@ stop_moving_player_run_game_logic:
 	li t0, 1
 	sb t0, PLAYER_B_MOVED(t3)
 
+	# if there are unmoved alive enemies then queue enemy transition
+	jal CHECK_UNMOVED_ENEMIES
+	bne a0, zero, enemy_transition_stop_moving_player_run_game_logic
+
 	# *GAME_STATE = GAME_STATE_AFTER_MOVE
 	la t0, GAME_STATE
 	li t1, GAME_STATE_AFTER_MOVE
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+enemy_transition_stop_moving_player_run_game_logic:
+	li t0, 1
+	la t1, QUEUE_ENEMY_TRANSITION
+	sb t0, 0(t1)
+
+	# *GAME_STATE = GAME_STATE_AFTER_MOVE
+	la t0, GAME_STATE
+	li t1, GAME_STATE_AFTER_MOVE
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_AFTER_MOVE
 	j ret_run_game_logic
 
 set_action_menu_run_game_logic:
@@ -380,6 +427,16 @@ check_turn_run_game_logic:
 	j ret_run_game_logic
 
 choose_ally_check_turn_run_game_logic:
+	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+
+transition_ally_check_turn_run_game_logic:
 	# save current time
 	csrr t0, time
 	la t1, PHASE_DELAY
@@ -394,12 +451,35 @@ choose_ally_check_turn_run_game_logic:
 	j ret_run_game_logic
 
 move_enemy_check_turn_run_game_logic:
+	# check if transition is queued
+	la t0, QUEUE_ENEMY_TRANSITION
+	lb t0, 0(t0)
+	bne t0, zero, transition__enemy_check_turn_run_game_logic
+
 	# *GAME_STATE = GAME_STATE_MOVE_ENEMY
 	la t0, GAME_STATE
 	li t1, GAME_STATE_MOVE_ENEMY
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_MOVE_ENEMY
+	j ret_run_game_logic
+
+transition__enemy_check_turn_run_game_logic:
+	# unqueue transition
+	la t0, QUEUE_ENEMY_TRANSITION
+	sb zero, 0(t0)
+
+	# PHASE_DELAY = current time
+	la t0, PHASE_DELAY
+	csrr t1, time
+	sw t1, 0(t0)
+
+	# *GAME_STATE = GAME_STATE_ENEMY_PHASE_TRANSITION
+	la t0, GAME_STATE
+	li t1, GAME_STATE_ENEMY_PHASE_TRANSITION
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_ENEMY_PHASE_TRANSITION
 	j ret_run_game_logic
 
 next_map_check_turn_run_game_logic:
@@ -426,6 +506,11 @@ allies_dead_check_turn_run_game_logic:
 	j ret_run_game_logic
 
 move_enemy_run_game_logic:
+	# queue ally transition
+	li t0, 1
+	la t1, QUEUE_ALLY_TRANSITION
+	sb t0, 0(t1)
+
 	addi sp, sp, -4
 	sw s0, 0(sp)
 
@@ -757,10 +842,38 @@ start_map_run_game_logic:
 	la t1, CURRENT_MAP
 	sw t0, 0(t1)
 
+	# queue ally transition
+	li t0, 1
+	la t1, QUEUE_ALLY_TRANSITION
+	sb t0, 0(t1)
+
 	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
 	la t0, GAME_STATE
 	li t1, GAME_STATE_CHOOSE_ALLY
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+enemy_phase_transition_run_game_logic:
+	# t0 = time passed
+	csrr t0, time
+	la t1, PHASE_DELAY
+	lw t1, 0(t1)
+	sub t0, t0, t1
+
+	# if t0 < WAIT_PHASE_TRANSITION continue
+	li t1, WAIT_PHASE_TRANSITION
+	blt t0, t1, continue_enemy_phase_transition_run_game_logic
+
+	# *GAME_STATE = GAME_STATE_MOVE_ENEMY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_MOVE_ENEMY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_MOVE_ENEMY
+	j ret_run_game_logic
+
+continue_enemy_phase_transition_run_game_logic:
+	li a0, GAME_STATE_ENEMY_PHASE_TRANSITION
 	j ret_run_game_logic

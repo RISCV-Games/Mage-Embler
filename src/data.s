@@ -86,6 +86,8 @@ DMG_STRING: .string "DMG"
 
 YOU_WIN_STRING: .string "YOU WIN!"
 YOU_LOOSE_STRING: .string "YOU LOOSE"
+ALLY_PHASE_STRING: .string "ALLY TURN"
+ENEMY_PHASE_STRING: .string "ENEMY TURN"
 
 WALKABLE_BLOCKS: .align 2
 .space TILES_PER_MAP
@@ -239,6 +241,9 @@ TEMP_BUFFER:
 .align 0
 N_PLAYERS:
 .byte 0
+
+QUEUE_ALLY_TRANSITION: .byte 0
+QUEUE_ENEMY_TRANSITION: .byte 0
 
 PLAYER_1: .string "Player1"
 PLAYER_2: .string "Player2"

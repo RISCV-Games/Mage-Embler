@@ -41,6 +41,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_ENEMY_WINS
 	beq a0, t0, enemy_wins_run_game_render
 
+	li t0, GAME_STATE_ENEMY_PHASE_TRANSITION
+	beq a0, t0, enemy_phase_transition_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -154,6 +157,15 @@ ally_phase_transition_run_game_render:
 	jal DRAW_MAP
 	jal DRAW_PLAYERS
 
+	la a0, ALLY_PHASE_STRING
+	li a1, WIN_STRING_COLOR  # Cor das strings
+    li a2, 100          # Tamanho x do menu
+    li a3, 20          # Tamanho y do menu
+    li a4, 0x09090909  # Cor de fundo do menu
+    li a5, 110         # Posicao x do menu
+    li a6, 100          # Posicao y do menu
+    jal DRAW_DIALOG
+
 	jal SWAP_FRAMES
 	j ret_run_game_render
 
@@ -179,6 +191,22 @@ enemy_wins_run_game_render:
 
 	la a0, YOU_LOOSE_STRING
 	li a1, LOOSE_STRING_COLOR  # Cor das strings
+    li a2, 100          # Tamanho x do menu
+    li a3, 20          # Tamanho y do menu
+    li a4, 0x09090909  # Cor de fundo do menu
+    li a5, 110         # Posicao x do menu
+    li a6, 100          # Posicao y do menu
+    jal DRAW_DIALOG
+
+	jal SWAP_FRAMES
+	j ret_run_game_render
+
+enemy_phase_transition_run_game_render:
+	jal DRAW_MAP
+	jal DRAW_PLAYERS
+
+	la a0, ENEMY_PHASE_STRING
+	li a1, WIN_STRING_COLOR  # Cor das strings
     li a2, 100          # Tamanho x do menu
     li a3, 20          # Tamanho y do menu
     li a4, 0x09090909  # Cor de fundo do menu
