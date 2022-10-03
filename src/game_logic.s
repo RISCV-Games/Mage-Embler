@@ -87,7 +87,7 @@ init_run_game_logic:
 
 	# Set MAP_NUM = 0
 	la t0, MAP_NUM
-	li t1, 0
+	li t1, 4
 	sb t1, 0(t0)
 
 	# CURRENT_MAP = MAPS[MAP_NUM]
@@ -1019,10 +1019,14 @@ victory_dialogue_run_game_logic:
 	j ret_run_game_logic
 
 next_victory_dialogue_run_game_logic:
+	li a7, 1
+	li a0, 1000
+	ecall
+
 	la t0, DIALOGUE_STRING_NUM
 	lb t1, 0(t0)
 	li t0, VICTORY_NSTRINGS
-	bge t0, t1, exit_victory_dialogue_run_game_logic
+	bge t1, t0, exit_victory_dialogue_run_game_logic
 
 	la t0, DIALOGUE_STRING_NUM
 	lb t1, 0(t0)

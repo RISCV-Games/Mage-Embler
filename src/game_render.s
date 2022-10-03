@@ -244,7 +244,6 @@ dialogue_run_game_render:
 	beq t0, t1, map4_dialogue_run_render_game
 
 draw_dialogue_run_game_render:
-
 	# t1 = string array offset
 	la t1, DIALOGUE_STRING_NUM
 	lb t1, 0(t1)
@@ -286,4 +285,22 @@ map4_dialogue_run_render_game:
 	j draw_dialogue_run_game_render
 
 victory_dialogue_run_game_render:
-	#la t0, VICTO
+	la a0, victory_dialog
+
+	# t1 = string array offset
+	la t1, DIALOGUE_STRING_NUM
+	lb t1, 0(t1)
+	slli t1, t1, 2
+	add a0, a0, t1
+	lw a0, 0(a0)
+
+	li a1, 0x000009ff  # Cor das strings
+	li a2, 300          # Tamanho x do menu
+	li a3, 100          # Tamanho y do menu
+	li a4, MENU_BG_COLOR  # Cor de fundo do menu
+	li a5, 10         # Posicao x do menu
+	li a6, 20          # Posicao y do menu
+	jal DRAW_DIALOG
+
+	jal SWAP_FRAMES
+	j ret_run_game_render
