@@ -63,6 +63,12 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_WIN_MAP
 	beq t0, t1, win_map_run_game_logic
 
+	li t1, GAME_STATE_ENEMY_WINS
+	beq t0, t1, enemy_wins_run_game_logic
+
+	li t1, GAME_STATE_START_MAP
+	beq t0, t1, start_map_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -348,7 +354,7 @@ end_combat_run_game_logic:
 	j ret_run_game_logic
 
 check_turn_run_game_logic:
-	# if every ally is dead set state to GAME_STATE_ALL_ALLIES_DEAD
+	# if every ally is dead set state to GAME_STATE_ENEMY_WINS
 	jal CHECK_ALIVE_ALLIES
 	beq a0, zero, allies_dead_check_turn_run_game_logic
 
@@ -406,12 +412,17 @@ next_map_check_turn_run_game_logic:
 	j ret_run_game_logic
 
 allies_dead_check_turn_run_game_logic:
-	# *GAME_STATE = GAME_STATE_ALL_ALLIES_DEAD
+	# LOOSE_MAP_DELAY = current time
+	csrr t0, time
+	la t1, LOOSE_MAP_DELAY
+	sw t0, 0(t1)
+
+	# *GAME_STATE = GAME_STATE_ENEMY_WINS
 	la t0, GAME_STATE
-	li t1, GAME_STATE_ALL_ALLIES_DEAD
+	li t1, GAME_STATE_ENEMY_WINS
 	sb t1, 0(t0)
 
-	li a0, GAME_STATE_ALL_ALLIES_DEAD
+	li a0, GAME_STATE_ENEMY_WINS
 	j ret_run_game_logic
 
 move_enemy_run_game_logic:
@@ -616,28 +627,6 @@ enemy_enter_combat_run_game_logic:
 	j ret_run_game_logic
 
 check_next_map_run_game_logic:
-	# check if we are in the last map
-	la t0, MAP_NUM
-	lb t0, 0(t0)
-	li t1, N_MAPS
-	addi t1, t1, -1
-	beq t0, t1, last_map_check_next_map_run_game_logic
-
-	# if not in last map increment map num
-	addi t0, t0, 1
-	la t1, MAP_NUM
-	sb t0, 0(t1)
-
-	# *CURRENT_MAP = MAPS[MAP_NUM]
-	li t1, MAP_SIZE
-	mul t0, t0, t1
-	la t1, MAPS
-	add t0, t0, t1
-	la t1, CURRENT_MAP
-	sw t0, 0(t1)
-
-	jal INIT_PLAYERS
-
 	# *GAME_STATE = GAME_STATE_MAP_TRANSITION
 	la t0, GAME_STATE
 	li t1, GAME_STATE_MAP_TRANSITION
@@ -696,6 +685,28 @@ win_map_run_game_logic:
 	li t1, WAIT_WIN_MAP
 	blt t0, t1, continue_win_map_run_game_logic
 
+	# check if we are in the last map
+	la t0, MAP_NUM
+	lb t0, 0(t0)
+	li t1, N_MAPS
+	addi t1, t1, -1
+	beq t0, t1, last_map_check_next_map_run_game_logic
+
+	# if not in last map increment map num
+	addi t0, t0, 1
+	la t1, MAP_NUM
+	sb t0, 0(t1)
+
+	# *CURRENT_MAP = MAPS[MAP_NUM]
+	li t1, MAP_SIZE
+	mul t0, t0, t1
+	la t1, MAPS
+	add t0, t0, t1
+	la t1, CURRENT_MAP
+	sw t0, 0(t1)
+
+	jal INIT_PLAYERS
+
 	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
 	la t0, GAME_STATE
 	li t1, GAME_STATE_CHOOSE_ALLY
@@ -706,4 +717,50 @@ win_map_run_game_logic:
 
 continue_win_map_run_game_logic:
 	li a0, GAME_STATE_WIN_MAP
+	j ret_run_game_logic
+
+enemy_wins_run_game_logic:
+	# t0 = time passed
+	csrr t0, time
+	la t1, LOOSE_MAP_DELAY
+	lw t1, 0(t1)
+	sub t0, t0, t1
+
+	# if t0 < WAIT_LOOSE_MAP continue
+	li t1, WAIT_LOOSE_MAP
+	blt t0, t1, continue_enemy_wins_run_game_logic
+
+	# *GAME_STATE = GAME_STATE_START_MAP
+	la t0, GAME_STATE
+	li t1, GAME_STATE_START_MAP
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+	
+continue_enemy_wins_run_game_logic:
+	li a0, GAME_STATE_ENEMY_WINS
+	j ret_run_game_logic
+
+start_map_run_game_logic:
+	# initialize players
+	jal INIT_PLAYERS
+
+	# CURRENT_MAP = MAPS[MAP_NUM]
+	la t0, MAPS
+	la t1, MAP_NUM
+	lb t1, 0(t1)
+	li t2, MAP_SIZE
+	mul t1, t1, t2
+	add t0, t0, t1
+	la t1, CURRENT_MAP
+	sw t0, 0(t1)
+
+	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic

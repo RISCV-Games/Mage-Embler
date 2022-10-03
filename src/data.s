@@ -37,6 +37,7 @@ GAME_STATE: .byte GAME_STATE_INIT
 ENEMY_DELAY: .word 0
 PHASE_DELAY: .word 0
 WIN_MAP_DELAY: .word 0
+LOOSE_MAP_DELAY: .word 0
 
 KBD_INPUT: .byte 0
 .align 2
@@ -82,6 +83,9 @@ HIT_STRING: .string "HIT"
 MISS_STRING: .string "MISS"
 CRIT_STRING: .string "CRIT"
 DMG_STRING: .string "DMG"
+
+YOU_WIN_STRING: .string "YOU WIN!"
+YOU_LOOSE_STRING: .string "YOU LOOSE"
 
 WALKABLE_BLOCKS: .align 2
 .space TILES_PER_MAP
