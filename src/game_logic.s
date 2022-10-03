@@ -81,6 +81,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_VICTORY_MENU
 	beq t0, t1, victory_menu_run_game_logic
 
+	li t1, GAME_STATE_START_MENU
+	beq t0, t1, start_menu_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -115,12 +118,12 @@ init_run_game_logic:
 	la t0, DIALOGUE_STRING_NUM
 	sb zero, 0(t0)
 
-	# change state to GAME_STATE_DIALOGUE
+	# change state to GAME_STATE_START_MENU
 	la t0, GAME_STATE
-	li t1, GAME_STATE_DIALOGUE
+	li t1, GAME_STATE_START_MENU
 	sb t1, 0(t0)
 	
-	li a0, GAME_STATE_DIALOGUE
+	li a0, GAME_STATE_START_MENU
 	j ret_run_game_logic
 
 choose_ally_run_game_logic:
@@ -1077,4 +1080,33 @@ restart_victory_menu_run_game_logic:
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_INIT
+	j ret_run_game_logic
+
+start_menu_run_game_logic:
+	# Input
+	li a0, 2                     			  	 # Quantidade de opcoes
+	la a1, START_MENU_SELECTED_OPTION        # label que segura opcao selecionada
+	la a2, START_MENU_IS_SELECTED            # label que segura se foi selecionado ou nao
+	jal INPUT_MENU
+
+	# Some logic
+  la t0, START_MENU_IS_SELECTED
+  lb t1, 0(t0)
+  beq t1, zero, unselected_start_menu_run_game_logic
+
+	la t0, START_MENU_SELECTED_OPTION
+	lb t0, 0(t0)
+
+	j restart_start_menu_run_game_logic
+unselected_start_menu_run_game_logic:
+	li a0, GAME_STATE_START_MENU
+	j ret_run_game_logic
+
+restart_start_menu_run_game_logic:
+	# *GAME_STATE = GAME_STATE_DIALOGUE
+	la t0, GAME_STATE
+	li t1, GAME_STATE_DIALOGUE
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_DIALOGUE
 	j ret_run_game_logic
