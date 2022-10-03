@@ -81,14 +81,25 @@ ret_run_game_logic:
 	ret
 
 init_run_game_logic:
-	# initialize players
-	jal INIT_PLAYERS
 
-	# CURRENT_MAP = MAPS[0]
+	# Set MAP_NUM = 0
+	la t0, MAP_NUM
+	li t1, 1
+	sb t1, 0(t0)
+
+	# CURRENT_MAP = MAPS[MAP_NUM]
 	la t0, MAPS
+	la t1, MAP_NUM
+	lb t1, 0(t1)
+	li t2, MAP_SIZE
+	mul t1, t1, t2
+	add t0, t0, t1
 	la t1, CURRENT_MAP
 	sw t0, 0(t1)
 
+	# initialize players
+	jal INIT_PLAYERS
+	
 	# queue ally transition
 	li t0, 1
 	la t1, QUEUE_ALLY_TRANSITION

@@ -2,6 +2,9 @@
 .include "../src/macros.s"
 
 .text
+la t0, GAME_STATE
+sb zero, 0(t0)
+
 GAME:
 
 jal RUN_GAME_LOGIC
