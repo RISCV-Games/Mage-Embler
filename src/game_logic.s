@@ -75,6 +75,9 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_DIALOGUE
 	beq t0, t1, dialogue_run_game_logic
 
+	li t1, GAME_STATE_VICTORY_DIALOGUE
+	beq t0, t1, victory_dialogue_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -752,6 +755,16 @@ check_next_map_run_game_logic:
 	j ret_run_game_logic
 
 last_map_check_next_map_run_game_logic:
+	la t0, DIALOGUE_STRING_NUM
+	sb zero, 0(t0)
+
+	# *GAME_STATE = GAME_STATE_VICTORY_DIALOGUE
+	la t0, GAME_STATE
+	li t1, GAME_STATE_VICTORY_DIALOGUE
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_VICTORY_DIALOGUE
+	j ret_run_game_logic
 
 map_transition_run_game_logic:
 	# save current time
@@ -823,9 +836,9 @@ win_map_run_game_logic:
 
 	jal INIT_PLAYERS
 
-	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	# *GAME_STATE = GAME_STATE_DIALOGUE
 	la t0, GAME_STATE
-	li t1, GAME_STATE_CHOOSE_ALLY
+	li t1, GAME_STATE_DIALOGUE
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
@@ -932,6 +945,9 @@ dialogue_run_game_logic:
 	beq t0, t1, map4_dialogue_run_game_logic
 
 exit_dialogue_run_game_logic:
+	la t0, DIALOGUE_STRING_NUM
+	sb zero, 0(t0)
+
 	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
 	la t0, GAME_STATE
 	li t1, GAME_STATE_CHOOSE_ALLY
@@ -992,3 +1008,34 @@ map4_dialogue_run_game_logic:
 	lb t1, 0(t1)
 	bge t1, t0, exit_dialogue_run_game_logic
 	j input_dialogue_run_game_logic
+
+victory_dialogue_run_game_logic:
+	jal GET_KBD_INPUT
+	li t0, '\n'
+	beq a0, t0, next_victory_dialogue_run_game_logic
+
+	li a0, GAME_STATE_VICTORY_DIALOGUE
+	j ret_run_game_logic
+
+next_victory_dialogue_run_game_logic:
+	la t0, DIALOGUE_STRING_NUM
+	lb t1, 0(t0)
+	li t0, VICTORY_NSTRINGS
+	bge t0, t1, exit_victory_dialogue_run_game_logic
+
+	la t0, DIALOGUE_STRING_NUM
+	lb t1, 0(t0)
+	addi t1, t1, 1
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_VICTORY_DIALOGUE
+	j ret_run_game_logic
+
+exit_victory_dialogue_run_game_logic:
+	# *GAME_STATE = GAME_STATE_VICTORY_MENU
+	la t0, GAME_STATE
+	li t1, GAME_STATE_VICTORY_MENU
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_VICTORY_MENU
+	j ret_run_game_logic

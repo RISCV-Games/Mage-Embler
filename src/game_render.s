@@ -47,6 +47,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_DIALOGUE
 	beq a0, t0, dialogue_run_game_render
 
+	li t0, GAME_STATE_VICTORY_DIALOGUE
+	beq a0, t0, victory_dialogue_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -249,13 +252,13 @@ draw_dialogue_run_game_render:
 	add a0, a0, t1
 	lw a0, 0(a0)
 
-    li a1, 0x000009ff  # Cor das strings
-    li a2, 300          # Tamanho x do menu
-    li a3, 100          # Tamanho y do menu
-    li a4, MENU_BG_COLOR  # Cor de fundo do menu
-    li a5, 10         # Posicao x do menu
-    li a6, 20          # Posicao y do menu
-    jal DRAW_DIALOG
+	li a1, 0x000009ff  # Cor das strings
+	li a2, 300          # Tamanho x do menu
+	li a3, 100          # Tamanho y do menu
+	li a4, MENU_BG_COLOR  # Cor de fundo do menu
+	li a5, 10         # Posicao x do menu
+	li a6, 20          # Posicao y do menu
+	jal DRAW_DIALOG
 
 	jal SWAP_FRAMES
 	j ret_run_game_render
@@ -281,3 +284,6 @@ map3_dialogue_run_render_game:
 map4_dialogue_run_render_game:
 	la a0, map4_dialog
 	j draw_dialogue_run_game_render
+
+victory_dialogue_run_game_render:
+	#la t0, VICTO

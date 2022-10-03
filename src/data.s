@@ -262,6 +262,7 @@ map1_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
 map2_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
 map3_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
 map4_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
+victory_dialog: .word map0_string0, map0_string1, map0_string2, map0_string3
 
 .align 2
 # Images
