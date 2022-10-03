@@ -30,7 +30,7 @@ playAudio:
 	lw t0, 16(t0)
 
 	# return if not enought time passed
-	blt t1, t0, ret_playAudio
+	bltu t1, t0, ret_playAudio
 
 	# save ra
 	addi sp, sp, -4
