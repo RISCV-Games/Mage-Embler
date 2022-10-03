@@ -32,6 +32,9 @@ RUN_GAME_RENDER:
 	li t0, GAME_STATE_ENEMY_DELAY
 	beq a0, t0, enemy_delay_run_game_render
 
+	li t0, GAME_STATE_ALLY_PHASE_TRANSITION
+	beq a0, t0, ally_phase_transition_run_game_render
+
 ret_run_game_render:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -137,6 +140,13 @@ enemy_delay_run_game_render:
 	# draw cursor in attack mode
 	li a0, 1
 	jal DRAW_CURSOR
+
+	jal SWAP_FRAMES
+	j ret_run_game_render
+
+ally_phase_transition_run_game_render:
+	jal DRAW_MAP
+	jal DRAW_PLAYERS
 
 	jal SWAP_FRAMES
 	j ret_run_game_render

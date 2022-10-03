@@ -57,6 +57,12 @@ RUN_GAME_LOGIC:
 	li t1, GAME_STATE_MAP_TRANSITION
 	beq t0, t1, map_transition_run_game_logic
 
+	li t1, GAME_STATE_ALLY_PHASE_TRANSITION
+	beq t0, t1, ally_phase_transition_run_game_logic
+
+	li t1, GAME_STATE_WIN_MAP
+	beq t0, t1, win_map_run_game_logic
+
 ret_run_game_logic:
 	lw ra, 0(sp)
 	addi sp, sp, 4
@@ -368,9 +374,14 @@ check_turn_run_game_logic:
 	j ret_run_game_logic
 
 choose_ally_check_turn_run_game_logic:
-	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	# save current time
+	csrr t0, time
+	la t1, PHASE_DELAY
+	sw t0, 0(t1)
+
+	# *GAME_STATE = GAME_STATE_ALLY_PHASE_TRANSITION
 	la t0, GAME_STATE
-	li t1, GAME_STATE_CHOOSE_ALLY
+	li t1, GAME_STATE_ALLY_PHASE_TRANSITION
 	sb t1, 0(t0)
 
 	li a0, GAME_STATE_CHOOSE_ALLY
@@ -627,6 +638,41 @@ check_next_map_run_game_logic:
 
 	jal INIT_PLAYERS
 
+	# *GAME_STATE = GAME_STATE_MAP_TRANSITION
+	la t0, GAME_STATE
+	li t1, GAME_STATE_MAP_TRANSITION
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_MAP_TRANSITION
+	j ret_run_game_logic
+
+last_map_check_next_map_run_game_logic:
+
+map_transition_run_game_logic:
+	# save current time
+	csrr t0, time
+	la t1, WIN_MAP_DELAY
+	sw t0, 0(t1)
+
+	# *GAME_STATE = GAME_STATE_WIN_MAP
+	la t0, GAME_STATE
+	li t1, GAME_STATE_WIN_MAP
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_WIN_MAP
+	j ret_run_game_logic
+
+ally_phase_transition_run_game_logic:
+	# t0 = time passed
+	csrr t0, time
+	la t1, PHASE_DELAY
+	lw t1, 0(t1)
+	sub t0, t0, t1
+
+	# if t0 < WAIT_PHASE_TRANSITION continue
+	li t1, WAIT_PHASE_TRANSITION
+	blt t0, t1, continue_ally_phase_transition_run_game_logic
+
 	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
 	la t0, GAME_STATE
 	li t1, GAME_STATE_CHOOSE_ALLY
@@ -635,6 +681,29 @@ check_next_map_run_game_logic:
 	li a0, GAME_STATE_CHOOSE_ALLY
 	j ret_run_game_logic
 
-last_map_check_next_map_run_game_logic:
+continue_ally_phase_transition_run_game_logic:
+	li a0, GAME_STATE_ALLY_PHASE_TRANSITION
+	j ret_run_game_logic
 
-map_transition_run_game_logic:
+win_map_run_game_logic:
+	# t0 = time passed
+	csrr t0, time
+	la t1, WIN_MAP_DELAY
+	lw t1, 0(t1)
+	sub t0, t0, t1
+
+	# if t0 < WAIT_WIN_MAP continue
+	li t1, WAIT_WIN_MAP
+	blt t0, t1, continue_win_map_run_game_logic
+
+	# *GAME_STATE = GAME_STATE_CHOOSE_ALLY
+	la t0, GAME_STATE
+	li t1, GAME_STATE_CHOOSE_ALLY
+	sb t1, 0(t0)
+
+	li a0, GAME_STATE_CHOOSE_ALLY
+	j ret_run_game_logic
+
+continue_win_map_run_game_logic:
+	li a0, GAME_STATE_WIN_MAP
+	j ret_run_game_logic
