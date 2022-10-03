@@ -47,6 +47,10 @@
 	sb t1, PLAYER_B_HIT(t0)
 	li t1, %crit
 	sb t1, PLAYER_B_CRIT(t0)
+	li t1, 0
+	sb t1, PLAYER_B_MOVED(t0)
+	li t1, 0
+	sb t1, PLAYER_B_SPECIAL_TERRAIN(t0)
 
 	# increment N_PLAYERS
 	la t0, N_PLAYERS

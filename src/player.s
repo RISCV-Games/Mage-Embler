@@ -10,9 +10,14 @@
 ############################################################
 # Inicializa os players a partir do mapa.
 ############################################################
-# a0 = map number
-############################################################
 INIT_PLAYERS:
+	la a0, MAP_NUM
+	lb a0, 0(a0)
+
+	# sets N_PLAYERS to 0
+	la t0, N_PLAYERS
+	sb zero, 0(t0)
+
 	beq a0, zero, zero_init_players
 	li t0, 1
 	beq a0, t0, one_init_players
@@ -31,19 +36,34 @@ zero_init_players:
 
 	la s0, PLAYER_1
 
-	INIT_PLAYER( s0, 16,  6, IN_MAR , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 17,  7, IN_VER , 25, 25, 5 , 80 , 1 )
+	#INIT_PLAYER( s0, 16,  6, IN_MAR , 25, 25, 5 , 80 , 1 )
+	#INIT_PLAYER( s0, 17,  7, IN_VER , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 4 , 10, AL_AZUL, 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 5 ,  4, AL_VER , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0, 15,  7, AL_MAR , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 3 , 8 , IN_VER , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 16, 11, IN_AZUL, 25,  5, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 3 ,  8, IN_VER , 25,  3, 5 , 80 , 1 )
+	#INIT_PLAYER( s0, 16, 11, IN_AZUL, 25,  5, 5 , 80 , 1 )
 
 	lw s0, 0(sp)
 	addi sp, sp, 4
 	ret
 
 one_init_players:
+	addi sp, sp, -4
+	sw s0, 0(sp)
+
+	la s0, PLAYER_1
+
+	#INIT_PLAYER( s0, 16,  6, IN_MAR , 25, 25, 5 , 80 , 1 )
+	#INIT_PLAYER( s0, 17,  7, IN_VER , 25, 25, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 4 , 10, AL_AZUL, 25, 25, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 7 ,  4, AL_VER , 25, 25, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 15,  7, AL_MAR , 25, 25, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 3 ,  8, IN_VER , 25,  3, 5 , 80 , 1 )
+	#INIT_PLAYER( s0, 16, 11, IN_AZUL, 25,  5, 5 , 80 , 1 )
+
+	lw s0, 0(sp)
+	addi sp, sp, 4
 	ret
 
 two_init_players:

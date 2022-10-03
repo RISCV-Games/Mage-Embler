@@ -294,13 +294,24 @@ DRAW_MAP:
 	sw s1, 8(sp)
 	sw s2, 12(sp)
 
-	# a0 = MAPS[CURRENT_MAP]
+	# a0 = CURRENT_MAP
 	la a0, CURRENT_MAP
 	lw a0, 0(a0)
 
-	# TODO: fix hardcoded value in a1
-	la a1, CORRESPONDENCE_ARR_MAP0
+	# set a1 to correct correspondence array
+	la t0, MAP_NUM
+	lb t0, 0(t0)
+	beq t0, zero, arr0_draw_map
+	li t1, 1
+	beq t0, t1, arr1_draw_map
+	li t1, 2
+	beq t0, t1, arr2_draw_map
+	li t1, 3
+	beq t0, t1, arr3_draw_map
+	li t1, 4
+	beq t0, t1, arr4_draw_map
 
+setup_loop_draw_map:
 	# s0 = map, s1 = i = 0, s2 = correspondence list
 	mv s0, a0
 	li s1, 0
@@ -313,12 +324,12 @@ loop_draw_map:
 	# a1 = map[s1]
 	add a1, s0, s1
 	lb a1, 0(a1)
-	
+
 	# a2 = x, a3 = y
 	li t0, MAP_WIDTH
 	rem a2, s1, t0
 	div a3, s1, t0
-	
+
 	# a0 = map
 	mv a0, s2
 	jal DRAW_BLOCK
@@ -334,3 +345,23 @@ ret_draw_map:
 	lw s2, 12(sp)
 	addi sp, sp, 16
 	ret
+
+arr0_draw_map:
+	la a1, CORRESPONDENCE_ARR_MAP0
+	j setup_loop_draw_map
+
+arr1_draw_map:
+	la a1, CORRESPONDENCE_ARR_MAP1
+	j setup_loop_draw_map
+
+arr2_draw_map:
+	la a1, CORRESPONDENCE_ARR_MAP2
+	j setup_loop_draw_map
+
+arr3_draw_map:
+	la a1, CORRESPONDENCE_ARR_MAP3
+	j setup_loop_draw_map
+
+arr4_draw_map:
+	la a1, CORRESPONDENCE_ARR_MAP4
+	j setup_loop_draw_map
