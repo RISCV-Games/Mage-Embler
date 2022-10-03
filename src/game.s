@@ -9,6 +9,7 @@ GAME:
 
 jal RUN_GAME_LOGIC
 jal RUN_GAME_RENDER
+jal RUN_GAME_AUDIO
 
 j GAME
 
@@ -20,6 +21,8 @@ j GAME
 .include "../src/utils.s"
 .include "../src/menu.s"
 .include "../src/combat.s"
+.include "../src/audio.s"
 .include "../src/dialog.s"
 .include "../src/game_render.s"
 .include "../src/game_logic.s"
+.include "../src/game_audio.s"

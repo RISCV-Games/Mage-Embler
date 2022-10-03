@@ -1049,6 +1049,11 @@ exit_victory_dialogue_run_game_logic:
 	j ret_run_game_logic
 
 victory_menu_run_game_logic:
+	# AUDIO_STATE = AUDIO_STATE_WIN_MENU
+	la t0, AUDIO_STATE
+	li t1, AUDIO_STATE_WIN_MENU
+	sb t1, 0(t0)
+
 	# Input
 	li a0, 2                     			  	 # Quantidade de opcoes
 	la a1, WIN_MENU_SELECTED_OPTION        # label que segura opcao selecionada
@@ -1083,6 +1088,12 @@ restart_victory_menu_run_game_logic:
 	j ret_run_game_logic
 
 start_menu_run_game_logic:
+	# play menu song
+	la t0, AUDIO_STATE
+	li t1, AUDIO_STATE_START_MENU
+	sb t1, 0(t0)
+
+
 	# Input
 	li a0, 2                     			  	 # Quantidade de opcoes
 	la a1, START_MENU_SELECTED_OPTION        # label que segura opcao selecionada
