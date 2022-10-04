@@ -1039,11 +1039,6 @@ second_reduce_life_logic_combat:
     li t1, NUMBER_OF_STEPS_UNTIL_SECOND_LIFE
     beq t1, t0, calculate_dmg_second_logic_combat
 
-    # *AUDIO_STATE = AUDIO_STATE_COMBAT_SUBLIFE
-    la t0, AUDIO_STATE
-    li t1, AUDIO_STATE_COMBAT_SUBLIFE
-    sb t1, 0(t0)
-
     # Coloca a label dos dois playres como idle
     la t0, PLAYER_ATACKING
     sb zero, 0(t0)
@@ -1145,6 +1140,12 @@ sub_player_life_player_logic:
     addi t3, t3, -1
     sb t0, PLAYER_B_VIDA_ATUAL(t2)
     sb t3, 0(t1)
+
+    # *AUDIO_STATE = AUDIO_STATE_COMBAT_SUBLIFE
+    la t0, AUDIO_STATE
+    li t1, AUDIO_STATE_COMBAT_SUBLIFE
+    sb t1, 0(t0)
+
     j end_logic_combat
 
 sub_enemy_life_player_logic:
@@ -1160,6 +1161,13 @@ sub_enemy_life_player_logic:
     addi t3, t3, -1
     sb t0, PLAYER_B_VIDA_ATUAL(t2)
     sb t3, 0(t1)
+
+    # *AUDIO_STATE = AUDIO_STATE_COMBAT_SUBLIFE
+    la t0, AUDIO_STATE
+    li t1, AUDIO_STATE_COMBAT_SUBLIFE
+    sb t1, 0(t0)
+
+
     j end_logic_combat
 
 calculate_dmg_first_logic_combat:
