@@ -36,9 +36,9 @@ zero_init_players:
 
     la s0, PLAYER_1
 
-    INIT_PLAYER( s0, 4 , 10, AL_AZUL, 15, 15, 5 , 80 , 1 )
+    INIT_PLAYER( s0, 4 , 10, AL_AZUL, 15, 15, 5, 100 , 1 )
 
-    INIT_PLAYER( s0, 9,  10, IN_VER, 15, 1, 3 , 80 , 1 )
+    INIT_PLAYER( s0, 9,  10, IN_VER, 15, 1, 3 , 100 , 1 )
 
     lw s0, 0(sp)
     addi sp, sp, 4
