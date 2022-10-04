@@ -89,6 +89,11 @@ x_max_back_move_cursor:
 	bgt t2, t6, y_max_move_cursor
 y_max_back_move_cursor:
 
+	# *AUDIO_STATE = AUDIO_STATE_MOVE_CURSOR
+	la t5, AUDIO_STATE
+	li t6, AUDIO_STATE_MOVE_CURSOR
+	sb t6, 0(t5)
+
 	# (cursorX, cursorY) = (t1, t2)
 	sb t1, 0(t0)
 	sb t2, 1(t0)

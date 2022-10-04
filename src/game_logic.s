@@ -1134,6 +1134,10 @@ unselected_start_menu_run_game_logic:
 	j ret_run_game_logic
 
 restart_start_menu_run_game_logic:
+	# reset menu
+	la t0, START_MENU_IS_SELECTED
+	sb zero, 0(t0)
+
 	# *GAME_STATE = GAME_STATE_DIALOGUE
 	la t0, GAME_STATE
 	li t1, GAME_STATE_DIALOGUE
