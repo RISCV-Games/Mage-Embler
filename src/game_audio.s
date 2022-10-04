@@ -74,7 +74,7 @@ move_cursor_run_game_audio:
 	li a0, 25
 	li a1, 100
 	li a2, 0
-	li a3, SONG_VOLUME
+	li a3, EFFECT_VOLUME
 	jal MIDI_OUT
 
 	# *AUDIO_STATE = AUDIO_STATE_MAP
@@ -88,7 +88,7 @@ combat_sublife_run_game_audio:
 	li a0, 25
 	li a1, 100
 	li a2, 15
-	li a3, SONG_VOLUME
+	li a3, EFFECT_VOLUME
 	jal MIDI_OUT
 
 	# *AUDIO_STATE = AUDIO_STATE_COMBAT
