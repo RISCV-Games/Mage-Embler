@@ -307,6 +307,17 @@ map3_dialog: .word map3_01
 map4_dialog: .word map4_01
 victory_dialog: .word victory_string0, victory_string1, victory_string2, victory_string3
 
+STRING_AELTON: .string "Aelton"
+STRING_AQUILA: .string "Aquila"
+STRING_DUDU: .string "Dudu"
+STRING_RUAN: .string "Ruan"
+STRING_FELPS: .string "Felps"
+STRING_VICTOR: .string "Victor"
+STRING_ANA: .string "Ana"
+STRING_LUIZ: .string "Luiz"
+STRING_LAMAR: .string "Lamar"
+STRING_DUMMY: .string "Dummy"
+
 .align 2
 # Images
 .include "../sprites/walk/tiles.data"

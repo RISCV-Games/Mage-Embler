@@ -34,11 +34,14 @@ zero_init_players:
     addi sp, sp, -4
     sw s0, 0(sp)
 
-    la s0, PLAYER_1
+	la s0, STRING_AQUILA
+    INIT_PLAYER( s0, 4 , 10, AL_AZUL, 20, 20, 5, 70 , 1 )
+	
+    la s0, STRING_DUMMY
+    INIT_PLAYER( s0, 9,  10, IN_VER, 15, 15, 3 , 70 , 1 )
 
-    INIT_PLAYER( s0, 4 , 10, AL_AZUL, 15, 15, 5, 100 , 1 )
+	
 
-    INIT_PLAYER( s0, 9,  10, IN_VER, 15, 1, 3 , 100 , 1 )
 
     lw s0, 0(sp)
     addi sp, sp, 4
@@ -48,13 +51,16 @@ one_init_players:
     addi sp, sp, -4
     sw s0, 0(sp)
 
-    la s0, PLAYER_1
+    la s0, STRING_DUDU
 
-    INIT_PLAYER( s0, 0 ,  4, AL_VER , 25, 25, 5 , 80 , 1 )
-    INIT_PLAYER( s0, 0 ,  5, AL_AZUL, 25, 25, 5 , 80 , 1 )
-
-    INIT_PLAYER( s0, 19 ,  3, IN_VER , 25,  3, 5 , 80 , 1 )
-    INIT_PLAYER( s0, 19 ,  4, IN_MAR , 25,  3, 5 , 80 , 1 )
+	la s0, STRING_AELTON
+    INIT_PLAYER( s0, 0 ,  4, AL_VER , 10, 10, 3 , 80 , 1 )
+	la s0, STRING_AQUILA
+    INIT_PLAYER( s0, 0 ,  5, AL_AZUL, 10, 10, 3 , 80 , 1 )
+	la s0, STRING_ANA
+    INIT_PLAYER( s0, 19 ,  3, IN_VER , 9,  9, 2 , 80 , 1 )
+	la s0, STRING_LUIZ
+    INIT_PLAYER( s0, 19 ,  4, IN_MAR , 9,  9, 2, 80 , 1 )
 
     lw s0, 0(sp)
     addi sp, sp, 4
@@ -64,15 +70,19 @@ two_init_players:
 	addi sp, sp, -4
 	sw s0, 0(sp)
 
-	la s0, PLAYER_1
-	INIT_PLAYER( s0,  1, 13, AL_AZUL , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0,  0, 9, AL_MAR , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0,  11, 2, AL_VER , 25, 25, 5 , 80 , 1 )
+	la s0, STRING_AQUILA
+	INIT_PLAYER( s0,  1, 13, AL_AZUL , 11, 11, 5 , 80 , 1 )
+	la s0, STRING_DUDU
+	INIT_PLAYER( s0,  0, 9, AL_MAR , 11, 11, 5 , 80 , 1 )
+	la s0, STRING_AELTON
+	INIT_PLAYER( s0,  11, 2, AL_VER , 11, 11, 5 , 80 , 1 )
 	
-	
-	INIT_PLAYER( s0, 9,  13, IN_VER , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 8,  8, IN_MAR , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 19,  9, IN_AZUL , 25, 25, 5 , 80 , 1 )
+	la s0, STRING_ANA
+	INIT_PLAYER( s0, 9,  13, IN_VER , 11, 11, 5 , 80 , 1 )
+	la s0, STRING_LUIZ
+	INIT_PLAYER( s0, 8,  8, IN_MAR , 11, 11, 5 , 80 , 1 )
+	la s0, STRING_VICTOR
+	INIT_PLAYER( s0, 19,  9, IN_AZUL , 11, 11, 5 , 80 , 1 )
 	
 	lw s0, 0(sp)
 	addi sp, sp, 4
@@ -83,15 +93,22 @@ three_init_players:
 	sw s0, 0(sp)
 
 	la s0, PLAYER_1
-	INIT_PLAYER( s0, 6 ,  13, AL_AZUL , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 8,  13, AL_VER , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 10 ,  13, AL_MAR , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 11,  13, AL_VER , 25, 25, 5 , 80 , 1 )
+	INIT_PLAYER( s0, 6 ,  13, AL_AZUL , 15, 15, 5 , 80 , 1 )
+	la s0, STRING_AELTON
+	INIT_PLAYER( s0, 8,  13, AL_VER , 15, 15, 5 , 80 , 1 )
+	la s0, STRING_DUDU
+	INIT_PLAYER( s0, 10 ,  13, AL_MAR , 15, 15, 5 , 80 , 1 )
+	la s0, STRING_FELPS
+	INIT_PLAYER( s0, 11,  13, AL_VER , 15, 15, 5 , 80 , 1 )
 	
-	INIT_PLAYER( s0, 7,  5, IN_AZUL , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 2,  8, IN_MAR , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 12,  4, IN_AZUL , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0, 15,  9, IN_VER , 25, 25, 5 , 80 , 1 )
+	la s0, STRING_VICTOR
+	INIT_PLAYER( s0, 7,  5, IN_AZUL , 15, 15, 5 , 80 , 1 )
+	la s0, STRING_LUIZ
+	INIT_PLAYER( s0, 12,  4, IN_AZUL , 15, 15, 5 , 80 , 1 )
+	la s0, STRING_ANA
+	INIT_PLAYER( s0, 15,  9, IN_VER , 15, 15, 5 , 80 , 1 )
+	la s0, STRING_LUIZ
+	INIT_PLAYER( s0, 2,  8, IN_MAR , 15, 15, 5 , 80 , 1 )
 	
 	lw s0, 0(sp)
 	addi sp, sp, 4
@@ -104,16 +121,24 @@ four_init_players:
 	la s0, PLAYER_1
 	INIT_PLAYER( s0,  7, 14, AL_AZUL , 25, 25, 5 , 80 , 1 )
 	INIT_PLAYER( s0,  9, 14, AL_VER , 25, 25, 5 , 80 , 1 )
+	la s0, STRING_DUDU
 	INIT_PLAYER( s0,  10, 14, AL_MAR , 25, 25, 5 , 80 , 1 )
+	la s0, STRING_FELPS
 	INIT_PLAYER( s0,  11, 14, AL_VER , 25, 25, 5 , 80 , 1 )
+	la s0, STRING_RUAN
 	INIT_PLAYER( s0,  13, 14, AL_AZUL , 25, 25, 5 , 80 , 1 )
 	
-	INIT_PLAYER( s0,  16, 3, IN_AZUL , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0,  15, 3, IN_VER , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0,  12, 4, IN_MAR , 25, 25, 5 , 80 , 1 )
-	INIT_PLAYER( s0,  13, 4, IN_VER , 25, 25, 5 , 80 , 1 )
+	la s0, STRING_VICTOR
+	INIT_PLAYER( s0,  16, 3, IN_AZUL , 25, 25, 4 , 80 , 1 )
+	la s0, STRING_ANA
+	INIT_PLAYER( s0,  15, 3, IN_VER , 25, 25, 4 , 80 , 1 )
+	la s0, STRING_LUIZ
+	INIT_PLAYER( s0,  12, 4, IN_MAR , 25, 25, 4 , 80 , 1 )
+	la s0, STRING_ANA
+	INIT_PLAYER( s0,  13, 4, IN_VER , 25, 25, 4 , 80 , 1 )
 	
-	INIT_PLAYER( s0,  10, 5, IN_AZUL , 25, 25, 5 , 80 , 1 )
+	la s0, STRING_LAMAR
+	INIT_PLAYER( s0,  10, 5, IN_AZUL , 25, 25, 10 , 80 , 1 )
 	
 	lw s0, 0(sp)
 	addi sp, sp, 4

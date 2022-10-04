@@ -1192,12 +1192,14 @@ calculate_dmg_second_logic_combat:
 player_calculate_dmg_logic_combat:
     # Check if players hits
     la t0, PLAYERS_IN_COMBAT
-    lw t1, 0(t0)
-    lb t2, PLAYER_B_HIT(t1)
 
-    lb a0, PLAYER_B_TIPO(t1)
     lw t1, 4(t0)
     lb a1, PLAYER_B_TIPO(t1)
+
+    lw t1, 0(t0)
+    lb t2, PLAYER_B_HIT(t1)
+    lb a0, PLAYER_B_TIPO(t1)
+    
     jal CONFRONT_TYPE
 
     add t2, t2, a0 # Hit + type
@@ -1266,12 +1268,13 @@ player_miss_calculate_dmg_logic_combat:
 enemy_calculate_dmg_logic_combat:
     # Check if players hits
     la t0, PLAYERS_IN_COMBAT
-    lw t1, 4(t0)
-    lb t2, PLAYER_B_HIT(t1)
-    
-    lb a0, PLAYER_B_TIPO(t1)
+
     lw t1, 0(t0)
     lb a1, PLAYER_B_TIPO(t1)
+
+    lw t1, 4(t0)
+    lb t2, PLAYER_B_HIT(t1)
+    lb a0, PLAYER_B_TIPO(t1)
 
     jal CONFRONT_TYPE
 
