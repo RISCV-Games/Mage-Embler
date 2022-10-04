@@ -17,11 +17,11 @@ RUN_GAME_AUDIO:
 	li t1, AUDIO_STATE_WIN_MENU
 	beq t0, t1, win_menu_run_game_audio
 	
-	li t1, AUDIO_STATE_NOTHING
-	beq t0, t1, nothing_run_game_audio
+	li t1, AUDIO_STATE_MAP
+	beq t0, t1, map_run_game_audio
 
-	li t1, AUDIO_STATE_NOTHING
-	beq t0, t1, nothing_run_game_audio
+	li t1, AUDIO_STATE_COMBAT
+	beq t0, t1, combat_run_game_audio
 
 	li t1, AUDIO_STATE_NOTHING
 	beq t0, t1, nothing_run_game_audio
@@ -48,6 +48,22 @@ start_menu_run_game_audio:
 
 win_menu_run_game_audio:
 	la a0, WIN_MENU_SONG
+	li a1, WIN_MENU_INSTRUMENT
+	li a2, SONG_VOLUME
+	jal playAudio
+
+	j ret_run_game_audio
+
+map_run_game_audio:
+	la a0, MAP_SONG
+	li a1, WIN_MENU_INSTRUMENT
+	li a2, SONG_VOLUME
+	jal playAudio
+
+	j ret_run_game_audio
+
+combat_run_game_audio:
+	la a0, COMBAT_SONG
 	li a1, WIN_MENU_INSTRUMENT
 	li a2, SONG_VOLUME
 	jal playAudio

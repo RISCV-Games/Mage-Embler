@@ -421,6 +421,11 @@ x_choose_enemy_run_game_logic:
 	j ret_run_game_logic
 
 in_combat_run_game_logic:
+	# *AUDIO_STATE = AUDIO_STATE_COMBAT
+	la t0, AUDIO_STATE
+	li t1, AUDIO_STATE_COMBAT
+	sb t1, 0(t0)
+
 	# if combat ended go back to choose ally
 	la t0, IN_COMBAT
     lb t0, 0(t0)
@@ -442,6 +447,11 @@ end_combat_run_game_logic:
 	j ret_run_game_logic
 
 check_turn_run_game_logic:
+	# *AUDIO_STATE = AUDIO_STATE_MAP
+	la t0, AUDIO_STATE
+	li t1, AUDIO_STATE_MAP
+	sb t1, 0(t0)
+
 	# if every ally is dead set state to GAME_STATE_ENEMY_WINS
 	jal CHECK_ALIVE_ALLIES
 	beq a0, zero, allies_dead_check_turn_run_game_logic
@@ -883,6 +893,11 @@ start_map_run_game_logic:
 	# initialize players
 	jal INIT_PLAYERS
 
+	# *AUDIO_STATE = AUDIO_STATE_MAP
+	la t0, AUDIO_STATE
+	li t1, AUDIO_STATE_MAP
+	sb t1, 0(t0)
+
 	# CURRENT_MAP = MAPS[MAP_NUM]
 	la t0, MAPS
 	la t1, MAP_NUM
@@ -934,6 +949,11 @@ continue_enemy_phase_transition_run_game_logic:
 	j ret_run_game_logic
 
 dialogue_run_game_logic:
+	# AUDIO_STATE = AUDIO_STATE_MAP
+	la t0, AUDIO_STATE
+	li t1, AUDIO_STATE_MAP
+	sb t1, 0(t0)
+
 	la t0, MAP_NUM
 	lb t0, 0(t0)
 
@@ -1101,9 +1121,9 @@ start_menu_run_game_logic:
 	jal INPUT_MENU
 
 	# Some logic
-  la t0, START_MENU_IS_SELECTED
-  lb t1, 0(t0)
-  beq t1, zero, unselected_start_menu_run_game_logic
+	la t0, START_MENU_IS_SELECTED
+	lb t1, 0(t0)
+	beq t1, zero, unselected_start_menu_run_game_logic
 
 	la t0, START_MENU_SELECTED_OPTION
 	lb t0, 0(t0)
