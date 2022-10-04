@@ -26,8 +26,8 @@ RUN_GAME_AUDIO:
 	li t1, AUDIO_STATE_MOVE_CURSOR
 	beq t0, t1, move_cursor_run_game_audio
 
-	li t1, AUDIO_STATE_NOTHING
-	beq t0, t1, nothing_run_game_audio
+	li t1, AUDIO_STATE_COMBAT_SUBLIFE
+	beq t0, t1, combat_sublife_run_game_audio
 
 
 ret_run_game_audio:
@@ -74,6 +74,20 @@ move_cursor_run_game_audio:
 	li a0, 25
 	li a1, 100
 	li a2, 0
+	li a3, SONG_VOLUME
+	jal MIDI_OUT
+
+	# *AUDIO_STATE = AUDIO_STATE_NOTHING
+	la t0, AUDIO_STATE
+	li t1, AUDIO_STATE_NOTHING
+	sb t1, 0(t0)
+
+	j ret_run_game_audio
+
+combat_sublife_run_game_audio:
+	li a0, 25
+	li a1, 100
+	li a2, 15
 	li a3, SONG_VOLUME
 	jal MIDI_OUT
 
