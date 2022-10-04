@@ -76,7 +76,9 @@ MOVE_CURSOR:
 
 	# se cursor nao mexeu seta a0 = 0
 	add a0, a0, a1
+	bne a0, zero, play_audio_move_cursor
 
+back_move_cursor:
 	# t1 = min(CURSOR_MAX_X, t1), t1 = max(0, t1)
 	blt t1, zero, x_min_move_cursor
 	li t6, CURSOR_MAX_X
@@ -88,12 +90,6 @@ x_max_back_move_cursor:
 	li t6, CURSOR_MAX_Y
 	bgt t2, t6, y_max_move_cursor
 y_max_back_move_cursor:
-
-	# *AUDIO_STATE = AUDIO_STATE_MOVE_CURSOR
-	la t5, AUDIO_STATE
-	li t6, AUDIO_STATE_MOVE_CURSOR
-	sb t6, 0(t5)
-
 	# (cursorX, cursorY) = (t1, t2)
 	sb t1, 0(t0)
 	sb t2, 1(t0)
@@ -122,6 +118,14 @@ y_max_move_cursor:
 	mv t2, t6
 	mv a0, zero
 	j y_max_back_move_cursor
+
+play_audio_move_cursor:
+	# *AUDIO_STATE = AUDIO_STATE_MOVE_CURSOR
+	la t5, AUDIO_STATE
+	li t6, AUDIO_STATE_MOVE_CURSOR
+	sb t6, 0(t5)
+
+	j back_move_cursor
 
 #######################################################
 # Movimenta o cursor de acordo com a tecla pressionada
