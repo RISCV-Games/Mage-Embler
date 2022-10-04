@@ -112,12 +112,12 @@ GELO: .string "WATER"
 TERRA: .string "EARTH"
 
 HIT_STRING: .string "HIT"
-MISS_STRING: .string "MISS"
+MISS_STRING: .string "ERROU"
 CRIT_STRING: .string "CRIT"
 DMG_STRING: .string "DMG"
 
 YOU_WIN_STRING: .string "YOU WIN!"
-YOU_LOOSE_STRING: .string "YOU LOOSE"
+YOU_LOOSE_STRING: .string "YOU LOSE"
 ALLY_PHASE_STRING: .string "ALLY TURN"
 ENEMY_PHASE_STRING: .string "ENEMY TURN"
 

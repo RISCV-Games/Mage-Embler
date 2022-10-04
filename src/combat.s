@@ -657,8 +657,8 @@ hit_draw_combat:
 
 miss_draw_combat:
     la a0, MISS_STRING
-    li a1, DMG_STRING_POSITION_X
-    li a2, DMG_STRING_POSITION_Y
+    li a1, MISS_STRING_POSITION_X
+    li a2, MISS_STRING_POSITION_Y
 
     li a3, branco
     li t0, transp
@@ -927,6 +927,9 @@ magic_aliado_idle_logic_combat:
     li t0, IDLE_MAGIC_HEIGHT
     sb t0, PLAYER_B_MAGIA_SIZE_Y(t2)
 
+    lb t0, PLAYER_B_VIDA_ATUAL(t2)
+    beq t0, zero, finish_logic_combat
+
     j end_idle_atack_logic_combat
 
 
@@ -1018,6 +1021,9 @@ magic_inimigo_idle_logic_combat:
     sb t0, PLAYER_B_MAGIA_SIZE_X(t2)
     li t0, IDLE_MAGIC_HEIGHT
     sb t0, PLAYER_B_MAGIA_SIZE_Y(t2)
+
+    lb t0, PLAYER_B_VIDA_ATUAL(t2)
+    beq t0, zero, finish_logic_combat
 
     j end_idle_atack_logic_combat
 
@@ -1140,7 +1146,7 @@ sub_enemy_life_player_logic:
     la t1, PLAYERS_IN_COMBAT
     lw t2, 4(t1)
     lb t0, PLAYER_B_VIDA_ATUAL(t2)
-    beq t0, zero, finish_logic_combat
+    beq t0, zero, end_logic_combat
     la t1, COMBAT_DAMAGE
     lb t3, 0(t1)
     beq t3, zero, end_logic_combat
