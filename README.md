@@ -1,5 +1,5 @@
 # Projeto
-Projeto final de OAC
+Projeto final de OAC. O arquivo principal está em src/game.s. É recomendado executar o jogo utilizando o fpgrars ou a placa FPGA, preferencialmente utilizando o processador uniciclo. Movimente o jogador utilizando as teclas 'w', 'a', 's' e 'd' e clique enter para executar as ações. A tecla 'p' pode ser usada como cheat para passar de mapa na vez dos aliados.
 
 
 # TODO
@@ -26,8 +26,7 @@ V  - Victor
 - [X] Remover jogadores mortos
 - [X] Alternância de turnos
 - [X] Definicao de estética( Tiles, sprites de animacao )
-- [R] Historia
-- [ ] Adicionar .datas com músicas
-- [ ] Menu de início e fim do jogo
-- [ ] Dialogo final
-- [ ] Menu durante o jogo de restart e exit
+- [X] Historia
+- [X] Adicionar .datas com músicas
+- [X] Menu de início e fim do jogo
+- [X] Dialogo final
