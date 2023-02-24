@@ -3,7 +3,7 @@
 ## How to Run
 Clone te repo, download [FPGRARS](https://github.com/LeoRiether/FPGRARS) and run:
 ```sh
-fpgrars ./src/main.s
+fpgrars ./src/game.s
 ```
 ## Level 3
 ![](https://github.com/RISCV-Games/Mage-Embler/blob/main/readmeAssets/gif3.gif)
